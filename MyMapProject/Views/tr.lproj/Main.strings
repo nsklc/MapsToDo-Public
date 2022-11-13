@@ -1,0 +1,231 @@
+/* Class = "UIButton"; normalTitle = "SAVE"; ObjectID = "2B6-MV-z30"; */
+"2B6-MV-z30.normalTitle" = "KAYDET";
+
+/* Class = "UIButton"; normalTitle = " Field"; ObjectID = "2dU-ZU-IVh"; */
+"2dU-ZU-IVh.normalTitle" = " Arazi";
+
+/* Class = "UILabel"; text = "Places"; ObjectID = "2Ky-kJ-DNa"; */
+"2Ky-kJ-DNa.text" = "Yerler";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "3md-cz-icL"; */
+"3md-cz-icL.text" = "Etiket";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "6s9-J5-pMq"; */
+"6s9-J5-pMq.text" = "Ayrıntı";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "6ZY-al-dmo"; */
+"6ZY-al-dmo.text" = "Ayrıntı";
+
+/* Class = "UIBarButtonItem"; title = "Item"; ObjectID = "7Fk-lm-dAl"; */
+"7Fk-lm-dAl.title" = "Öğe";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "9EG-mW-hYG"; */
+"9EG-mW-hYG.text" = "Etiket";
+
+/* Class = "UILabel"; text = "Import/Export"; ObjectID = "9GE-X8-BmN"; */
+"9GE-X8-BmN.text" = "İçe/Dışa Aktar";
+
+/* Class = "UIButton"; normalTitle = "Terrain"; ObjectID = "40G-oZ-HU3"; */
+"40G-oZ-HU3.normalTitle" = "Arazi";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "99Z-IA-imY"; */
+"99Z-IA-imY.text" = "Etiket";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "Al4-sP-Poj"; */
+"Al4-sP-Poj.normalTitle" = "Düğme";
+
+/* Class = "UITextField"; placeholder = "Group Title"; ObjectID = "AYE-2D-Fg0"; */
+"AYE-2D-Fg0.placeholder" = "Grup İsmi";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "Ba6-ol-uFk"; */
+"Ba6-ol-uFk.text" = "Etiket";
+
+/* Class = "UIBarButtonItem"; title = "Item"; ObjectID = "bUp-IX-jbD"; */
+"bUp-IX-jbD.title" = "Öğe";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "c0v-7d-8Kk"; */
+"c0v-7d-8Kk.text" = "Etiket";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "c8a-yQ-ApU"; */
+"c8a-yQ-ApU.text" = "Etiket";
+
+/* Class = "UILabel"; text = "Settings"; ObjectID = "cbG-p6-Vwb"; */
+"cbG-p6-Vwb.text" = "Ayarlar";
+
+/* Class = "UIBarButtonItem"; title = "MinusButton"; ObjectID = "CBI-dz-Whl"; */
+"CBI-dz-Whl.title" = "MinusButton";
+
+/* Class = "UIButton"; normalTitle = " Place "; ObjectID = "D4J-ZX-LzO"; */
+"D4J-ZX-LzO.normalTitle" = " Yer ";
+
+/* Class = "UILabel"; text = "Status"; ObjectID = "DdT-Ob-TrW"; */
+"DdT-Ob-TrW.text" = "Durum";
+
+/* Class = "UIBarButtonItem"; title = "Item"; ObjectID = "Dus-pL-agS"; */
+"Dus-pL-agS.title" = "Öğe";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "dXn-ud-Zeu"; */
+"dXn-ud-Zeu.text" = "İsim";
+
+/* Class = "UILabel"; text = "Start Date"; ObjectID = "E7b-W2-V5l"; */
+"E7b-W2-V5l.text" = "Başlangıç Tarihi";
+
+/* Class = "UITableViewSection"; headerTitle = " "; ObjectID = "eAW-8J-uCk"; */
+"eAW-8J-uCk.headerTitle" = "";
+
+/* Class = "UILabel"; text = "Groups"; ObjectID = "Evq-XC-jIh"; */
+"Evq-XC-jIh.text" = "Gruplar";
+
+/* Class = "UILabel"; text = "Map"; ObjectID = "ewS-NN-nfh"; */
+"ewS-NN-nfh.text" = "Harita";
+
+/* Class = "UINavigationItem"; title = "Items"; ObjectID = "Fc1-AP-cqa"; */
+"Fc1-AP-cqa.title" = "Öğeler";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "fDY-n1-fc8"; */
+"fDY-n1-fc8.text" = "Etiket";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "Feh-rc-vfC"; */
+"Feh-rc-vfC.text" = "Etiket";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "FqP-fg-OeF"; */
+"FqP-fg-OeF.text" = "Etiket";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "geO-1U-75x"; */
+"geO-1U-75x.normalTitle" = "Düğme";
+
+/* Class = "UIButton"; normalTitle = " Line "; ObjectID = "gOD-EY-PSd"; */
+"gOD-EY-PSd.normalTitle" = " Çizgi ";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "HA1-bJ-0Z3"; */
+"HA1-bJ-0Z3.normalTitle" = "Düğme";
+
+/* Class = "UITextField"; text = "asdasd"; ObjectID = "Haq-83-0nn"; */
+"Haq-83-0nn.text" = "asdasd";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "Hb7-px-dAe"; */
+"Hb7-px-dAe.text" = "İsim";
+
+/* Class = "UIButton"; normalTitle = "Normal"; ObjectID = "hQp-OB-aVR"; */
+"hQp-OB-aVR.normalTitle" = "Normal";
+
+/* Class = "UIButton"; normalTitle = "Cancel"; ObjectID = "i2A-ew-iEk"; */
+"i2A-ew-iEk.normalTitle" = "İptal";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "IHI-eE-k5j"; */
+"IHI-eE-k5j.text" = "Etiket";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "IpA-Zh-qqf"; */
+"IpA-Zh-qqf.text" = "Etiket";
+
+/* Class = "UINavigationItem"; title = "Fields"; ObjectID = "Jdc-oy-Wst"; */
+"Jdc-oy-Wst.title" = "Araziler";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "JGT-TI-rMn"; */
+"JGT-TI-rMn.text" = "Etiket";
+
+/* Class = "UILabel"; text = "Detail"; ObjectID = "jwQ-GZ-NK8"; */
+"jwQ-GZ-NK8.text" = "Ayrıntı";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "kDP-ti-nQb"; */
+"kDP-ti-nQb.text" = "Etiket";
+
+/* Class = "UILabel"; text = "Fields"; ObjectID = "L2Q-lv-5TV"; */
+"L2Q-lv-5TV.text" = "Araziler";
+
+/* Class = "UILabel"; text = "Lines"; ObjectID = "L7S-JM-0eo"; */
+"L7S-JM-0eo.text" = "Çizgiler";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "lcD-d2-aiB"; */
+"lcD-d2-aiB.text" = "İsim";
+
+/* Class = "UIBarButtonItem"; title = "PlusButton"; ObjectID = "lep-In-KoY"; */
+"lep-In-KoY.title" = "PlusButton";
+
+/* Class = "UIBarButtonItem"; title = "Item"; ObjectID = "lgi-lg-Mks"; */
+"lgi-lg-Mks.title" = "Öğe";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "ljp-Qm-m84"; */
+"ljp-Qm-m84.text" = "İsim";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "Lmt-nF-XIn"; */
+"Lmt-nF-XIn.normalTitle" = "Düğme";
+
+/* Class = "UILabel"; text = "Title"; ObjectID = "LPI-af-5sM"; */
+"LPI-af-5sM.text" = "İsim";
+
+/* Class = "UIBarButtonItem"; title = "Item"; ObjectID = "lSL-EJ-JUA"; */
+"lSL-EJ-JUA.title" = "Öğe";
+
+/* Class = "UIBarButtonItem"; title = "Select All"; ObjectID = "MZQ-uK-JOU"; */
+"MZQ-uK-JOU.title" = "Tümünü Seç";
+
+/* Class = "UIButton"; normalTitle = "Custom"; ObjectID = "nB7-d1-Ouc"; */
+"nB7-d1-Ouc.normalTitle" = "Özel";
+
+/* Class = "UIBarButtonItem"; title = "Add"; ObjectID = "Oxn-qr-8UL"; */
+"Oxn-qr-8UL.title" = "Ekle";
+
+/* Class = "UIButton"; normalTitle = "Add"; ObjectID = "prp-2C-P5D"; */
+"prp-2C-P5D.normalTitle" = "Ekle";
+
+/* Class = "UIBarButtonItem"; title = "Share"; ObjectID = "pVK-R7-BgF"; */
+"pVK-R7-BgF.title" = "Paylaş";
+
+/* Class = "UIBarButtonItem"; title = "Item"; ObjectID = "r9L-Kj-zwk"; */
+"r9L-Kj-zwk.title" = "Öğe";
+
+/* Class = "UIBarButtonItem"; title = "trashItem"; ObjectID = "RDK-ya-JBf"; */
+"RDK-ya-JBf.title" = "trashItem";
+
+/* Class = "UIButton"; normalTitle = "Color"; ObjectID = "s45-48-cK3"; */
+"s45-48-cK3.normalTitle" = "Renk";
+
+/* Class = "UITextField"; placeholder = "Title"; ObjectID = "T1A-pv-wp7"; */
+"T1A-pv-wp7.placeholder" = "İsim";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "T2A-i8-WkY"; */
+"T2A-i8-WkY.text" = "Etiket";
+
+/* Class = "UILabel"; text = "End Date"; ObjectID = "tnQ-0f-LkM"; */
+"tnQ-0f-LkM.text" = "Bitiş Tarihi";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "U47-Wc-g3b"; */
+"U47-Wc-g3b.text" = "Etiket";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "UAy-o0-O78"; */
+"UAy-o0-O78.text" = "Etiket";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "uDa-qX-01X"; */
+"uDa-qX-01X.text" = "Etiket";
+
+/* Class = "UIBarButtonItem"; title = "Item"; ObjectID = "umQ-59-Sgb"; */
+"umQ-59-Sgb.title" = "Öğe";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "vFP-JM-kfL"; */
+"vFP-JM-kfL.text" = "Etiket";
+
+/* Class = "UINavigationItem"; title = "Title"; ObjectID = "w1Y-Ga-qIZ"; */
+"w1Y-Ga-qIZ.title" = "İsim";
+
+/* Class = "UIButton"; normalTitle = "Satellite "; ObjectID = "XfK-dt-ij1"; */
+"XfK-dt-ij1.normalTitle" = "Uydu";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "y7P-by-oV5"; */
+"y7P-by-oV5.normalTitle" = "Düğme";
+
+/* Class = "UIBarButtonItem"; title = "Restore"; ObjectID = "ydl-Tc-mfF"; */
+"ydl-Tc-mfF.title" = "Yinele";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "Z4n-z6-rPV"; */
+"Z4n-z6-rPV.normalTitle" = "Düğme";
+
+/* Class = "UILabel"; text = "Label"; ObjectID = "Z8h-kF-BdY"; */
+"Z8h-kF-BdY.text" = "Etiket";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "ZJz-A9-9v6"; */
+"ZJz-A9-9v6.normalTitle" = "Düğme";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "zQ1-qV-fbK"; */
+"zQ1-qV-fbK.normalTitle" = "Düğme";
+

@@ -1,0 +1,8 @@
+/* Bundle display name */
+"CFBundleDisplayName" = "Field Planner";
+/* Bundle name */
+"CFBundleName" = "MyMapProject";
+/* Privacy - Camera Usage Description */
+"NSCameraUsageDescription" = "Use for take field photos.";
+/* Privacy - Location When In Use Usage Description */
+"NSLocationWhenInUseUsageDescription" = "\"asd\"";

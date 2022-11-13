@@ -1,0 +1,591 @@
+/* No comment provided by engineer. */
+"\n\n• Cloud Storage - Save your measurements, to-do items and field photos to the cloud." = "\n\n• Bulut Depolama - Ölçümlerinizi, yapılacak işlerinizi ve arazi fotoğraflarınızı buluta kaydedin.";
+
+/* No comment provided by engineer. */
+"\n\n• Collaboration With Your Team - Import and export files without limits to collaborate with your team." = "\n\n• Ekibinizle Birlikte Çalışın - Ekibinizle birlikte çalışmak için sınırsız sayıda dosyayı içe ve dışa aktarın.";
+
+/* No comment provided by engineer. */
+"\n\n• Offline Support - If the device is offline, %@ Professional caches data that your app is actively using. When the device comes back online, %@ Professional synchronizes any local changes back to cloud." = "\n\n• Çevrim Dışı Desteği - Cihaz çevrim dışıysa %1$@ To Do Professional, uygulamanızın aktif olarak kullandığı verileri ön belleğe kaydeder. Cihaz tekrar çevrim içi olduğunda ise %2$@ Professional, yapılan tüm yerel değişiklikleri yeniden buluta yükler.";
+
+/* No comment provided by engineer. */
+"\n\n• Realtime Updates - %@ Professional uses data synchronization to update data with cloud services." = "\n\n • Gerçek Zamanlı Güncellemeler - %@ Professional, verileri bulut hizmetleriyle güncellemek için veri senkronizasyonu kullanır.";
+
+/* No comment provided by engineer. */
+"\n\n• Storage Limits - With %@ Professional, you will have 5 GB of cloud storage and you can save hundreds of overlays and photos." = "\n\n • Depolama Limitleri - %@ Professional ile 5 GB bulut depolama alanına sahip olur, yüzlerce ölçümünüzü ve fotoğraflarını kaydedebilirsiniz.";
+
+/* No comment provided by engineer. */
+"\n Area = " = "\n Alan = ";
+
+/* No comment provided by engineer. */
+"\n Circumference = " = "\n Çevre = ";
+
+/* No comment provided by engineer. */
+" Area = " = " Alan = ";
+
+/* No comment provided by engineer. */
+" Field cannot contain 2 or less corners." = " Arazide 2 veya daha az köşe bulunamaz.";
+
+/* No comment provided by engineer. */
+" Field: %@ " = " Arazi: %@";
+
+/* No comment provided by engineer. */
+" Lat:" = " Enlem:";
+
+/* No comment provided by engineer. */
+" Length = " = " Uzunluk = ";
+
+/* No comment provided by engineer. */
+" Line must contain 1 or more markers." = " Çizgide 1 veya daha fazla köşe olmalıdır.";
+
+/* No comment provided by engineer. */
+" Line: %@ " = " Çizgi: %@";
+
+/* No comment provided by engineer. */
+" Lon:" = " Boylam:";
+
+/* No comment provided by engineer. */
+" Password Changed" = " Şifre Değiştirildi";
+
+/* No comment provided by engineer. */
+" Place: %@" = " Yer: %@";
+
+/* No comment provided by engineer. */
+"%@" = "%@";
+
+/* No comment provided by engineer. */
+"%@ - Group Task" = "%@ - Grup İşi";
+
+/* No comment provided by engineer. */
+"%@ %@ / Month" = "%1$@ %2$@ / Aylık";
+
+/* No comment provided by engineer. */
+"%@ %@ / Year" = "%1$@ %2$@ / Yıllık";
+
+/* No comment provided by engineer. */
+"%@'s Items" = "%@ Öğeleri";
+
+/* No comment provided by engineer. */
+"%ld Field" = " %ld Arazi";
+
+/* No comment provided by engineer. */
+"%ld Fields" = " %ld Arazi";
+
+/* No comment provided by engineer. */
+"• Ad Free" = "• Reklamsız";
+
+/* No comment provided by engineer. */
+"a" = "a";
+
+/* No comment provided by engineer. */
+"A password reset email has been sent." = "Şifre sıfırlama için bir e-posta gönderildi.";
+
+/* No comment provided by engineer. */
+"A password reset email will be sent." = "Şifre sıfırlama için bir e-posta gönderilecek.";
+
+/* No comment provided by engineer. */
+"ac" = "ac";
+
+/* No comment provided by engineer. */
+"Add Field Item" = "Arazi Öğesi Ekle";
+
+/* No comment provided by engineer. */
+"Add Items as Individual Field Item" = "Tekil Arazi Öğesi olarak Ekle";
+
+/* No comment provided by engineer. */
+"Add Items as Shared Group Item" = "Paylaşımlı Grup Öğesi olarak Ekle";
+
+/* No comment provided by engineer. */
+"Add Line Item" = "Çizgi Öğesi Ekle";
+
+/* No comment provided by engineer. */
+"Add New Item" = "Yeni Öğe Ekle";
+
+/* No comment provided by engineer. */
+"Add Photo" = "Fotoğraf Ekle";
+
+/* No comment provided by engineer. */
+"Add Place Item" = "Yer Öğesi Ekle";
+
+/* No comment provided by engineer. */
+"All Fields" = "Tüm Araziler";
+
+/* No comment provided by engineer. */
+"All fields in this group will be deleted." = "Bu grupta yer alan tüm araziler silinecek.";
+
+/* No comment provided by engineer. */
+"All Groups" = "Tüm Gruplar";
+
+/* No comment provided by engineer. */
+"All Lines" = "Tüm Çizgiler";
+
+/* No comment provided by engineer. */
+"All Overlays" = "Tüm Ölçümler";
+
+/* No comment provided by engineer. */
+"All Places" = "Tüm Yerler";
+
+/* No comment provided by engineer. */
+"An email address must be provided." = "Bir e-posta adresi girilmelidir.";
+
+/* No comment provided by engineer. */
+"An password reset email sent." = "Şifre yenileme e-maili gönderildi.";
+
+/* No comment provided by engineer. */
+"An password reset email will be sent." = "Şifre yenileme e-maili gönderilecek.";
+
+/* No comment provided by engineer. */
+"Annually %@ %@" = "Yıllık %1$@ %2$@ ";
+
+/* No comment provided by engineer. */
+"Area" = "Alan";
+
+/* No comment provided by engineer. */
+"Area unit" = "Alan birimi";
+
+/* No comment provided by engineer. */
+"Auth info not found." = "Oturum açma bilgisi bulunamadı.";
+
+/* No comment provided by engineer. */
+"Battery saving mode" = "Pil tasarrufu modu";
+
+/* No comment provided by engineer. */
+"Bored with ads?" = "Reklamlardan sıkıldınız mı?";
+
+/* No comment provided by engineer. */
+"Cancel" = "İptal";
+
+/* No comment provided by engineer. */
+"Canceled" = "İptal Edildi";
+
+/* No comment provided by engineer. */
+"Change" = "Değiştir";
+
+/* No comment provided by engineer. */
+"Change %@'s Group" = "%@ adlı arazinin grubunu değiştir";
+
+/* No comment provided by engineer. */
+"Change %@'s Title" = "%@ adlı arazinin adını değiştir";
+
+/* No comment provided by engineer. */
+"Change Password" = "Şifreyi Değiştir";
+
+/* No comment provided by engineer. */
+"Circumference" = "Çevre";
+
+/* No comment provided by engineer. */
+"cm" = "cm";
+
+/* No comment provided by engineer. */
+"cmu{00B2}" = "cmu{00B2}";
+
+/* No comment provided by engineer. */
+"Color" = "Renk";
+
+/* No comment provided by engineer. */
+"Completed" = "Tamamlandı";
+
+/* No comment provided by engineer. */
+"Confirm Password" = "Şifreyi Doğrula";
+
+/* No comment provided by engineer. */
+"Create new item" = "Yeni öğe oluştur";
+
+/* No comment provided by engineer. */
+"Current Password" = "Mevcut Şifre";
+
+/* No comment provided by engineer. */
+"Current password was entered incorrectly." = "Mevcut şifre yanlış girildi.";
+
+/* No comment provided by engineer. */
+"Delete" = "Sil";
+
+/* No comment provided by engineer. */
+"Delete %@" = "%@ Sil";
+
+/* No comment provided by engineer. */
+"Delete group  %@ " = "%@ adlı grubu sil";
+
+/* No comment provided by engineer. */
+"Delete group and keep the fields." = "Grubu sil ve arazileri tut.";
+
+/* No comment provided by engineer. */
+"Delete Item" = "Öğeyi Sil";
+
+/* No comment provided by engineer. */
+"Delete this image" = "Bu görüntüyü sil";
+
+/* No comment provided by engineer. */
+"Delete%@" = "Sil %@";
+
+/* No comment provided by engineer. */
+"Display Name" = "Görünen İsim";
+
+/* No comment provided by engineer. */
+"Distance unit between corners" = "Köşeler arasındaki mesafe";
+
+/* No comment provided by engineer. */
+"Do you want to import file or export file?" = "Dosyayı içe aktarmak mı, yoksa dışa aktarmak mı istiyorsunuz?";
+
+/* No comment provided by engineer. */
+"Done" = "Bitti";
+
+/* No comment provided by engineer. */
+"E-Mail" = "E-posta";
+
+/* No comment provided by engineer. */
+"Edit field overlay" = "Arazi ölçümünü düzenle";
+
+/* No comment provided by engineer. */
+"Edit items" = "Öğeleri düzenle";
+
+/* No comment provided by engineer. */
+"Edit line overlay" = "Çizgi ölçümünü düzenle";
+
+/* No comment provided by engineer. */
+"Edit place overlay" = "Yer ölçümü düzenle";
+
+/* No comment provided by engineer. */
+"Email" = "E-posta";
+
+/* No comment provided by engineer. */
+"Email address is badly formatted." = "E-posta adresinin formatı yanlış.";
+
+/* No comment provided by engineer. */
+"Email Sent" = "E-posta Gönderildi";
+
+/* No comment provided by engineer. */
+"Enter a display name." = "Görünecek olan ismi girin.";
+
+/* No comment provided by engineer. */
+"Enter Coordinates" = "Koordinatları Girin";
+
+/* No comment provided by engineer. */
+"Enter Email" = "E-posta Girin";
+
+/* No comment provided by engineer. */
+"Enter Length" = "Uzunluk Girin";
+
+/* No comment provided by engineer. */
+"Enter Password" = "Şifre Girin";
+
+/* No comment provided by engineer. */
+"Error saving context, " = "Error saving context, ";
+
+/* No comment provided by engineer. */
+"Export" = "Dışa Aktar";
+
+/* No comment provided by engineer. */
+"Export File" = "Dışa Aktar";
+
+/* No comment provided by engineer. */
+"Exporting file task is completed. Now you can share the file." = "Dosyayı dışa aktarma işlemi tamamlandı. Şimdi dosyayı paylaşabilirsiniz.";
+
+/* No comment provided by engineer. */
+"Field needs a title." = "Arazinin bir ismi olmalıdır.";
+
+/* No comment provided by engineer. */
+"Field's overlay, to-do items and photos will be deleted." = "Arazinin ölçümü, yapılacak işleri ve fotoğrafları silinecek.";
+
+/* No comment provided by engineer. */
+"Fields cannot have the same title." = "Arazilerin isimleri aynı olamaz.";
+
+/* No comment provided by engineer. */
+"For  %@" = "%@ için";
+
+/* No comment provided by engineer. */
+"For %@" = "%@ için";
+
+/* No comment provided by engineer. */
+"Forgot password?" = "Şifrenizi mi unuttunuz?";
+
+/* No comment provided by engineer. */
+"ft" = "ft";
+
+/* No comment provided by engineer. */
+"ftu{00B2}" = "ftu{00B2}";
+
+/* No comment provided by engineer. */
+"Get Maps To Do Pro account, get rid of ads and limitations." = "Maps To Do Pro hesabı alın, reklamlardan ve limitlerden kurulun.";
+
+/* No comment provided by engineer. */
+"Group" = "Grup";
+
+/* No comment provided by engineer. */
+"Group Color" = "Grup Rengi";
+
+/* No comment provided by engineer. */
+"Groupless Group" = "Grupsuz Grup";
+
+/* No comment provided by engineer. */
+"Groups" = "Gruplar";
+
+/* No comment provided by engineer. */
+"ha" = "ha";
+
+/* No comment provided by engineer. */
+"If this is your first login, you will be registered automatically." = "Eğer ilk kez oturum açıyorsanız kaydınız otomatik olarak gerçekleşecektir.";
+
+/* No comment provided by engineer. */
+"If you select 'send email', a password forgot mail will be sent" = "'E-Mail Gönder' butonuna basarsanız, şifremi unuttum maili gönderilecek.";
+
+/* No comment provided by engineer. */
+"Imperial" = "Emperyal";
+
+/* No comment provided by engineer. */
+"Import" = "İçe Aktar";
+
+/* No comment provided by engineer. */
+"Import File" = "Dosyayı İçe Aktar";
+
+/* No comment provided by engineer. */
+"Import/Export File" = "Dosyayı İçe Aktar/Dışa Aktar";
+
+/* No comment provided by engineer. */
+"Importing file task is completed." = "Dosyayı içe aktarma işlemi tamamlandı.";
+
+/* No comment provided by engineer. */
+"in" = "in";
+
+/* No comment provided by engineer. */
+"In Progress" = "Devam Ediyor";
+
+/* No comment provided by engineer. */
+"inu{00B2}" = "inu{00B2}";
+
+/* No comment provided by engineer. */
+"Item needs a title." = "Öğenin bir ismi olmalıdır.";
+
+/* No comment provided by engineer. */
+"Item will be deleted." = "Öğe silinecek.";
+
+/* No comment provided by engineer. */
+"km" = "km";
+
+/* No comment provided by engineer. */
+"kmu{00B2}" = "kmu{00B2}";
+
+/* No comment provided by engineer. */
+"Labels" = "Etiketler";
+
+/* No comment provided by engineer. */
+"Landmarks" = "Yer İşaretleri";
+
+/* No comment provided by engineer. */
+"Language" = "Dil";
+
+/* No comment provided by engineer. */
+"Lat" = "Enlem";
+
+/* No comment provided by engineer. */
+"Latitude" = "Enlem";
+
+/* No comment provided by engineer. */
+"Length" = "Uzunluk";
+
+/* No comment provided by engineer. */
+"Line's overlay, to-do items and photos items will be deleted." = "Çizginin ölçümü, yapılacak işleri ve fotoğrafları silinecek";
+
+/* No comment provided by engineer. */
+"Line's overlay, to-do items and photos will be deleted." = "Çizginin ölçümü, yapılacak işleri ve fotoğrafları silinecek.";
+
+/* No comment provided by engineer. */
+"Lines" = "Çizgiler";
+
+/* No comment provided by engineer. */
+"Location" = "Konum";
+
+/* No comment provided by engineer. */
+"Log in" = "Oturum aç";
+
+/* No comment provided by engineer. */
+"Lon" = "Boylam";
+
+/* No comment provided by engineer. */
+"Longitude" = "Boylam";
+
+/* No comment provided by engineer. */
+"Low data mode" = "Düşük veri modu";
+
+/* No comment provided by engineer. */
+"m" = "m";
+
+/* No comment provided by engineer. */
+"Measurement units" = "Ölçü birimleri";
+
+/* No comment provided by engineer. */
+"Metric" = "Metrik";
+
+/* No comment provided by engineer. */
+"mi" = "mi";
+
+/* No comment provided by engineer. */
+"miu{00B2}" = "miu{00B2}";
+
+/* No comment provided by engineer. */
+"Monthly %@ %@" = "Aylık %1$@ %2$@";
+
+/* No comment provided by engineer. */
+"mu{00B2}" = "mu{00B2}";
+
+/* No comment provided by engineer. */
+"Navigation controller does not exist." = "Navigation controller does not exist.";
+
+/* No comment provided by engineer. */
+"New Group Title" = "Yeni Grup İsmi";
+
+/* No comment provided by engineer. */
+"New Password" = "Yeni Şifre";
+
+/* No comment provided by engineer. */
+"New pasword and confirm password must to be same." = "Yeni şifre ve onay şifre aynı olmalıdır.";
+
+/* No comment provided by engineer. */
+"New Title" = "Yeni İsim";
+
+/* No comment provided by engineer. */
+"No Items Added" = "Hiçbir Öğe Eklenmedi";
+
+/* No comment provided by engineer. */
+"Notes" = "Notlar";
+
+/* No comment provided by engineer. */
+"OK" = "Tamam";
+
+/* No comment provided by engineer. */
+"Oops!" = "Tüh!";
+
+/* No comment provided by engineer. */
+"Open info page" = "Bilgi sayfasını aç";
+
+/* No comment provided by engineer. */
+"Password" = "Şifre";
+
+/* No comment provided by engineer. */
+"Password Changed" = "Şifre Değiştirildi";
+
+/* No comment provided by engineer. */
+"Password must contain 6 or more characters." = "Şifre en az 6 veya daha fazla karakter içermelidir.";
+
+/* No comment provided by engineer. */
+"Place's overlay and to-do items will be deleted." = "Yerin ölçümü ve yapılacak işleri silinecek.";
+
+/* No comment provided by engineer. */
+"Place's overlay, to-do items and photos will be deleted." = "Yerin ölçümü, yapılacak işleri ve fotoğrafları silinecek.";
+
+/* No comment provided by engineer. */
+"Places" = "Yerler";
+
+/* No comment provided by engineer. */
+"Please select 2 points on the map." = " Lütfen haritadan 2 nokta seçin.";
+
+/* No comment provided by engineer. */
+"Please select 3 points on the map." = " Lütfen haritadan 3 nokta seçin.";
+
+/* No comment provided by engineer. */
+"Please select place's point on the map." = " Lütfen haritadan yerin noktasını seçin.";
+
+/* No comment provided by engineer. */
+"Render with geodesic correction" = "Jeodezik düzeltme kullan";
+
+/* No comment provided by engineer. */
+"Restore Subscription" = "Üyeliği Yinele";
+
+/* No comment provided by engineer. */
+"Roads" = "Yollar";
+
+/* No comment provided by engineer. */
+"Send Email" = "E-posta Gönder";
+
+/* No comment provided by engineer. */
+"Settings" = "Ayarlar";
+
+/* No comment provided by engineer. */
+"Share" = "Paylaş";
+
+/* No comment provided by engineer. */
+"Show all calculated units" = "Hesaplanan tüm birimleri göster";
+
+/* No comment provided by engineer. */
+"Show distance between corners" = "Köşeler arasındaki mesafeyi göster";
+
+/* No comment provided by engineer. */
+"Sign in with Email" = "E-posta ile oturum aç";
+
+/* No comment provided by engineer. */
+"Sign in with Google" = "Google ile oturum aç";
+
+/* No comment provided by engineer. */
+"Sign Out" = "Çıkış";
+
+/* No comment provided by engineer. */
+"Submit" = "Gönder";
+
+/* No comment provided by engineer. */
+"Subscribe" = "Abone Ol";
+
+/* No comment provided by engineer. */
+"The password must be 6 characters long or more." = "Şifre en az 6 karakter veya daha uzun olmalıdır.";
+
+/* No comment provided by engineer. */
+"The selected point will be kept fixed and the edge will be extended" = "Seçilen nokta sabit kalacak ve kenar genişletilecek.";
+
+/* No comment provided by engineer. */
+"The selected point will stay fixed and the edge will be extended." = "Seçilen nokta sabit kalacak ve kenar genişletilecek.";
+
+/* No comment provided by engineer. */
+"Title" = "İsim";
+
+/* No comment provided by engineer. */
+"Waiting To Run" = "Bekliyor";
+
+/* No comment provided by engineer. */
+"Which type of file do you want to export? For better results choose GeoJSON file type." = "Dışa aktarmak istediğiniz dosyanın türü nedir? Daha iyi sonuçlar almak için GeoJSON dosya türünü seçin.";
+
+/* No comment provided by engineer. */
+"Which type of file do you want to import? For better results choose GeoJSON file type." = "İçe aktarmak istediğiniz dosyanın türü nedir? Daha iyi sonuçlar almak için GeoJSON dosya türünü seçin.";
+
+/* No comment provided by engineer. */
+"Wrong password. Try again or click 'Forgot password' to get an email to reset your password." = "Şifre yanlış. Şifreyi tekrar girin veya “Şifremi unuttum” seçeneğine basarak şifre sıfırlama e-postası alın.";
+
+/* No comment provided by engineer. */
+"yd" = "yd";
+
+/* No comment provided by engineer. */
+"ydu{00B2}" = "ydu{00B2}";
+
+/* No comment provided by engineer. */
+"You can save %@% by subscribing annually." = "Yıllık abone olarak %1$@%2$ b oranında tasarruf sağlayabilirsiniz.";
+
+/* No comment provided by engineer. */
+"You can save %% %@ by subscribing annually." = "Yıllık abonelik olarak %% %@ tasarruf edebilirsiniz.";
+
+/* No comment provided by engineer. */
+"You can save %% %@ by subscribing annually. \n\nTerms of Use and Privacy Policy" = "Yıllık abonelikte %% %@ tasarruf edebilirsiniz.         \n\nKullanım Koşulları ve Gizlilik Politikası";
+
+/* No comment provided by engineer. */
+"You can save up to %@%% by subscribing annually. \n\nTerms of Use and Privacy Policy" = "Yıllık abone olarak %%%@ tasarruf edebilirsiniz.\n\nKullanım Koşulları ve Gizlilik Politikası";
+
+/* No comment provided by engineer. */
+"You have reached to free account field adding limit.To subscribe and get rid of this error, press OK." = "Ücretsiz hesap arazi ekleme limitine ulaştınız. Abone olmak ve bu hatadan kurtulmak için Tamam'a basın.";
+
+/* No comment provided by engineer. */
+"You have reached to free account item adding limit.To subscribe and get rid of this error, press OK." = "Ücretsiz hesap öne ekleme limitine ulaştınız. Abone olmak ve bu hatadan kurtulmak için Tamam'a basın.";
+
+/* No comment provided by engineer. */
+"You have reached to free account line adding limit.To subscribe and get rid of this error, press OK." = "Ücretsiz hesap çizgi ekleme limitine ulaştınız. Abone olmak ve bu hatadan kurtulmak için Tamam'a basın.";
+
+/* No comment provided by engineer. */
+"You have reached to free account photo limit.To subscribe and get rid of this error, press OK." = "Ücretsiz fotoğraf ekleme limitine ulaştınız. Abone olmak ve bu hatadan kurtulmak için Tamam'a basın.";
+
+/* No comment provided by engineer. */
+"You have reached to free account place adding limit.To subscribe and get rid of this error, press OK." = "Ücretsiz hesap yer işaretleme limitine ulaştınız. Abone olmak ve bu hatadan kurtulmak için Tamam'a basın.";
+
+/* No comment provided by engineer. */
+"You must enter an email address and password." = "Bir e-posta adresi ve şifre girmelisiniz.";
+
+/* No comment provided by engineer. */
+"You must enter an email address." = "Bir e-posta adresi girmelisiniz.";
+
+/* No comment provided by engineer. */
+"You need to select a corner and then tap the “x” button." = "Bir köşeyi seçmeniz ve ardından çarpı düğmesine basmanız gerekir.";
+

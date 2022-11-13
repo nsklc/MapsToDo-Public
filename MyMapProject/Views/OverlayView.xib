@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="OverlayView" customModule="MyMapProject" customModuleProvider="target">
+            <connections>
+                <outlet property="labelsHorizontalSlider" destination="ee2-US-f6v" id="gzD-P6-JZ9"/>
+                <outlet property="labelsLabel" destination="4Ay-aM-RqH" id="rBt-Pb-YuB"/>
+                <outlet property="landmarksHorizontalSliders" destination="OM0-kW-0MV" id="A6y-DT-GVy"/>
+                <outlet property="landmarksLabel" destination="fYJ-p8-TBG" id="gLF-94-lz7"/>
+                <outlet property="roadsHorizontalSlider" destination="ted-Z9-fo6" id="Zhn-1H-GAR"/>
+                <outlet property="roadsLabel" destination="akU-AD-Src" id="nam-9r-xiG"/>
+                <outlet property="slideIdicator" destination="tkl-Fh-W1k" id="zaa-UC-rX8"/>
+                <outlet property="slidersStackView" destination="bja-qP-SED" id="aOz-7p-Bqp"/>
+                <outlet property="styleButtonsStackView" destination="RIF-Kh-Ytj" id="E4I-xM-pdR"/>
+                <outlet property="view" destination="iN0-l3-epB" id="pfa-2I-J1c"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view contentMode="scaleToFill" id="iN0-l3-epB">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="490"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tkl-Fh-W1k">
+                    <rect key="frame" x="177" y="10" width="60" height="6"/>
+                    <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="6" id="G9f-sk-V8w"/>
+                        <constraint firstAttribute="width" constant="60" id="Hbw-bK-Thr"/>
+                    </constraints>
+                </view>
+                <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" distribution="fillEqually" translatesAutoresizingMaskIntoConstraints="NO" id="bja-qP-SED">
+                    <rect key="frame" x="20" y="44" width="1836" height="100"/>
+                    <subviews>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="YqG-Wc-KTP">
+                            <rect key="frame" x="0.0" y="0.0" width="918" height="100"/>
+                            <subviews>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="akU-AD-Src">
+                                    <rect key="frame" x="0.0" y="0.0" width="918" height="30"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                    <nil key="textColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="fYJ-p8-TBG">
+                                    <rect key="frame" x="0.0" y="35" width="918" height="30"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                    <nil key="textColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4Ay-aM-RqH">
+                                    <rect key="frame" x="0.0" y="70" width="918" height="30"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                    <nil key="textColor"/>
+                                    <nil key="highlightedColor"/>
+                                </label>
+                            </subviews>
+                        </stackView>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="ou2-Ee-Qw2">
+                            <rect key="frame" x="918" y="0.0" width="918" height="100"/>
+                            <subviews>
+                                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="ted-Z9-fo6">
+                                    <rect key="frame" x="-2" y="0.0" width="922" height="31"/>
+                                    <connections>
+                                        <action selector="sliderValueChanged:" destination="-1" eventType="valueChanged" id="aW9-A2-od9"/>
+                                    </connections>
+                                </slider>
+                                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="OM0-kW-0MV">
+                                    <rect key="frame" x="-2" y="35" width="922" height="31"/>
+                                    <connections>
+                                        <action selector="sliderValueChanged:" destination="-1" eventType="valueChanged" id="R6K-73-0aW"/>
+                                    </connections>
+                                </slider>
+                                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="ee2-US-f6v">
+                                    <rect key="frame" x="-2" y="70" width="922" height="31"/>
+                                    <connections>
+                                        <action selector="sliderValueChanged:" destination="-1" eventType="valueChanged" id="FgK-FQ-jra"/>
+                                    </connections>
+                                </slider>
+                            </subviews>
+                        </stackView>
+                    </subviews>
+                </stackView>
+                <stackView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" distribution="fillEqually" spacing="15" translatesAutoresizingMaskIntoConstraints="NO" id="RIF-Kh-Ytj">
+                    <rect key="frame" x="42" y="217" width="300" height="150"/>
+                    <subviews>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="cKH-7X-x93">
+                            <rect key="frame" x="0.0" y="0.0" width="90" height="150"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xZs-HR-9Sv">
+                                    <rect key="frame" x="0.0" y="0.0" width="90" height="70"/>
+                                    <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="20"/>
+                                    <state key="normal" title="Standard" backgroundImage="standartMap">
+                                        <color key="titleColor" systemColor="labelColor"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="standardButtonTapped:" destination="-1" eventType="touchUpInside" id="b6J-GP-OsR"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3PW-MK-rcG">
+                                    <rect key="frame" x="0.0" y="80" width="90" height="70"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                    <state key="normal" title="Night" backgroundImage="nightMap"/>
+                                    <connections>
+                                        <action selector="nightButtonTapped:" destination="-1" eventType="touchUpInside" id="CUb-UX-t1t"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                        </stackView>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="c9Q-DC-u8w">
+                            <rect key="frame" x="105" y="0.0" width="90" height="150"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wtA-58-v15">
+                                    <rect key="frame" x="0.0" y="0.0" width="90" height="70"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                    <state key="normal" title="Dark" backgroundImage="darkMap"/>
+                                    <connections>
+                                        <action selector="darkButtonTapped:" destination="-1" eventType="touchUpInside" id="rje-fw-Bht"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hP3-8M-flQ">
+                                    <rect key="frame" x="0.0" y="80" width="90" height="70"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                    <color key="tintColor" systemColor="labelColor"/>
+                                    <state key="normal" title="Silver" backgroundImage="silverMap">
+                                        <color key="titleColor" systemColor="labelColor"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="silverButtonTapped:" destination="-1" eventType="touchUpInside" id="4r3-K2-O9f"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                        </stackView>
+                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="E6o-oJ-dYQ">
+                            <rect key="frame" x="210" y="0.0" width="90" height="150"/>
+                            <subviews>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="5FC-Lg-bov">
+                                    <rect key="frame" x="0.0" y="0.0" width="90" height="70"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                    <state key="normal" title="Retro" backgroundImage="retroMap">
+                                        <color key="titleColor" systemColor="labelColor"/>
+                                    </state>
+                                    <connections>
+                                        <action selector="retroButtonTapped:" destination="-1" eventType="touchUpInside" id="uDP-iG-pjN"/>
+                                    </connections>
+                                </button>
+                                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="jbb-r7-4W3">
+                                    <rect key="frame" x="0.0" y="80" width="90" height="70"/>
+                                    <fontDescription key="fontDescription" type="system" pointSize="20"/>
+                                    <state key="normal" title="Aubergine" backgroundImage="aubergineMap"/>
+                                    <connections>
+                                        <action selector="aubergineButtonTapped:" destination="-1" eventType="touchUpInside" id="N0L-0j-BO9"/>
+                                    </connections>
+                                </button>
+                            </subviews>
+                        </stackView>
+                    </subviews>
+                </stackView>
+            </subviews>
+            <viewLayoutGuide key="safeArea" id="vUN-kp-3ea"/>
+            <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+            <constraints>
+                <constraint firstItem="tkl-Fh-W1k" firstAttribute="centerX" secondItem="iN0-l3-epB" secondAttribute="centerX" id="LNx-DM-7SD"/>
+                <constraint firstItem="tkl-Fh-W1k" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="10" id="Ncj-Ka-5N8"/>
+            </constraints>
+            <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
+            <point key="canvasLocation" x="133.33333333333334" y="241.74107142857142"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="aubergineMap" width="70" height="70"/>
+        <image name="darkMap" width="70" height="70"/>
+        <image name="nightMap" width="70" height="70"/>
+        <image name="retroMap" width="70" height="70"/>
+        <image name="silverMap" width="70" height="70"/>
+        <image name="standartMap" width="70" height="70"/>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

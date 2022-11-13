@@ -1,0 +1,10 @@
+/* Bundle display name */
+"CFBundleDisplayName" = "Maps To Do";
+/* Bundle name */
+"CFBundleName" = "MyMapProject";
+"GeoJson File" = "GeoJson File";
+"Kml File" = "Kml File";
+/* Privacy - Camera Usage Description */
+"NSCameraUsageDescription" = "Used for taking field photos.";
+/* Privacy - Location When In Use Usage Description */
+"NSLocationWhenInUseUsageDescription" = "Used for simplify the find your map overlays.";

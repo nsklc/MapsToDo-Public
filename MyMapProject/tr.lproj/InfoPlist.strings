@@ -1,0 +1,21 @@
+/* Bundle display name */
+"CFBundleDisplayName" = "Maps To Do";
+
+/* Bundle name */
+"CFBundleName" = "MyMapProject";
+
+/* (No Comment) */
+"GeoJson File" = "GeoJson Dosyası";
+
+/* (No Comment) */
+"Kml File" = "Kml Dosyası";
+
+/* Privacy - Camera Usage Description */
+"NSCameraUsageDescription" = "Arazi fotoğrafları çekmek için kullanılır.";
+
+/* Privacy - Location When In Use Usage Description */
+"NSLocationWhenInUseUsageDescription" = "Çizimlerinizi bulmanızı kolaylaştırmak için kullanılacak. ";
+
+/* Privacy - Photo Library Additions Usage Description */
+"NSPhotoLibraryAddUsageDescription" = "Ölçümlerin fotoğraflarını kaydetmek için lütfen izin verin.";
+
