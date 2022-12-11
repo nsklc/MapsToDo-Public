@@ -11,6 +11,7 @@
 		BC7922CC29163CA700FD834C /* APIConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC7922CB29163CA700FD834C /* APIConstants.swift */; };
 		BC8A2A4428F53037001D2130 /* SettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8A2A4328F53037001D2130 /* SettingViewModel.swift */; };
 		BC97357628F43CAE007F1EBC /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC97357528F43CAE007F1EBC /* SettingsViewController.swift */; };
+		BCAEE2FD2921FEEE00A5385A /* UnitsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAEE2FC2921FEEE00A5385A /* UnitsHelper.swift */; };
 		C20F5AE5272BAAB30006AA35 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20F5AE4272BAAB30006AA35 /* AppDelegate.swift */; };
 		C25598AC25BC46700000080D /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C25598AB25BC466F0000080D /* Constants.swift */; };
 		C25598BE25BC47190000080D /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = C25598B825BC47180000080D /* Item.swift */; };
@@ -37,7 +38,6 @@
 		C257E4712605BB5D007B5701 /* EmailLoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C257E4702605BB5D007B5701 /* EmailLoginViewController.swift */; };
 		C257E4742605BB64007B5701 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C257E4732605BB63007B5701 /* LoginViewController.swift */; };
 		C257E47926062B51007B5701 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C257E47826062B51007B5701 /* AuthViewController.swift */; };
-		C257E47D26065DA1007B5701 /* UnitsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C257E47C26065DA1007B5701 /* UnitsHelper.swift */; };
 		C257E48226066904007B5701 /* SubscriptionsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C257E48126066904007B5701 /* SubscriptionsHelper.swift */; };
 		C263095525C0A06700919DBF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C263095725C0A06700919DBF /* Main.storyboard */; };
 		C264751026198BF20021E88C /* PresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C264750F26198BF20021E88C /* PresentationController.swift */; };
@@ -63,6 +63,7 @@
 		BC7922CB29163CA700FD834C /* APIConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIConstants.swift; sourceTree = "<group>"; };
 		BC8A2A4328F53037001D2130 /* SettingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewModel.swift; sourceTree = "<group>"; };
 		BC97357528F43CAE007F1EBC /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		BCAEE2FC2921FEEE00A5385A /* UnitsHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnitsHelper.swift; sourceTree = "<group>"; };
 		C20F5AE4272BAAB30006AA35 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C25598AB25BC466F0000080D /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		C25598B825BC47180000080D /* Item.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
@@ -89,7 +90,6 @@
 		C257E4702605BB5D007B5701 /* EmailLoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmailLoginViewController.swift; sourceTree = "<group>"; };
 		C257E4732605BB63007B5701 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		C257E47826062B51007B5701 /* AuthViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
-		C257E47C26065DA1007B5701 /* UnitsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = UnitsHelper.swift; path = Controllers/UnitsHelper.swift; sourceTree = SOURCE_ROOT; };
 		C257E48126066904007B5701 /* SubscriptionsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsHelper.swift; sourceTree = "<group>"; };
 		C263095625C0A06700919DBF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C263095A25C0A0B800919DBF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
@@ -173,7 +173,7 @@
 		C257E47B26065B7D007B5701 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
-				C257E47C26065DA1007B5701 /* UnitsHelper.swift */,
+				BCAEE2FC2921FEEE00A5385A /* UnitsHelper.swift */,
 				C257E48126066904007B5701 /* SubscriptionsHelper.swift */,
 				C298DFE426157DBA006669FE /* AlertsHelper.swift */,
 				C264751C2619FB2B0021E88C /* MapStylesHelper.swift */,
@@ -520,6 +520,7 @@
 				C25598AC25BC46700000080D /* Constants.swift in Sources */,
 				C2952E4C272EB2C500AED16B /* SwitchViewCell.swift in Sources */,
 				C25598CB25BC47470000080D /* FieldsController.swift in Sources */,
+				BCAEE2FD2921FEEE00A5385A /* UnitsHelper.swift in Sources */,
 				C255990025BC49DE0000080D /* ToDoListViewController.swift in Sources */,
 				C25598EB25BC49D30000080D /* SlideInTransition.swift in Sources */,
 				C25598C925BC47470000080D /* PlacesController.swift in Sources */,
@@ -528,7 +529,6 @@
 				BC8A2A4428F53037001D2130 /* SettingViewModel.swift in Sources */,
 				BC7922CC29163CA700FD834C /* APIConstants.swift in Sources */,
 				C25598EF25BC49D30000080D /* MenuViewController.swift in Sources */,
-				C257E47D26065DA1007B5701 /* UnitsHelper.swift in Sources */,
 				C264751A26198EBC0021E88C /* OverlayView.swift in Sources */,
 				C257E4742605BB64007B5701 /* LoginViewController.swift in Sources */,
 				C299C48B260DEF3E007DF470 /* PremiumViewController.swift in Sources */,
