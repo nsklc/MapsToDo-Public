@@ -7,19 +7,14 @@
 //
 
 import UIKit
-import RealmSwift
 import ChameleonFramework
 import SwipeCellKit
-import FirebaseAuth
 import GoogleMaps
 
 class LineListViewController: SwipeTableViewController, UITextFieldDelegate {
     
     var linesController: LinesController?
-    
     var cameraPositionPath: GMSPath?
-    
-    private var handle: AuthStateDidChangeListenerHandle?
 
     override func viewDidLoad() {
         super.viewDidLoad()

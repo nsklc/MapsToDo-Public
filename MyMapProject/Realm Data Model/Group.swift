@@ -9,17 +9,9 @@
 import Foundation
 import RealmSwift
 
-class Group: Object {
-    @objc dynamic var id = UUID().uuidString
-    @objc dynamic var title: String = ""
-    @objc dynamic var color: String = "f9e0ae"
+class Group: Overlay {
     @objc dynamic var lastUpdateTime: Date = Date()
     let fields = List<Field>()
-    let items = List<Item>()
-    
-    override static func primaryKey() -> String? {
-        return "id"
-    }
 }
 
 

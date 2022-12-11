@@ -7,19 +7,14 @@
 //
 
 import UIKit
-import RealmSwift
 import ChameleonFramework
 import SwipeCellKit
-import FirebaseAuth
 import GoogleMaps
 
 class PlaceListViewController: SwipeTableViewController, UINavigationControllerDelegate, UITextFieldDelegate {
     
     var placesController: PlacesController?
-    
     var cameraPositionPath: GMSPath?
-    
-    private var handle: AuthStateDidChangeListenerHandle?
     
     override func viewDidLoad() {
         super.viewDidLoad()

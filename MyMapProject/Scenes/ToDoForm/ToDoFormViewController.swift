@@ -13,7 +13,7 @@ import Firebase
 import FirebaseFirestore
 import GoogleMobileAds
 
-class ToDoFormViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate {
+class ToDoFormViewController: UIViewController {
     
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var startStackView: UIStackView!
@@ -25,18 +25,13 @@ class ToDoFormViewController: UIViewController, UITextFieldDelegate, UITextViewD
     @IBOutlet weak var noteTextView: UITextView!
     @IBOutlet weak var saveButton: UIButton!
     @IBOutlet weak var notesLabel: UILabel!
-    
     @IBOutlet weak var camButton: UIButton!
     
     private var statusPickerData = [String]()
-    
-    let realm = try! Realm()
-    
+    private let realm = try! Realm()
     private var userDefaults: Results<UserDefaults>?
-    
     private let db = Firestore.firestore()
     private let user = Auth.auth().currentUser
-    
     var selectedItem: Item?
     
     weak var timer: Timer?
@@ -107,8 +102,24 @@ class ToDoFormViewController: UIViewController, UITextFieldDelegate, UITextViewD
                                }
         )
     }
+    
+    //MARK: - viewDidAppear
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        timer?.invalidate()
+    }
+    
     //MARK: - keyboardWillShow
-    @objc func keyboardWillShow(notification:NSNotification) {
+    @objc func keyboardWillShow(notification: NSNotification) {
        guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
         
         let keyboardScreenEndFrame = keyboardValue.cgRectValue
@@ -140,8 +151,7 @@ class ToDoFormViewController: UIViewController, UITextFieldDelegate, UITextViewD
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
-    
-    
+     
     //MARK: - updateStatus
     func updateStatus() {
         let date = Date()
@@ -326,67 +336,6 @@ class ToDoFormViewController: UIViewController, UITextFieldDelegate, UITextViewD
         noteTextView.attributedText = fullString
     }
     
-    //MARK: - textFieldShouldReturn
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if textField == titleTextField {
-            titleTextField.resignFirstResponder()
-        }
-        return true
-    }
-    
-    //MARK: - textField shouldChangeCharactersIn
-    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
-        // get the current text, or use an empty string if that failed
-        let currentText = textField.text ?? ""
-
-        // attempt to read the range they are trying to change, or exit if we can't
-        guard let stringRange = Range(range, in: currentText) else { return false }
-
-        // add their new text to the existing text
-        let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
-        
-        if updatedText.count >= 20 {
-            textField.layer.borderWidth = 0.50
-            textField.layer.borderColor = UIColor.flatRed().cgColor
-        } else {
-            textField.layer.borderWidth = 0
-        }
-
-        // make sure the result is under 20 characters
-        return updatedText.count <= 20
-    }
-    
-    //MARK: - textView shouldChangeTextIn
-    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        // get the current text, or use an empty string if that failed
-        let currentText = textView.text ?? ""
-
-        // attempt to read the range they are trying to change, or exit if we can't
-        guard let stringRange = Range(range, in: currentText) else { return false }
-
-        // add their new text to the existing text
-        let updatedText = currentText.replacingCharacters(in: stringRange, with: text)
-
-        // make sure the result is under 16 characters
-        return updatedText.count <= 65535
-    }
-    
-    
-    //MARK: - viewDidAppear
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(true)
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(true)
-    }
-    
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        
-        timer?.invalidate()
-    }
-    
 }
 
 extension ToDoFormViewController: UIPickerViewDelegate, UIPickerViewDataSource{
@@ -428,45 +377,6 @@ extension ToDoFormViewController: UIPickerViewDelegate, UIPickerViewDataSource{
             }
         }
     }
-    
-    //MARK: - add photo button
-    /*
-     let addPhoto: UIBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Add Photo", comment: ""), style: .done, target: self, action: #selector(self.doneButtonAction))
-     */
-    
-}
-extension UITextView{
-    //MARK: - doneAccessory
-    @IBInspectable var doneAccessory: Bool{
-        get{
-            return self.doneAccessory
-        }
-        set (hasDone) {
-            if hasDone{
-                addDoneButtonOnKeyboard()
-            }
-        }
-    }
-    //MARK: - addDoneButtonOnKeyboard
-    func addDoneButtonOnKeyboard()
-    {
-        let doneToolbar: UIToolbar = UIToolbar(frame: CGRect.init(x: 0, y: 0, width: UIScreen.main.bounds.width, height: 50))
-        doneToolbar.barStyle = .default
-        
-        let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let done: UIBarButtonItem = UIBarButtonItem(title: NSLocalizedString("Done", comment: ""), style: .done, target: self, action: #selector(self.doneButtonAction))
-        
-        let items = [flexSpace, done]
-        doneToolbar.items = items
-        doneToolbar.sizeToFit()
-        
-        self.inputAccessoryView = doneToolbar
-    }
-    //MARK: - doneButtonAction
-    @objc func doneButtonAction()
-    {
-        self.resignFirstResponder()
-    }
 }
 
 extension ToDoFormViewController: GADFullScreenContentDelegate {
@@ -499,5 +409,55 @@ extension ToDoFormViewController: GADFullScreenContentDelegate {
                                 interstitial?.fullScreenContentDelegate = self
                                }
         )
+    }
+}
+
+extension ToDoFormViewController: UITextViewDelegate {
+    //MARK: - textView shouldChangeTextIn
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        // get the current text, or use an empty string if that failed
+        let currentText = textView.text ?? ""
+
+        // attempt to read the range they are trying to change, or exit if we can't
+        guard let stringRange = Range(range, in: currentText) else { return false }
+
+        // add their new text to the existing text
+        let updatedText = currentText.replacingCharacters(in: stringRange, with: text)
+
+        // make sure the result is under 65535 characters
+        return updatedText.count <= 65535
+    }
+}
+
+
+extension ToDoFormViewController: UITextFieldDelegate {
+    //MARK: - textFieldShouldReturn
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        if textField == titleTextField {
+            titleTextField.resignFirstResponder()
+        }
+        return true
+    }
+    
+    //MARK: - textField shouldChangeCharactersIn
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        // get the current text, or use an empty string if that failed
+        let currentText = textField.text ?? ""
+
+        // attempt to read the range they are trying to change, or exit if we can't
+        guard let stringRange = Range(range, in: currentText) else { return false }
+
+        // add their new text to the existing text
+        let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
+        
+        if updatedText.count >= 20 {
+            textField.layer.borderWidth = 0.50
+            textField.layer.borderColor = UIColor.flatRed().cgColor
+        } else {
+            textField.layer.borderWidth = 0
+        }
+
+        // make sure the result is under 20 characters
+        return updatedText.count <= 20
     }
 }

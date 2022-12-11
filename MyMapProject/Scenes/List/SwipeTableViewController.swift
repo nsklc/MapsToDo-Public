@@ -1,9 +1,9 @@
 //
 //  SwipeTableViewController.swift
-//  Todoey
+//  MyMapProject
 //
 //  Created by Enes Kılıç on 11.08.2020.
-//  Copyright © 2020 App Brewery. All rights reserved.
+//  Copyright © 2020 Enes Kılıç. All rights reserved.
 //
 
 import UIKit
@@ -12,7 +12,7 @@ import FirebaseAuth
 
 class SwipeTableViewController: UITableViewController, SwipeTableViewCellDelegate {
     
-    //private var handle: AuthStateDidChangeListenerHandle?
+    private var handle: AuthStateDidChangeListenerHandle?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,20 +35,7 @@ class SwipeTableViewController: UITableViewController, SwipeTableViewCellDelegat
 
         let deleteAction = SwipeAction(style: .destructive, title: NSLocalizedString("Delete", comment: "")) { action, indexPath in
             // handle action by updating model with deletion
-            
-            
-            
             self.deleteItem(at: indexPath)
-            /*if let categoryForDeletion = self.categories?[indexPath.row] {
-                do {
-                    try self.realm.write({
-                    self.realm.delete(categoryForDeletion)
-                    })
-                } catch {
-                    print("Error deleting category, \(error)")
-                }
-            }*/
-            
         }
 
         // customize the action appearance
@@ -69,7 +56,7 @@ class SwipeTableViewController: UITableViewController, SwipeTableViewCellDelegat
     }
     
     /*override func viewDidAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+        super.viewDidAppear(animated)
         handle = Auth.auth().addStateDidChangeListener { (auth, user) in
             
         }

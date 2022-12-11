@@ -7,16 +7,12 @@
 //
 
 import UIKit
-import RealmSwift
 import ChameleonFramework
 import SwipeCellKit
-import FirebaseAuth
 
 class GroupListViewController: SwipeTableViewController, UITextFieldDelegate {
         
     var fieldsController: FieldsController?
-    
-    private var handle: AuthStateDidChangeListenerHandle?
     
     override func viewDidLoad() {
         super.viewDidLoad()

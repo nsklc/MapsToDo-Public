@@ -17,6 +17,11 @@ import GoogleMobileAds
 import MobileCoreServices
 import UniformTypeIdentifiers
 
+protocol MapViewControllerProtocol: AnyObject {
+    func setUserDefaultSettings(latitude: Double?, longitude: Double?, zoom: Float?, mapType: String?, customMapStyle: String?, isBatterySaveModeActive: Bool)
+    func arrangeUI(isProAccount: Bool)
+}
+
 class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate {
     
     private let realm = try! Realm()
@@ -254,7 +259,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         fieldsController = FieldsController(mapView: mapView)
         
         // Get lines in the realm
-        linesController = LinesController(mapView: mapView, isGeodesic: userDefaults!.first!.isGeodesicActive)
+        linesController = LinesController(mapView: mapView)
         
         // Get Places in the realm
         placesController = PlacesController(mapView: mapView)
@@ -400,7 +405,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         
         // Get lines in the realm
         linesController = nil
-        linesController = LinesController(mapView: mapView, isGeodesic: userDefaults!.first!.isGeodesicActive)
+        linesController = LinesController(mapView: mapView)
         
         // Get Places in the realm
         placesController = nil

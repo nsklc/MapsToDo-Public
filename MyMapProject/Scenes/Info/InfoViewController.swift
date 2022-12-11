@@ -18,7 +18,6 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
     let realm = try! Realm()
     
     @IBOutlet weak var infoStackView: UIStackView!
-    
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var rightTitleLabel: UILabel!
     @IBOutlet weak var groupLabel: UILabel!

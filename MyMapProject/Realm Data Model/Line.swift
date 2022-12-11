@@ -9,18 +9,10 @@
 import Foundation
 import RealmSwift
 
-class Line: Object {
-    @objc dynamic var id = UUID().uuidString
-    @objc dynamic var title: String = ""
-    @objc dynamic var color: String = "f9e0ae"
+class Line: Overlay {
+    let photos = List<String>()
     @objc dynamic var length: Double = 0.0
     @objc dynamic var lastUpdateTime: Date = Date()
     var polylineMarkersPositions = List<Position>()
-    let items = List<Item>()
-    let photos = List<String>()
-    
-    override static func primaryKey() -> String? {
-        return "id"
-    }
 }
 

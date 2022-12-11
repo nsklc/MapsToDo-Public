@@ -244,10 +244,6 @@ class PremiumViewController: UIViewController {
         termsAndConditionsLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
     }
     
-}
-
-extension PremiumViewController {
-    
     func fetchOfferings() {
         Purchases.shared.offerings { (offerings, error) in
             if let error = error {

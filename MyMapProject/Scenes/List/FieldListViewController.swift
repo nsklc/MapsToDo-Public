@@ -1,29 +1,22 @@
 //
 //  CategoryViewController.swift
-//  Todoey
+//  MyMapProject
 //
 //  Created by Enes Kılıç on 10.08.2020.
+//  Copyright © 2020 Enes Kılıç. All rights reserved.
 //
 
 import UIKit
-import RealmSwift
 import ChameleonFramework
 import SwipeCellKit
-import FirebaseAuth
 import GoogleMaps
 
-class FieldListViewController: SwipeTableViewController, UITextFieldDelegate {
+final class FieldListViewController: SwipeTableViewController, UITextFieldDelegate {
     
     var fieldsController: FieldsController?
-    
     var cameraPositionPath: GMSPath?
-    
-    private var handle: AuthStateDidChangeListenerHandle?
-    
     var selectedGroup: Group?
-    
     var isMetric: Bool?
-    
     var groupsCollectionView:UICollectionView?
 
     override func viewDidLoad() {
@@ -399,11 +392,4 @@ extension FieldListViewController: UINavigationControllerDelegate, UICollectionV
         }
         hideFilterGroupCollection(hide: true)
     }
-
-    override func viewDidAppear(_ animated: Bool) {
-        handle = Auth.auth().addStateDidChangeListener { (auth, user) in
-            
-        }
-    }
-    
 }
