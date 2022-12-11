@@ -55,8 +55,10 @@
 		C264751A26198EBC0021E88C /* OverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C264751926198EBC0021E88C /* OverlayView.swift */; };
 		C264751D2619FB2B0021E88C /* MapStylesHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C264751C2619FB2B0021E88C /* MapStylesHelper.swift */; };
 		C26DAB72262379BD004A6CD9 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C26DAB70262379BD004A6CD9 /* InfoPlist.strings */; };
-		C288A788261DCB4100969BFE /* ImportGeoOrKmlFileHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C288A787261DCB4100969BFE /* ImportGeoOrKmlFileHelper.swift */; };
-		C28E2C3D262C538500C33FBB /* GeoJsonAndKmlTemplates.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28E2C3C262C538500C33FBB /* GeoJsonAndKmlTemplates.swift */; };
+		C27B90A325E1244300063CE3 /* TeamViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27B90A225E1244300063CE3 /* TeamViewController.swift */; };
+		C2838C7525EE56C900F6E3CE /* PermissionsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2838C7425EE56C900F6E3CE /* PermissionsViewController.swift */; };
+		C288A788261DCB4100969BFE /* ImportGeoFileHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C288A787261DCB4100969BFE /* ImportGeoFileHelper.swift */; };
+		C28E2C3D262C538500C33FBB /* GeoJsonTemplates.swift in Sources */ = {isa = PBXBuildFile; fileRef = C28E2C3C262C538500C33FBB /* GeoJsonTemplates.swift */; };
 		C29045C625C85B67005E1D2B /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C29045C425C85B67005E1D2B /* Localizable.strings */; };
 		C2952E4A272EB26800AED16B /* SegmentedControlCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2952E49272EB26800AED16B /* SegmentedControlCell.swift */; };
 		C2952E4C272EB2C500AED16B /* SwitchViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2952E4B272EB2C500AED16B /* SwitchViewCell.swift */; };
@@ -120,8 +122,10 @@
 		C264751C2619FB2B0021E88C /* MapStylesHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapStylesHelper.swift; sourceTree = "<group>"; };
 		C26DAB71262379BD004A6CD9 /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C27B909F25E0FE2500063CE3 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
-		C288A787261DCB4100969BFE /* ImportGeoOrKmlFileHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportGeoOrKmlFileHelper.swift; sourceTree = "<group>"; };
-		C28E2C3C262C538500C33FBB /* GeoJsonAndKmlTemplates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoJsonAndKmlTemplates.swift; sourceTree = "<group>"; };
+		C27B90A225E1244300063CE3 /* TeamViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamViewController.swift; sourceTree = "<group>"; };
+		C2838C7425EE56C900F6E3CE /* PermissionsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PermissionsViewController.swift; sourceTree = "<group>"; };
+		C288A787261DCB4100969BFE /* ImportGeoFileHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportGeoFileHelper.swift; sourceTree = "<group>"; };
+		C28E2C3C262C538500C33FBB /* GeoJsonTemplates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeoJsonTemplates.swift; sourceTree = "<group>"; };
 		C29045C525C85B67005E1D2B /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		C2952E49272EB26800AED16B /* SegmentedControlCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedControlCell.swift; sourceTree = "<group>"; };
 		C2952E4B272EB2C500AED16B /* SwitchViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwitchViewCell.swift; sourceTree = "<group>"; };
@@ -222,8 +226,8 @@
 				C298DFE426157DBA006669FE /* AlertsHelper.swift */,
 				C264751C2619FB2B0021E88C /* MapStylesHelper.swift */,
 				BC540DFD2945AF6A0005DF3C /* UnitsHelper.swift */,
-				C288A787261DCB4100969BFE /* ImportGeoOrKmlFileHelper.swift */,
-				C28E2C3C262C538500C33FBB /* GeoJsonAndKmlTemplates.swift */,
+				C288A787261DCB4100969BFE /* ImportGeoFileHelper.swift */,
+				C28E2C3C262C538500C33FBB /* GeoJsonTemplates.swift */,
 				BC7922CB29163CA700FD834C /* APIConstants.swift */,
 				C25598AB25BC466F0000080D /* Constants.swift */,
 			);
@@ -561,7 +565,7 @@
 				BCCB20C0291CEF5D0068F196 /* FieldPolygon.swift in Sources */,
 				C25598FF25BC49DE0000080D /* FieldListViewController.swift in Sources */,
 				C25598CA25BC47470000080D /* LinesController.swift in Sources */,
-				C288A788261DCB4100969BFE /* ImportGeoOrKmlFileHelper.swift in Sources */,
+				C288A788261DCB4100969BFE /* ImportGeoFileHelper.swift in Sources */,
 				C2B4467824EFFEC600379EB1 /* SceneDelegate.swift in Sources */,
 				C2952E4A272EB26800AED16B /* SegmentedControlCell.swift in Sources */,
 				C255990225BC49DE0000080D /* ToDoFormViewController.swift in Sources */,
@@ -576,7 +580,7 @@
 				BCCB20CD291D1AB20068F196 /* ArrayExtensions.swift in Sources */,
 				C25598C925BC47470000080D /* PlacesController.swift in Sources */,
 				C25598BE25BC47190000080D /* Item.swift in Sources */,
-				C28E2C3D262C538500C33FBB /* GeoJsonAndKmlTemplates.swift in Sources */,
+				C28E2C3D262C538500C33FBB /* GeoJsonTemplates.swift in Sources */,
 				BC8A2A4428F53037001D2130 /* SettingViewModel.swift in Sources */,
 				C2838C7525EE56C900F6E3CE /* PermissionsViewController.swift in Sources */,
 				C248C8C025D3DCDF005EC743 /* ItemsController.swift in Sources */,

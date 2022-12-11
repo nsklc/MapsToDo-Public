@@ -10,14 +10,6 @@ import Foundation
 import GoogleMapsUtils
 import GoogleMaps
 
-class ImportGeoOrKmlFileHelper {
-    
-    static var app: ImportGeoOrKmlFileHelper = {
-        return ImportGeoOrKmlFileHelper()
-    }()
-    
-}
-
 class GeoJSON {
     private var mapView: GMSMapView!
     
@@ -30,22 +22,17 @@ class GeoJSON {
     var gmPoints = [GMUPoint]()
     
     func renderGeoJSON(url: URL, fieldsController: FieldsController, linesController: LinesController, placesController: PlacesController, mapView: GMSMapView, completion: @escaping () -> Void ) {
-        //guard let path = Bundle.main.path(forResource: "GeoJSON_sample", ofType: "json") else {
-        //  return
-        //}
-        
-        //let url = URL(fileURLWithPath: path)
+//        guard let path = Bundle.main.path(forResource: "GeoJSON_sample", ofType: "json") else {
+//          return
+//        }
+//
+//        let url = URL(fileURLWithPath: path)
         
         let geoJsonParser = GMUGeoJSONParser(url: url)
         
         geoJsonParser.parse()
         
         print(geoJsonParser.features.count)
-        //if geoJsonParser.features.count > 100 {
-        //  return
-        //}
-        
-//        let dispatchQueue = DispatchQueue.global(qos: .unspecified)
         
         var counter = 0
         
@@ -136,71 +123,6 @@ class GeoJSON {
                         }
                         
                         
-                    }
-                }
-            }
-        }
-        completion()
-    }
-    
-    func renderKml(url: URL, fieldsController: FieldsController, linesController: LinesController, placesController: PlacesController, mapView: GMSMapView, completion: @escaping () -> Void ) {
-        
-        let kmlParser = GMUKMLParser(url: url)
-        
-        kmlParser.parse()
-       
-        for mark in kmlParser.placemarks {
-            
-            if let mark = mark as? GMUPlacemark {
-                
-                let title = mark.title ?? mark.style?.title ?? "untitled"
-                
-                var color = mark.style?.fillColor?.hexValue() ?? mark.style?.strokeColor?.hexValue() ?? UIColor.flatBlueDark().hexValue()
-                
-                if let style = kmlParser.styles.first(where: {$0.styleID == mark.title}) {
-                    color = style.fillColor?.hexValue() ?? UIColor.flatBlueDark().hexValue()
-                }
-                
-                if let polygon = mark.geometry as? GMUPolygon {
-                    // First path is represents the exterior ring. Any subsequent elements representinterior rings (or holes).
-                    if let path = polygon.paths.first {
-                        print(path.coordinate(at: 0))
-                        var markers = [GMSMarker]()
-                        for i in 0...path.count()-1 {
-                            let marker = GMSMarker(position: path.coordinate(at: i))
-                            markers.append(marker)
-                        }
-                        markers.removeDuplicates()
-                        
-                        if fieldsController.fields!.count < K.freeAccountLimitations.overlayLimit {
-                            if markers.count > 2 {
-                                fieldsController.addField(title: title, groupTitle: "", color: color, initialMarkers: markers, id: nil, isGeodesic: true)
-                            }
-                        }
-                    }
-                    
-                } else if let polyline = mark.geometry as? GMULineString {
-                    
-                    var markers = [GMSMarker]()
-                    for i in 0...polyline.path.count()-1 {
-                        let marker = GMSMarker(position: polyline.path.coordinate(at: i))
-                        markers.append(marker)
-                    }
-                    markers.removeDuplicates()
-                    if linesController.lines!.count < K.freeAccountLimitations.overlayLimit {
-                        if markers.count > 2 {
-                            
-                            linesController.addLine(title: title, color: color, initialMarkers: markers, mapView: mapView, isGeodesic: true, id: nil)
-                        }
-                    }
-                    
-                    
-                } else if let place = mark.geometry as? GMUPoint {
-                    
-                    let marker = GMSMarker(position: place.coordinate)
-                    
-                    if placesController.places!.count < K.freeAccountLimitations.overlayLimit {
-                        placesController.addPlace(title: title, color: color, mapView: mapView, initialMarker: marker, id: nil, iconSize: nil)
                     }
                 }
             }

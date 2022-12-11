@@ -224,7 +224,7 @@
 "Distance unit between corners" = "Köşeler arasındaki mesafe";
 
 /* No comment provided by engineer. */
-"Do you want to import file or export file?" = "Dosyayı içe aktarmak mı, yoksa dışa aktarmak mı istiyorsunuz?";
+"Do you want to import or export GeoJSON file?" = "GeoJSON dosyayısını içe aktarmak mı, yoksa dışa aktarmak mı istiyorsunuz?";
 
 /* No comment provided by engineer. */
 "Done" = "Bitti";

@@ -95,7 +95,7 @@ struct AlertsHelper {
         let alert = UIAlertController(title: NSLocalizedString("Export File", comment: ""), message: NSLocalizedString("Exporting file task is completed. Now you can share the file.", comment: ""), preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
         alert.addAction(UIAlertAction(title: NSLocalizedString("Share", comment: ""), style: .default, handler: { (action) in
-            AlertsHelper.presentShareSheet(on: vc, isGeoJson: isGeoJson)
+            AlertsHelper.presentShareSheet(on: vc)
         }))
         DispatchQueue.main.async {
             vc.present(alert, animated: true, completion: nil)
@@ -103,15 +103,9 @@ struct AlertsHelper {
         
     }
     
-    static func presentShareSheet(on vc: UIViewController, isGeoJson: Bool) {
+    static func presentShareSheet(on vc: UIViewController) {
         
-        var filename = getDocumentsDirectory().appendingPathComponent("mapstodo.kml")
-        
-        if isGeoJson {
-            filename = getDocumentsDirectory().appendingPathComponent("mapstodo.geojson")
-        }
-        
-        
+        var filename = getDocumentsDirectory().appendingPathComponent("mapstodo.geojson")
         let shareSheetVC = UIActivityViewController(activityItems: [filename], applicationActivities: nil)
         
         if UIDevice.current.userInterfaceIdiom == .pad {

@@ -1414,7 +1414,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             case .settings:
                 self.selectSegue(segueIdentifier: K.segueIdentifiers.goToSettings)
             case .importFile:
-                let alert = UIAlertController(title: NSLocalizedString("Import/Export File", comment: ""), message: NSLocalizedString("Do you want to import file or export file?", comment: ""), preferredStyle: .alert)
+                let alert = UIAlertController(title: NSLocalizedString("Import/Export File", comment: ""), message: NSLocalizedString("Do you want to import or export GeoJSON file?", comment: ""), preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
                 alert.addAction(UIAlertAction(title: NSLocalizedString("Import", comment: ""), style: .default, handler: { (action) in
                     self.importFile()
@@ -2342,12 +2342,7 @@ extension MapViewController: UIDocumentPickerDelegate,UINavigationControllerDele
         
         let geo = GeoJSON(mapView: mapView)
         
-        if myURL.pathExtension == "kml" {
-            geo.renderKml(url: myURL, fieldsController: fieldsController!, linesController: linesController!, placesController: placesController!, mapView: mapView) {
-                
-                AlertsHelper.importFileTaskCompletedAlert(on: self)
-            }
-        } else if myURL.pathExtension == "geojson" {
+        if myURL.pathExtension == "geojson" {
             geo.renderGeoJSON(url: myURL, fieldsController: fieldsController!, linesController: linesController!, placesController: placesController!, mapView: mapView) {
                 AlertsHelper.importFileTaskCompletedAlert(on: self)
             }
@@ -2361,21 +2356,8 @@ extension MapViewController: UIDocumentPickerDelegate,UINavigationControllerDele
     }
     //MARK: - exportFile
     func exportFileType() {
-        
-        let alert = UIAlertController(title: NSLocalizedString("Export File", comment: ""), message: NSLocalizedString("Which type of file do you want to export? For better results choose GeoJSON file type.", comment: ""), preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "GeoJSON", style: .default, handler: { [self] (action) in
-            
-            exportFileContent(isGeoJson: true)
-            
-        }))
-        alert.addAction(UIAlertAction(title: "KML (BETA)", style: .default, handler: { [self] (action) in
-            
-            exportFileContent(isGeoJson: false)
-            
-        }))
-        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .destructive, handler: nil))
         DispatchQueue.main.async {
-            self.present(alert, animated: true, completion: nil)
+            self.exportFileContent(isGeoJson: true)
         }
     }
     //MARK: - exportFiles
@@ -2400,51 +2382,29 @@ extension MapViewController: UIDocumentPickerDelegate,UINavigationControllerDele
     }
     //MARK: - exportFileFinal
     func exportFileFinal(isGeoJson: Bool, exportType: String) {
-        let geo = GeoJsonAndKmlTemplates()
+        let geo = GeoJsonTemplates()
         
         if isGeoJson {
             geo.makeGeojsonFile(exportType: exportType, fieldsController: fieldsController!, linesController: linesController!, placesController: placesController!, completion: {
                 AlertsHelper.exportFileTaskCompletedAlert(on: self, isGeoJson: isGeoJson)
-            })
-        } else {
-            geo.makeKMLFile(exportType: exportType, fieldsController: fieldsController!, linesController: linesController!, placesController: placesController!, completion: {
-                AlertsHelper.exportFileTaskCompletedAlert(on: self, isGeoJson: isGeoJson)
-                
             })
         }
     }
     
     //MARK: - importFileAlert
     func importFile() {
-        
-        let alert1 = UIAlertController(title: NSLocalizedString("Import File", comment: ""), message: NSLocalizedString("Which type of file do you want to import? For better results choose GeoJSON file type.", comment: ""), preferredStyle: .alert)
-        alert1.addAction(UIAlertAction(title: "GeoJSON", style: .default, handler: { (action) in
-            self.importGeoJSON()
-        }))
-        alert1.addAction(UIAlertAction(title: "KML (BETA)", style: .default, handler: { (action) in
-            self.importKML()
-        }))
-        alert1.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .destructive, handler: nil))
         DispatchQueue.main.async {
-            self.present(alert1, animated: true, completion: nil)
+            self.importGeoJSON()
         }
     }
     //MARK: - importGeoJSON
     func importGeoJSON() {
         selectFiles(isGeoJSON: true)
     }
-    //MARK: - importKML
-    func importKML() {
-        selectFiles(isGeoJSON: false)
-    }
     //MARK: - selectFiles
     func selectFiles(isGeoJSON: Bool) {
         
         var type = "nsklc.geojsonExtension"
-        
-        if !isGeoJSON {
-            type = "nsklc.kmlExtension"
-        }
         
         let types = [UTType.init(exportedAs: type)]
      
