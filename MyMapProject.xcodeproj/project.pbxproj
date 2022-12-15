@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		ADF2F6A94C1A125CA47EED52 /* Pods_MyMapProject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 91062F31C87585E0B7AEC74B /* Pods_MyMapProject.framework */; };
+		BC023EFD294AFAE9002FBCBD /* ExportTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC023EFC294AFAE9002FBCBD /* ExportTypes.swift */; };
 		BC540DFE2945AF6A0005DF3C /* UnitsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC540DFD2945AF6A0005DF3C /* UnitsHelper.swift */; };
 		BC7922CC29163CA700FD834C /* APIConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC7922CB29163CA700FD834C /* APIConstants.swift */; };
 		BC8A2A4428F53037001D2130 /* SettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8A2A4328F53037001D2130 /* SettingViewModel.swift */; };
@@ -72,6 +73,7 @@
 		3D26FBD39712C2576173CC04 /* Pods-MyMapProject.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyMapProject.release.xcconfig"; path = "Target Support Files/Pods-MyMapProject/Pods-MyMapProject.release.xcconfig"; sourceTree = "<group>"; };
 		91062F31C87585E0B7AEC74B /* Pods_MyMapProject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MyMapProject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9C32C092A966103C64F17F76 /* Pods-MyMapProject.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyMapProject.debug.xcconfig"; path = "Target Support Files/Pods-MyMapProject/Pods-MyMapProject.debug.xcconfig"; sourceTree = "<group>"; };
+		BC023EFC294AFAE9002FBCBD /* ExportTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportTypes.swift; sourceTree = "<group>"; };
 		BC540DFD2945AF6A0005DF3C /* UnitsHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnitsHelper.swift; sourceTree = "<group>"; };
 		BC7922CB29163CA700FD834C /* APIConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIConstants.swift; sourceTree = "<group>"; };
 		BC8A2A4328F53037001D2130 /* SettingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewModel.swift; sourceTree = "<group>"; };
@@ -230,6 +232,7 @@
 				C28E2C3C262C538500C33FBB /* GeoJsonTemplates.swift */,
 				BC7922CB29163CA700FD834C /* APIConstants.swift */,
 				C25598AB25BC466F0000080D /* Constants.swift */,
+				BC023EFC294AFAE9002FBCBD /* ExportTypes.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -603,6 +606,7 @@
 				C25598FD25BC49DE0000080D /* LineListViewController.swift in Sources */,
 				BCCB20D0291E1BC50068F196 /* ToDoListViewModel.swift in Sources */,
 				BCCB20C5291D17B20068F196 /* UIViewExtensions.swift in Sources */,
+				BC023EFD294AFAE9002FBCBD /* ExportTypes.swift in Sources */,
 				C25598BF25BC47190000080D /* Line.swift in Sources */,
 				C25598FB25BC49DE0000080D /* InfoViewController.swift in Sources */,
 				BCCB20C7291D187D0068F196 /* UIImageViewExtensions.swift in Sources */,

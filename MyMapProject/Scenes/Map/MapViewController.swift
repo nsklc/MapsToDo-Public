@@ -22,6 +22,12 @@ protocol MapViewControllerProtocol: AnyObject {
     func arrangeUI(isProAccount: Bool)
 }
 
+enum OverlayType {
+    case field
+    case line
+    case place
+}
+
 class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapViewDelegate {
     
     private let realm = try! Realm()
@@ -39,12 +45,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     
     @IBOutlet weak var addStackView: UIStackView!
     @IBOutlet weak var addFormStackView: UIStackView!
-    private enum overlayTypeOptions {
-        case field
-        case line
-        case place
-    }
-    private var addType : overlayTypeOptions = .field
+    private var addType : OverlayType = .field
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var groupTitleTextField: UITextField!
     
@@ -54,7 +55,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     @IBOutlet weak var saveButton: UIBarButtonItem!
     @IBOutlet weak var trashButton: UIBarButtonItem!
     
-    private var editingOverlayType: overlayTypeOptions = .place
+    private var editingOverlayType: OverlayType = .place
     @IBOutlet weak var selectAllButton: UIBarButtonItem!
     @IBOutlet weak var colorBarButtonItem: UIBarButtonItem!
     
@@ -323,18 +324,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     
     //MARK: - keyboardWillShow
     @objc func keyboardWillShow(notification:NSNotification) {
-        /*guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
-        
-        let keyboardScreenEndFrame = keyboardValue.cgRectValue
-        let keyboardViewEndFrame = view.convert(keyboardScreenEndFrame, from: view.window)
-        
-        guard let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {
-              // if keyboard size is not available for some reason, dont do anything
-              return
-           }*/
-         
-         // move the root view up by the distance of keyboard height
-        //self.addFormStackView.frame.origin.y = 0 - keyboardSize.height
         if !UIDevice.current.orientation.isPortrait {
             NSLayoutConstraint.deactivate([self.centerYConstraint])
             centerYConstraint = addFormStackView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor, constant: -150)
@@ -448,13 +437,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             } else {
                 if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
                     
-                    let alert = UIAlertController(title:NSLocalizedString("Auth info not found.", comment: "") , message: "For the usage of cloud synchronization, you need to sign in.", preferredStyle: .alert)
-                    let okAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default) {_ in
+                    AlertsHelper.authInfoAlert(on: self) {
                         self.performSegue(withIdentifier: K.segueIdentifiers.goToLoginViewController, sender: self)
                     }
-                    alert.addAction(okAction)
-                    present(alert, animated: true)
-                    
                 }
             }
         }
@@ -545,40 +530,27 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     func mapView(_ mapView: GMSMapView, didTap marker: GMSMarker) -> Bool {
         switch editingOverlayType {
         case .field:
-            var unitLength = UnitLength.centimeters
             if marker.title != "lengthMarker" {
                 if let markers = fieldsController?.selectedFieldMarkers {
                     selectDeleteMarker(selectedMarker: marker, markers: markers)
                 }
             } else {
-                let ac = UIAlertController(title: NSLocalizedString("Enter Length", comment: ""), message: NSLocalizedString("The selected point will stay fixed and the edge will be extended.", comment: ""), preferredStyle: .alert)
-                ac.addTextField()
-                ac.textFields![0].keyboardType = .decimalPad
-                
                 let temp = UnitsHelper.app.getPlaceholderAndUnitLengthType(isMeasureSystemMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
                 
-                ac.textFields![0].placeholder = temp.first!.key
-                unitLength = temp.first!.value
-                
-                let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .destructive)
-                let submitAction = UIAlertAction(title: NSLocalizedString("Submit", comment: ""), style: .default) { [self, unowned ac] _ in
-                    if let length = Double(ac.textFields![0].text!) {
-                        var dragedMarker: GMSMarker?
-                        if userDefaults!.first!.isMeasureSystemMetric {
-                            let lengthWithUnit = Measurement.init(value: length, unit: unitLength)
-                            dragedMarker = fieldsController!.setEdgeLength(lengthMarkerIndex: fieldsController!.selectedFieldLengthMarkers.firstIndex(of: marker)!, edgeLength: lengthWithUnit.converted(to: UnitLength.meters).value)
-                        } else {
-                            let lengthWithUnit = Measurement.init(value: length, unit: unitLength)
-                            dragedMarker = fieldsController!.setEdgeLength(lengthMarkerIndex: fieldsController!.selectedFieldLengthMarkers.firstIndex(of: marker)!, edgeLength: lengthWithUnit.converted(to: UnitLength.meters).value)
-                        }
-                        if let draggedMarker = dragedMarker {
-                            markerDidDrag(didDrag: draggedMarker, isDraggedByCalculation: true)
-                        }
+                AlertsHelper.didTapMarkerAlert(on: self, placeholderTitle: temp.first!.key, unitLength: temp.first!.value) { [weak self] length, unitLength  in
+                    guard let self = self else { return }
+                    var dragedMarker: GMSMarker?
+                    if self.userDefaults!.first!.isMeasureSystemMetric {
+                        let lengthWithUnit = Measurement.init(value: length, unit: unitLength)
+                        dragedMarker = self.fieldsController!.setEdgeLength(lengthMarkerIndex: self.fieldsController!.selectedFieldLengthMarkers.firstIndex(of: marker)!, edgeLength: lengthWithUnit.converted(to: UnitLength.meters).value)
+                    } else {
+                        let lengthWithUnit = Measurement.init(value: length, unit: unitLength)
+                        dragedMarker = self.fieldsController!.setEdgeLength(lengthMarkerIndex: self.fieldsController!.selectedFieldLengthMarkers.firstIndex(of: marker)!, edgeLength: lengthWithUnit.converted(to: UnitLength.meters).value)
+                    }
+                    if let draggedMarker = dragedMarker {
+                        self.markerDidDrag(didDrag: draggedMarker, isDraggedByCalculation: true)
                     }
                 }
-                ac.addAction(cancelAction)
-                ac.addAction(submitAction)
-                present(ac, animated: true)
             }
         case .line:
             if marker.title != "lengthMarker" {
@@ -586,35 +558,23 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
                     selectDeleteMarker(selectedMarker: marker, markers: markers)
                 }
             } else {
-                var unitLength = UnitLength.centimeters
-                let ac = UIAlertController(title: NSLocalizedString("Enter Length", comment: ""), message: NSLocalizedString("The selected point will be kept fixed and the edge will be extended", comment: ""), preferredStyle: .alert)
-                ac.addTextField()
-                ac.textFields![0].keyboardType = .decimalPad
                 
                 let temp = UnitsHelper.app.getPlaceholderAndUnitLengthType(isMeasureSystemMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
                 
-                ac.textFields![0].placeholder = temp.first!.key
-                unitLength = temp.first!.value
-                
-                let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .destructive)
-                let submitAction = UIAlertAction(title: NSLocalizedString("Submit", comment: ""), style: .default) { [self, unowned ac] _ in
-                    if let length = Double(ac.textFields![0].text!) {
-                        var dragedMarker: GMSMarker?
-                        if userDefaults!.first!.isMeasureSystemMetric {
-                            let lengthWithUnit = Measurement.init(value: length, unit: unitLength)
-                            dragedMarker = linesController!.setEdgeLength(lengthMarkerIndex: linesController!.selectedLineLengthMarkers.firstIndex(of: marker)!, edgeLength: lengthWithUnit.converted(to: UnitLength.meters).value)
-                        } else {
-                            let lengthWithUnit = Measurement.init(value: length, unit: unitLength)
-                            dragedMarker = linesController!.setEdgeLength(lengthMarkerIndex: linesController!.selectedLineLengthMarkers.firstIndex(of: marker)!, edgeLength: lengthWithUnit.converted(to: UnitLength.meters).value)
-                        }
-                        if let draggedMarker = dragedMarker {
-                            markerDidDrag(didDrag: draggedMarker, isDraggedByCalculation: true)
-                        }
+                AlertsHelper.didTapMarkerAlert(on: self, placeholderTitle: temp.first!.key, unitLength: temp.first!.value) { [weak self] length, unitLength in
+                    guard let self = self else { return }
+                    var dragedMarker: GMSMarker?
+                    if self.userDefaults!.first!.isMeasureSystemMetric {
+                        let lengthWithUnit = Measurement.init(value: length, unit: unitLength)
+                        dragedMarker = self.linesController!.setEdgeLength(lengthMarkerIndex: self.linesController!.selectedLineLengthMarkers.firstIndex(of: marker)!, edgeLength: lengthWithUnit.converted(to: UnitLength.meters).value)
+                    } else {
+                        let lengthWithUnit = Measurement.init(value: length, unit: unitLength)
+                        dragedMarker = self.linesController!.setEdgeLength(lengthMarkerIndex: self.linesController!.selectedLineLengthMarkers.firstIndex(of: marker)!, edgeLength: lengthWithUnit.converted(to: UnitLength.meters).value)
+                    }
+                    if let draggedMarker = dragedMarker {
+                        self.markerDidDrag(didDrag: draggedMarker, isDraggedByCalculation: true)
                     }
                 }
-                ac.addAction(cancelAction)
-                ac.addAction(submitAction)
-                present(ac, animated: true)
             }
         case .place:
             editingOverlayType = .place
@@ -626,64 +586,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     func selectDeleteMarker(selectedMarker: GMSMarker, markers: [GMSMarker]){
         
         if selectedMarker.title == "delete" {
-            let alert = UIAlertController(title: NSLocalizedString("Enter Coordinates", comment: ""), message: "", preferredStyle: .alert)
-            alert.addTextField()
-            alert.textFields![0].keyboardType = .decimalPad
-            alert.textFields![0].text = String(format: "%.4f", selectedMarker.position.latitude)
-            alert.textFields![0].clearButtonMode = .always
-            alert.textFields![0].borderStyle = .roundedRect
-            
-            //let iconView = UIImageView(frame: CGRect(x: 10, y: 5, width: 20, height: 20))
-            //iconView.image = image
-            //let iconContainerView: UIView = UIView(frame: CGRect(x: 20, y: 0, width: 30, height: 30))
-            //iconContainerView.addSubview(iconView)
-            //leftView = iconContainerView
-            //leftViewMode = .always
-            
-            let label = UILabel(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
-            label.text = NSLocalizedString("Lat", comment: "")
-            
-            alert.textFields![0].leftView = label
-            //alert.textFields![0].leftView?.addSubview(label)
-            alert.textFields![0].leftViewMode = .always
-            alert.textFields![0].leftViewRect(forBounds: CGRect(x: alert.textFields![0].bounds.midX, y: alert.textFields![0].bounds.midY, width: 0, height: 0))
-            
-            
-            alert.addTextField()
-            alert.textFields![1].keyboardType = .decimalPad
-            alert.textFields![1].text = String(format: "%.4f",selectedMarker.position.longitude)
-            alert.textFields![1].clearButtonMode = .always
-            alert.textFields![1].borderStyle = .roundedRect
-            
-            let label1 = UILabel(frame: CGRect(x: 0, y: 0, width: 20, height: 20))
-            
-            label1.text = NSLocalizedString("Lon", comment: "")
-            alert.textFields![1].leftView = label1
-            //alert.textFields![0].leftView?.addSubview(label)
-            alert.textFields![1].leftViewMode = .always
-            alert.textFields![1].leftViewRect(forBounds: CGRect(x: alert.textFields![1].bounds.midX, y: alert.textFields![1].bounds.midY, width: 0, height: 0))
-            
-            alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: nil))
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Submit", comment: ""), style: .default, handler: { (uiAlertAction) in
-                if let latText = alert.textFields![0].text, let lonText = alert.textFields![1].text {
-                    
-                    if let lat = Double(latText) {
-                        print(lat)
-                        selectedMarker.position.latitude = lat
-                        
-                    }
-                    
-                    if let lon = Double(lonText) {
-                        print(lon)
-                        selectedMarker.position.longitude = lon
-                    }
-                    
-                }
+            AlertsHelper.moveCornerAlert(on: self,
+                                         position: selectedMarker.position) { position in
+                selectedMarker.position = position
                 self.markerDidDrag(didDrag: selectedMarker, isDraggedByCalculation: true)
-                print(selectedMarker.position.latitude)
-                print(selectedMarker.position.longitude)
-            }))
-            present(alert, animated: true, completion: nil)
+            }
         }
         
         if editingOverlayType != .place {
@@ -837,44 +744,15 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         }
         
         if !isInitialState {
-            
-            let alert = UIAlertController(title: String(format: NSLocalizedString("For  %@", comment: ""), fieldsController!.selectedField.title), message: "", preferredStyle: .actionSheet)
-            
-            
-       
-            let titleAttributes = [NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-Bold", size: 25)!, NSAttributedString.Key.foregroundColor: UIColor.black]
-            let titleString = NSAttributedString(string: String(format: NSLocalizedString("For %@", comment: ""), fieldsController!.selectedField.title), attributes: titleAttributes)
-            //let messageAttributes = [NSAttributedString.Key.font: UIFont(name: "Helvetica", size: 17)!, NSAttributedString.Key.foregroundColor: UIColor.red]
-            //let messageString = NSAttributedString(string: "Company name", attributes: messageAttributes)
-            alert.setValue(titleString, forKey: "attributedTitle")
-            //alert.setValue(messageString, forKey: "attributedMessage")
-            
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Edit field overlay", comment: ""), style: .default, handler: { (uiAlertAction) in
+            guard let fieldsController = fieldsController else { return }
+            AlertsHelper.overlayActionSheet(on: self,
+                                            overlayTitle: fieldsController.selectedField.title) {
                 self.editFieldMapActions()
-            }))
-            
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Edit items", comment: ""), style: .default, handler: { (uiAlertAction) in
+            } editItemsAction: {
                 self.performSegue(withIdentifier: K.segueIdentifiers.goToItemsFromMapView, sender: self)
-            }))
-            
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Open info page", comment: ""), style: .default, handler: { (uiAlertAction) in
+            } infoPageAction: {
                 self.performSegue(withIdentifier: K.segueIdentifiers.mapViewToInfoView, sender: self)
-            }))
-            
-            if UIDevice.current.userInterfaceIdiom == .phone {
-                alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
-            } else if UIDevice.current.userInterfaceIdiom == .pad {
-                alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .destructive, handler: nil))
-                
-                if let popoverController = alert.popoverPresentationController {
-                    popoverController.sourceView = self.view //to set the source of your alert
-                    popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
-                    popoverController.permittedArrowDirections = [] //to hide the arrow of any particular direction
-                }
-                
             }
-            
-            present(alert, animated: true, completion: nil)
         } else {
             editFieldMapActions()
         }
@@ -923,41 +801,15 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         
         if !isInitialState {
             
-            let alert = UIAlertController(title: String(format: NSLocalizedString("For %@", comment: ""), linesController!.selectedLine.title), message: "", preferredStyle: .actionSheet)
-       
-            let titleAttributes = [NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-Bold", size: 25)!, NSAttributedString.Key.foregroundColor: UIColor.black]
-            let titleString = NSAttributedString(string: String(format: NSLocalizedString("For %@", comment: ""), linesController!.selectedLine.title), attributes: titleAttributes)
-            //let messageAttributes = [NSAttributedString.Key.font: UIFont(name: "Helvetica", size: 17)!, NSAttributedString.Key.foregroundColor: UIColor.red]
-            //let messageString = NSAttributedString(string: "Company name", attributes: messageAttributes)
-            alert.setValue(titleString, forKey: "attributedTitle")
-            //alert.setValue(messageString, forKey: "attributedMessage")
-            
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Edit line overlay", comment: ""), style: .default, handler: { (uiAlertAction) in
+            guard let linesController = linesController else { return }
+            AlertsHelper.overlayActionSheet(on: self,
+                                            overlayTitle: linesController.selectedLine.title) {
                 self.editLineMapActions()
-            }))
-            
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Edit items", comment: ""), style: .default, handler: { (uiAlertAction) in
+            } editItemsAction: {
                 self.performSegue(withIdentifier: K.segueIdentifiers.goToItemsFromMapView, sender: self)
-            }))
-            
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Open info page", comment: ""), style: .default, handler: { (uiAlertAction) in
+            } infoPageAction: {
                 self.performSegue(withIdentifier: K.segueIdentifiers.mapViewToInfoView, sender: self)
-            }))
-            
-            if UIDevice.current.userInterfaceIdiom == .phone {
-                alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
-            } else if UIDevice.current.userInterfaceIdiom == .pad {
-                alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .destructive, handler: nil))
-                
-                if let popoverController = alert.popoverPresentationController {
-                    popoverController.sourceView = self.view //to set the source of your alert
-                    popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
-                    popoverController.permittedArrowDirections = [] //to hide the arrow of any particular direction
-                }
-                
             }
-            
-            present(alert, animated: true, completion: nil)
         } else {
             editLineMapActions()
         }
@@ -996,59 +848,27 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     func editPlace(placeMarker: GMSMarker) {
         editingOverlayType = .place
         minusButton.image = UIImage()
-        //minusButton.image = UIImage(systemName: K.systemImages.minusCircleFill)
         plusButton.isEnabled = true
         plusButton.image = UIImage()
-        //plusButton.image = UIImage(systemName: K.systemImages.plusCircleFill)
         selectAllButton.isEnabled = false
         selectAllButton.image = UIImage()
         
         placeMarker.isDraggable = true
-        
         
         if let place = placesController!.places!.first(where: {$0.id == placeMarker.title}) {
             placesController?.selectedPlace = place
         }
         
         if !isInitialState {
-            
-            
-            
-            let alert = UIAlertController(title: String(format: NSLocalizedString("For %@", comment: ""), linesController!.selectedLine.title) , message: "", preferredStyle: .actionSheet)
-       
-            let titleAttributes = [NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-Bold", size: 25)!, NSAttributedString.Key.foregroundColor: UIColor.black]
-            let titleString = NSAttributedString(string: String(format: NSLocalizedString("For %@", comment: ""), placesController!.selectedPlace.title), attributes: titleAttributes)
-            //let messageAttributes = [NSAttributedString.Key.font: UIFont(name: "Helvetica", size: 17)!, NSAttributedString.Key.foregroundColor: UIColor.red]
-            //let messageString = NSAttributedString(string: "Company name", attributes: messageAttributes)
-            alert.setValue(titleString, forKey: "attributedTitle")
-            //alert.setValue(messageString, forKey: "attributedMessage")
-            
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Edit place overlay", comment: ""), style: .default, handler: { (uiAlertAction) in
+            guard let placesController = placesController else { return }
+            AlertsHelper.overlayActionSheet(on: self,
+                                            overlayTitle: placesController.selectedPlace.title) {
                 self.editPlaceMapActions()
-            }))
-            
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Edit items", comment: ""), style: .default, handler: { (uiAlertAction) in
+            } editItemsAction: {
                 self.performSegue(withIdentifier: K.segueIdentifiers.goToItemsFromMapView, sender: self)
-            }))
-            
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Open info page", comment: ""), style: .default, handler: { (uiAlertAction) in
+            } infoPageAction: {
                 self.performSegue(withIdentifier: K.segueIdentifiers.mapViewToInfoView, sender: self)
-            }))
-            
-            if UIDevice.current.userInterfaceIdiom == .phone {
-                alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
-            } else if UIDevice.current.userInterfaceIdiom == .pad {
-                alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .destructive, handler: nil))
-                
-                if let popoverController = alert.popoverPresentationController {
-                    popoverController.sourceView = self.view //to set the source of your alert
-                    popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
-                    popoverController.permittedArrowDirections = [] //to hide the arrow of any particular direction
-                }
-                
             }
-            
-            present(alert, animated: true, completion: nil)
         } else {
             editPlaceMapActions()
         }
@@ -1198,7 +1018,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             }
         }
         if errorMessage != "done" {
-            errorAlert(errorMessage: errorMessage)
+            AlertsHelper.errorAlert(on: self, with: errorMessage, errorMessage: "")
             isInitialState = false
             hideView(view: arrowButton, hidden: false)
             self.navigationController?.navigationBar.isHidden = false
@@ -1221,14 +1041,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         }
         addFormStackView.isHidden = true
     }
-    //MARK: - errorAlert
-    func errorAlert(errorMessage: String) {
-        let alert = UIAlertController(title: errorMessage, message: "", preferredStyle: .alert)
-        let editItemsAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .cancel)
-        alert.addAction(editItemsAction)
-        present(alert, animated: true, completion: nil)
-    }
-    
     //MARK: - arrowButtonTapped
     @IBAction func arrowButtonTapped(_ sender: UIButton) {
         hideView(view: arrowButton, hidden: true, transitionOption: .transitionFlipFromRight)
@@ -1414,16 +1226,10 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             case .settings:
                 self.selectSegue(segueIdentifier: K.segueIdentifiers.goToSettings)
             case .importFile:
-                let alert = UIAlertController(title: NSLocalizedString("Import/Export File", comment: ""), message: NSLocalizedString("Do you want to import or export GeoJSON file?", comment: ""), preferredStyle: .alert)
-                alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
-                alert.addAction(UIAlertAction(title: NSLocalizedString("Import", comment: ""), style: .default, handler: { (action) in
+                AlertsHelper.importExportAlert(on: self) {
                     self.importFile()
-                }))
-                alert.addAction(UIAlertAction(title: NSLocalizedString("Export", comment: ""), style: .default, handler: { (action) in
+                } exportAction: {
                     self.exportFileType()
-                }))
-                DispatchQueue.main.async {
-                    self.present(alert, animated: true, completion: nil)
                 }
             default:
                 break
@@ -1518,49 +1324,44 @@ extension MapViewController{
     @IBAction func trashButtonTapped(_ sender: UIBarButtonItem) {
         switch editingOverlayType {
         case .field:
-            
-            let alert = UIAlertController(title: String(format: NSLocalizedString("Delete %@", comment: ""), fieldsController!.selectedField.title), message: NSLocalizedString("Field's overlay, to-do items and photos will be deleted.", comment: ""), preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Delete", comment: ""), style: .destructive, handler: { [self] (uiAlertAction) in
+            guard let fieldsController = fieldsController else { return }
+            AlertsHelper.deleteAlert(on: self,
+                                     with: .field,
+                                     overlayTitle: fieldsController.selectedField.title) { [unowned self] in
                 if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
-                    fieldsController?.deleteFieldFromCloud(field: fieldsController!.selectedField)
+                    fieldsController.deleteFieldFromCloud(field: fieldsController.selectedField)
                 }
-                fieldsController?.deleteFieldFromDB(field: fieldsController!.selectedField)
+                fieldsController.deleteFieldFromDB(field: fieldsController.selectedField)
                 endEditing()
                 if userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
                     hideView(view: bannerView, hidden: false)
                 }
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-            present(alert, animated: true, completion: nil)
-            
+            }
         case .line:
-            
-            let alert = UIAlertController(title: String(format: NSLocalizedString("Delete %@", comment: ""), linesController!.selectedLine.title), message: NSLocalizedString("Line's overlay, to-do items and photos will be deleted.", comment: ""), preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Delete", comment: ""), style: .destructive, handler: { [self] (uiAlertAction) in
-                linesController?.deleteLineFromCloud(line: linesController!.selectedLine)
-                linesController?.deleteSelectedLineFromDB(line: linesController!.selectedLine)
+            guard let linesController = linesController else { return }
+            AlertsHelper.deleteAlert(on: self,
+                                     with: .line,
+                                     overlayTitle: linesController.selectedLine.title) { [unowned self] in
+                linesController.deleteLineFromCloud(line: linesController.selectedLine)
+                linesController.deleteSelectedLineFromDB(line: linesController.selectedLine)
                 endEditing()
                 if userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
                     hideView(view: bannerView, hidden: false)
                 }
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-            present(alert, animated: true, completion: nil)
-            
+            }
         case .place:
-            
-            let alert = UIAlertController(title: String(format: NSLocalizedString("Delete %@", comment: ""), placesController!.selectedPlace.title), message: NSLocalizedString("Place's overlay, to-do items and photos will be deleted.", comment: ""), preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Delete", comment: ""), style: .destructive, handler: { [self] (uiAlertAction) in
-                placesController!.deletePlaceFromCloud(place: placesController!.selectedPlace)
-                placesController!.deletePlaceFromDB(place: placesController!.selectedPlace)
+            guard let placesController = placesController else { return }
+            AlertsHelper.deleteAlert(on: self,
+                                     with: .place,
+                                     overlayTitle: placesController.selectedPlace.title
+                                        ) { [unowned self] in
+                placesController.deletePlaceFromCloud(place: placesController.selectedPlace)
+                placesController.deletePlaceFromDB(place: placesController.selectedPlace)
                 endEditing()
                 if userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
                     hideView(view: bannerView, hidden: false)
                 }
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-            present(alert, animated: true, completion: nil)
-            
+            }
         }
     }
     //MARK: - colorBarButtonItemTapped
@@ -1818,13 +1619,8 @@ extension MapViewController{
                     }
                     
                     if markersCount == fieldsController?.selectedFieldMarkers.count {
-                        let alert = UIAlertController(title: NSLocalizedString("Oops!", comment: "") , message: K.errorMessages.deletingCornerErrorMessage, preferredStyle: .alert)
-                        let editItemsAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .cancel) { (action) in
-                            
-                        }
-                        alert.addAction(editItemsAction)
-                        present(alert, animated: true, completion: nil)
-                        
+                        AlertsHelper.errorAlert(on: self,
+                                                with: NSLocalizedString("Oops!", comment: ""), errorMessage: K.errorMessages.deletingCornerErrorMessage)
                     } else {
                         if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
                             fieldsController?.deleteSelectedFieldLengthMarker(index: deletedMarkerIndex, isMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
@@ -1840,15 +1636,7 @@ extension MapViewController{
                         areaLabelSet()
                     }
                 } else {
-                    let alert = UIAlertController(title: (fieldsController?.selectedField.title)! + K.errorMessages.tooFewCornerCountForFieldErrorMessage, message: "", preferredStyle: .alert)
-                    
-                    let editItemsAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .cancel) { (action) in
-                        
-                    }
-                    
-                    alert.addAction(editItemsAction)
-                    
-                    present(alert, animated: true, completion: nil)
+                    AlertsHelper.errorAlert(on: self, with: (fieldsController?.selectedField.title)! + K.errorMessages.tooFewCornerCountForFieldErrorMessage, errorMessage: "")
                 }
             }
         case .line:
@@ -1869,13 +1657,7 @@ extension MapViewController{
                     }
                     
                     if markersCount == linesController?.selectedLineMarkers.count {
-                        let alert = UIAlertController(title: NSLocalizedString("Oops!", comment: "") , message: K.errorMessages.deletingCornerErrorMessage, preferredStyle: .alert)
-                        let editItemsAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .cancel) { (action) in
-                            
-                        }
-                        alert.addAction(editItemsAction)
-                        present(alert, animated: true, completion: nil)
-                        
+                        AlertsHelper.errorAlert(on: self, with: NSLocalizedString("Oops!", comment: ""), errorMessage: K.errorMessages.deletingCornerErrorMessage)
                     } else {
                         if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
                             linesController?.deleteSelectedLineLengthMarker(index: deletedMarkerIndex, isMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
@@ -1892,15 +1674,9 @@ extension MapViewController{
                     linesController?.selectedPolyline.map = mapView
                     areaLabelSet()
                 } else {
-                    let alert = UIAlertController(title: (fieldsController?.selectedField.title)! + K.errorMessages.tooFewCornerCountForLineErrorMessage, message: "", preferredStyle: .alert)
-                    
-                    let editItemsAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .cancel) { (action) in
-                        
-                    }
-                    
-                    alert.addAction(editItemsAction)
-                    
-                    present(alert, animated: true, completion: nil)
+                    AlertsHelper.errorAlert(on: self,
+                                            with: (fieldsController?.selectedField.title)! + K.errorMessages.tooFewCornerCountForLineErrorMessage,
+                                            errorMessage: "")
                 }
             }
         case .place:
@@ -2357,38 +2133,21 @@ extension MapViewController: UIDocumentPickerDelegate,UINavigationControllerDele
     //MARK: - exportFile
     func exportFileType() {
         DispatchQueue.main.async {
-            self.exportFileContent(isGeoJson: true)
+            self.exportFileContent()
         }
     }
     //MARK: - exportFiles
-    func exportFileContent(isGeoJson: Bool) {
-        let alert = UIAlertController(title: "Export File", message: "Export", preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: NSLocalizedString("All Fields", comment: ""), style: .default, handler: { [self] (action) in
-            exportFileFinal(isGeoJson: isGeoJson, exportType: "fields")
-        }))
-        alert.addAction(UIAlertAction(title: NSLocalizedString("All Lines", comment: ""), style: .default, handler: { [self] (action) in
-            exportFileFinal(isGeoJson: isGeoJson, exportType: "lines")
-        }))
-        alert.addAction(UIAlertAction(title: NSLocalizedString("All Places", comment: ""), style: .default, handler: { [self] (action) in
-            exportFileFinal(isGeoJson: isGeoJson, exportType: "places")
-        }))
-        alert.addAction(UIAlertAction(title: NSLocalizedString("All Overlays", comment: ""), style: .default, handler: { [self] (action) in
-            exportFileFinal(isGeoJson: isGeoJson, exportType: "all")
-        }))
-        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
-        DispatchQueue.main.async {
-            self.present(alert, animated: true, completion: nil)
+    func exportFileContent() {
+        AlertsHelper.exportTypesAlert(on: self) { exportType in
+            self.exportFileFinal(exportType: exportType)
         }
     }
     //MARK: - exportFileFinal
-    func exportFileFinal(isGeoJson: Bool, exportType: String) {
+    func exportFileFinal(exportType: ExportTypes) {
         let geo = GeoJsonTemplates()
-        
-        if isGeoJson {
-            geo.makeGeojsonFile(exportType: exportType, fieldsController: fieldsController!, linesController: linesController!, placesController: placesController!, completion: {
-                AlertsHelper.exportFileTaskCompletedAlert(on: self, isGeoJson: isGeoJson)
-            })
-        }
+        geo.makeGeojsonFile(exportType: exportType, fieldsController: fieldsController!, linesController: linesController!, placesController: placesController!, completion: {
+            AlertsHelper.exportFileTaskCompletedAlert(on: self)
+        })
     }
     
     //MARK: - importFileAlert

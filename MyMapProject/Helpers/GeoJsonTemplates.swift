@@ -31,7 +31,7 @@ struct GeoJsonTemplates {
             }
             """
     
-    func makeGeojsonFile(exportType: String, fieldsController: FieldsController, linesController: LinesController, placesController: PlacesController, completion: @escaping () -> Void ) {
+    func makeGeojsonFile(exportType: ExportTypes, fieldsController: FieldsController, linesController: LinesController, placesController: PlacesController, completion: @escaping () -> Void ) {
         
         var json = """
                     {
@@ -39,21 +39,21 @@ struct GeoJsonTemplates {
                         "features": [
                     """
         
-        if exportType == "all" || exportType == "fields" {
+        if exportType == .all || exportType == .fields {
             fieldsController.fields?.forEach({ (field) in
                 json += makeFieldsGeoJSONString(field: field)
                 json += ","
             })
         }
         
-        if exportType == "all" || exportType == "lines" {
+        if exportType == .all || exportType == .lines {
             linesController.lines?.forEach({ (line) in
                 json += makeLinesGeoJSONString(line: line)
                 json += ","
             })
         }
         
-        if exportType == "all" || exportType == "places" {
+        if exportType == .all || exportType == .places {
             placesController.places?.forEach({ (place) in
                 json += makePlacesGeoJSONString(place: place)
                 json += ","
