@@ -48,12 +48,6 @@ class PremiumViewController: UIViewController {
         }
         userDefaults = realm.objects(UserDefaults.self)
         setAutoLayout()
-        
-//        buyButton.isHidden = true
-        
-        //print(userDefaults?.first?.accountType)
-        
-        
     }
     
     //MARK: - buyProButtonTapped
@@ -80,14 +74,10 @@ class PremiumViewController: UIViewController {
                         navigationController?.popToRootViewController(animated: true)
                     }
                 } else {
-                    let alert = UIAlertController(title:NSLocalizedString("Restore Subscription", comment: "") , message: "For restoring purpose, any subscription info not found.", preferredStyle: .alert)
-                    let okAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default)
-                    alert.addAction(okAction)
-                    present(alert, animated: true)
+                    AlertsHelper.restoreSubscriptionAlert(on: self)
                 }
             }
         }
-        
     }
     
     

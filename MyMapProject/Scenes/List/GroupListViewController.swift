@@ -30,81 +30,68 @@ class GroupListViewController: SwipeTableViewController, UITextFieldDelegate {
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
         guard orientation == .right else { return nil }
         
-        if fieldsController!.groups![indexPath.row].title == NSLocalizedString("Groupless Group", comment: "") {
-            return nil
-        }
+        guard fieldsController!.groups![indexPath.row].title == NSLocalizedString("Groupless Group", comment: ""),
+              let fieldsController = self.fieldsController,
+              let groups = fieldsController.groups else { return nil }
+        
         let deleteAction = SwipeAction(style: .destructive, title: NSLocalizedString("Delete", comment: "")){ action, indexPath in
             
-            let alert = UIAlertController(title: String(format: NSLocalizedString("Delete group  %@ ", comment: ""), self.fieldsController!.groups![indexPath.row].title), message: K.deleteGroupWithAllFields, preferredStyle: .alert)
-            
-            let deleteWithFields = UIAlertAction(title: NSLocalizedString("Delete", comment: ""), style: .destructive) { (action) in
+            AlertsHelper.deleteAlert(on: self,
+                                     with: .group,
+                                     overlayTitle: groups[indexPath.row].title) { [weak self] in
+                guard let self = self,
+                      let fieldsController = self.fieldsController,
+                      let groups = fieldsController.groups else { return }
                 
-                if let groupForDeletion = self.fieldsController!.groups?[indexPath.row] {
-                    for field in groupForDeletion.fields {
-                        self.fieldsController?.selectedField = field
-                        self.fieldsController?.deleteFieldFromCloud(field: self.fieldsController!.selectedField)
-                        self.fieldsController?.deleteFieldFromDB(field: self.fieldsController!.selectedField)
-                    }
-                    self.fieldsController!.deleteGroupFromCloud(group: groupForDeletion)
-                    self.fieldsController!.deleteGroupFromDB(group: groupForDeletion)
+                let groupForDeletion = groups[indexPath.row]
+                for field in groupForDeletion.fields {
+                    fieldsController.selectedField = field
+                    fieldsController.deleteFieldFromCloud(field: fieldsController.selectedField)
+                    fieldsController.deleteFieldFromDB(field: fieldsController.selectedField)
                 }
+                fieldsController.deleteGroupFromCloud(group: groupForDeletion)
+                fieldsController.deleteGroupFromDB(group: groupForDeletion)
+                
                 self.tableView.reloadData()
             }
-            
-            let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { (action) in }
-            
-            alert.addAction(deleteWithFields)
-            //alert.addAction(deleteGroupItems)
-            alert.addAction(cancelAction)
-            
-            self.present(alert, animated: true, completion: nil)
         }
 
         // customize the action appearance
         deleteAction.image = UIImage(systemName: K.systemImages.trashFill)
   
         let changeTitle = SwipeAction(style: .default, title: NSLocalizedString("Title", comment: "")) { action, indexPath in
-            var textField = UITextField()
             
-            let alert = UIAlertController(title: String(format: NSLocalizedString("Change %@'s Title", comment: ""), self.fieldsController!.groups![indexPath.row].title), message: "", preferredStyle: .alert)
-           
-            let action = UIAlertAction(title: NSLocalizedString("Change", comment: ""), style: .default) { [self] (action) in
-                
-                if let text = textField.text {
-                    let oldGroup = fieldsController!.groups![indexPath.row]
-                    if let group = self.fieldsController!.groups!.first(where: {$0.title == text}) {
-                        for field in self.fieldsController!.groups![indexPath.row].fields {
-                            if let polygon = self.fieldsController!.polygons.first(where: {$0.title == field.id}) {
-                                fieldsController!.changeFieldGroup(field: field, oldGroup: oldGroup, newGroup: group, polygon: polygon)
-                            }
-                            fieldsController!.changeFieldGroupAtCloud(field: field, newGroup: group)
-                            //fieldsController!.setColor(color: group.color, field: field)
+            guard let fieldsController = self.fieldsController,
+                  let groups = fieldsController.groups else { return }
+            
+            AlertsHelper.changeTitleAlert(on: self,
+                                          title: groups[indexPath.row].title,
+                                          overlayType: .group) { [weak self] newTitle in
+                guard let self = self,
+                      let fieldsController = self.fieldsController,
+                      let groups = fieldsController.groups else { return }
+                let oldGroup = groups[indexPath.row]
+                if let group = groups.first(where: {$0.title == newTitle}) {
+                    for field in groups[indexPath.row].fields {
+                        if let polygon = fieldsController.polygons.first(where: {$0.title == field.id}) {
+                            fieldsController.changeFieldGroup(field: field, oldGroup: oldGroup, newGroup: group, polygon: polygon)
                         }
-                        fieldsController!.deleteGroupFromCloud(group: oldGroup)
-                        fieldsController!.deleteGroupFromDB(group: oldGroup)
+                        fieldsController.changeFieldGroupAtCloud(field: field, newGroup: group)
+                        //fieldsController!.setColor(color: group.color, field: field)
+                    }
+                    fieldsController.deleteGroupFromCloud(group: oldGroup)
+                    fieldsController.deleteGroupFromDB(group: oldGroup)
+                } else {
+                    if newTitle.count != 0 {
+                        fieldsController.changeGroupTitle(group: oldGroup, title: newTitle)
+                        fieldsController.changeGroupTitleAtCloud(group: oldGroup, title: newTitle)
                     } else {
-                        if text.count != 0 {
-                            fieldsController!.changeGroupTitle(group: oldGroup, title: text)
-                            fieldsController!.changeGroupTitleAtCloud(group: oldGroup, title: text)
-                        }
+                        AlertsHelper.errorAlert(on: self,
+                                                with: NSLocalizedString("Oops!", comment: ""), errorMessage: NSLocalizedString("Group needs a title.", comment: ""))
                     }
                 }
-                tableView.reloadData()
+                self.tableView.reloadData()
             }
-            
-            let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { (action) in
-            }
-            
-            alert.addTextField { (alertTextField) in
-                alertTextField.placeholder = NSLocalizedString("New Title", comment: "")
-                textField = alertTextField
-                alertTextField.delegate = self
-            }
-            
-            alert.addAction(action)
-            alert.addAction(cancelAction)
-           
-            self.present(alert, animated: true, completion: nil)
         }
 
         // customize the action appearance

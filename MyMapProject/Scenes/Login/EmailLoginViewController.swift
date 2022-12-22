@@ -90,39 +90,11 @@ class EmailLoginViewController: UIViewController, UINavigationControllerDelegate
     }
     //MARK: - PasswordForgottenButtonTapped
     @IBAction func PasswordForgottenButtonTapped(_ sender: UIButton) {
-        let ac = UIAlertController(title: NSLocalizedString("Enter Email", comment: ""), message: NSLocalizedString("A password reset email will be sent.", comment: ""), preferredStyle: .alert)
-            ac.addTextField()
-            ac.textFields![0].placeholder = "Email Address"
-
-            let submitAction = UIAlertAction(title: NSLocalizedString("Submit", comment: ""), style: .default) { [unowned ac] _ in
-                let email = ac.textFields![0].text
-                Auth.auth().sendPasswordReset(withEmail: email!) { [self] error in
-                    if let error = error {
-                        if let errCode = AuthErrorCode(rawValue: error._code) {
-                            switch errCode {
-                                case .missingEmail:
-                                errorLabel.isHidden = false
-                                errorLabel.text = NSLocalizedString("An email address must be provided.", comment: "")
-                                case .invalidEmail:
-                                errorLabel.isHidden = false
-                                errorLabel.text = NSLocalizedString("Email address is badly formatted.", comment: "")
-                                default:
-                                    errorLabel.isHidden = false
-                                    errorLabel.text = error.localizedDescription
-                            }
-                        }
-                    } else {
-                        errorLabel.isHidden = false
-                        errorLabel.text = NSLocalizedString("A password reset email has been sent.", comment: "")
-                    }
-                }
-            }
-        
-        let cancelAction = UIAlertAction(title: NSLocalizedString(NSLocalizedString("Cancel", comment: ""), comment: ""), style: .destructive)
-        ac.addAction(cancelAction)
-        ac.addAction(submitAction)
-
-        present(ac, animated: true)
+        AuthAlertsHelper.passwordForgottenAlert(on: self) { [weak self] text, isHidden in
+            guard let self = self else { return }
+            self.errorLabel.isHidden = false
+            self.errorLabel.text = text
+        }
     }
     
     //MARK: - textFieldShouldReturn

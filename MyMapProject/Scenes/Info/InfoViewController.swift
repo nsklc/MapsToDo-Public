@@ -236,54 +236,51 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
     //MARK: - deleteButtonTapped
     @IBAction func deleteButtonTapped(_ sender: UIButton) {
         
-        let alert = UIAlertController(title: NSLocalizedString("Delete this image", comment: ""), message: "", preferredStyle: .alert)
-        
-        let deleteAction = UIAlertAction(title: NSLocalizedString("Delete", comment: ""), style: .destructive) { [self] (action) in
-            if images.count != 0 {
-                if let id = imageView.image?.accessibilityIdentifier {
-                    if deleteImage(id: id) {
+        AlertsHelper.deleteAlert(on: self,
+                                 with: .image,
+                                 overlayTitle: nil) { [weak self] in
+            guard let self = self else { return }
+            if self.images.count != 0 {
+                if let id = self.imageView.image?.accessibilityIdentifier {
+                    if self.deleteImage(id: id) {
                         print("image deleted")
-                        images.remove(at: images.firstIndex(of: imageView.image!)!)
+                        self.images.remove(at: self.images.firstIndex(of: self.imageView.image!)!)
                         do {
-                            switch infoPageType {
+                            switch self.infoPageType {
                             case .fieldInfoPage:
                                 try self.realm.write {
-                                    selectedField?.photos.remove(at: (selectedField?.photos.index(of: id))!)
+                                    self.selectedField?.photos.remove(at: (self.selectedField?.photos.index(of: id))!)
                                 }
                             case .lineInfoPage:
                                 try self.realm.write {
-                                    selectedLine?.photos.remove(at: (selectedLine?.photos.index(of: id))!)
+                                    self.selectedLine?.photos.remove(at: (self.selectedLine?.photos.index(of: id))!)
                                 }
                             case .placeInfoPage:
                                 try self.realm.write {
-                                    selectedPlace?.photos.remove(at: (selectedPlace?.photos.index(of: id))!)
+                                    self.selectedPlace?.photos.remove(at: (self.selectedPlace?.photos.index(of: id))!)
                                 }
                             }
                         } catch {
+                            AlertsHelper.savingPhotoAlert(on: self)
                             print("Saving photo in field, \(error)")
                         }
                         
-                        if images.count != 0 {
-                            imageView.image = images[0]
+                        if self.images.count != 0 {
+                            self.imageView.image = self.images[0]
                         } else {
-                            imageView.image = UIImage(systemName: K.imagesFromXCAssets.appLogo)
+                            self.imageView.image = UIImage(systemName: K.imagesFromXCAssets.appLogo)
                         }
                     } else {
-                        print("Image not deleted")
+                        AlertsHelper.savingPhotoAlert(on: self)
                     }
                     self.imageCollectionView.reloadData()
                 }
             } else {
-                imageView.image = UIImage(named: K.imagesFromXCAssets.appLogo)
+                self.imageView.image = UIImage(named: K.imagesFromXCAssets.appLogo)
+                AlertsHelper.thereIsNoPhotoAlert(on: self)
                 print("no image to delete")
             }
         }
-        let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { (action) in}
-        
-        alert.addAction(deleteAction)
-        alert.addAction(cancelAction)
-        present(alert, animated: true, completion: nil)
-        
     }
     //MARK: - saveImage
     func saveImage(image: UIImage) -> String? {

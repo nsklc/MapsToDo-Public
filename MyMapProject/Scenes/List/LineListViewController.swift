@@ -43,28 +43,24 @@ class LineListViewController: SwipeTableViewController, UITextFieldDelegate {
     }
     
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
-        guard orientation == .right else { return nil }
+        guard orientation == .right,
+              let linesController = linesController, let lines = linesController.lines else { return nil }
         
-        linesController?.selectedLine = (linesController?.lines![indexPath.row])!
+        linesController.selectedLine = lines[indexPath.row]
         
         let deleteAction = SwipeAction(style: .destructive, title: NSLocalizedString("Delete", comment: "")) { [self] action, indexPath in
-            // handle action by updating model with deletion
             
-            let alert = UIAlertController(title: String(format: NSLocalizedString("Delete %@", comment: ""), linesController!.selectedLine.title), message: NSLocalizedString("Line's overlay, to-do items and photos items will be deleted.", comment: ""), preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: NSLocalizedString("Delete", comment: ""), style: .destructive, handler: { [self] (uiAlertAction) in
-                
-                
-                linesController?.deleteLineFromCloud(line: linesController!.selectedLine)
-                linesController?.deleteSelectedLineFromDB(line: linesController!.selectedLine)
-                tableView.reloadData()
-                
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-            present(alert, animated: true, completion: nil)
-            
-            
+            AlertsHelper.deleteAlert(on: self,
+                                     with: .line,
+                                     overlayTitle: linesController.selectedLine.title) { [weak self] in
+                guard let self = self,
+                        let linesController = self.linesController else { return }
+                linesController.deleteLineFromCloud(line: linesController.selectedLine)
+                linesController.deleteSelectedLineFromDB(line: linesController.selectedLine)
+                self.tableView.reloadData()
+            }
         }
-        if let polyline = self.linesController!.polylines.first(where: {$0.title == linesController!.lines![indexPath.row].id}) {
+        if let polyline = linesController.polylines.first(where: {$0.title == lines[indexPath.row].id}) {
             cameraPositionPath = polyline.path
         }
         
@@ -73,11 +69,7 @@ class LineListViewController: SwipeTableViewController, UITextFieldDelegate {
         deleteAction.image = UIImage(systemName: K.systemImages.trashFill)
         
         let findInTheMap = SwipeAction(style: .default, title: NSLocalizedString("Location", comment: "")) { action, indexPath in
-            // handle action by updating model with go to map
-            
-            //_ = self.navigationController?.popViewController(animated: true)
-            self.temp()
-             
+            self.goBackToMapView()
         }
 
         // customize the action appearance
@@ -85,37 +77,19 @@ class LineListViewController: SwipeTableViewController, UITextFieldDelegate {
         findInTheMap.backgroundColor = #colorLiteral(red: 0.03921568627, green: 0.5176470588, blue: 1, alpha: 1)
         
         let changeTitle = SwipeAction(style: .default, title: NSLocalizedString("Title", comment: "")) { action, indexPath in
-            var textField = UITextField()
-            
-            let alert = UIAlertController(title: String(format: NSLocalizedString("Change %@'s Title", comment: ""), self.linesController!.lines![indexPath.row].title), message: "", preferredStyle: .alert)
-           
-            let action = UIAlertAction(title: NSLocalizedString("Change", comment: ""), style: .default) { (action) in
-                if let text = textField.text {
-                    if text.count != 0 {
-                        self.linesController!.changeTitle(for: (self.linesController?.lines![indexPath.row])!, title: text)
-                    }
-                }
-                self.tableView.reloadData()
+            guard let linesController = self.linesController,
+                    let lines = linesController.lines else { return }
+            AlertsHelper.changeTitleAlert(on: self,
+                                          title: lines[indexPath.row].title,
+                                          overlayType: .line) { newTitle in
+                linesController.changeTitle(for: (lines[indexPath.row]), title: newTitle)
+                tableView.reloadData()
             }
-            
-            let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { (action) in
-            }
-            
-            alert.addTextField { (alertTextField) in
-                alertTextField.placeholder = NSLocalizedString("New Title", comment: "")
-                textField = alertTextField
-                alertTextField.delegate = self
-            }
-            
-            alert.addAction(action)
-            alert.addAction(cancelAction)
-           
-            self.present(alert, animated: true, completion: nil)
         }
 
         // customize the action appearance
         changeTitle.image = UIImage(systemName: K.systemImages.rectangleAndPencilAndEllipsisrtl)
-        if linesController?.lines![indexPath.row].color != UIColor.flatYellow().hexValue() {
+        if lines[indexPath.row].color != UIColor.flatYellow().hexValue() {
             changeTitle.backgroundColor = UIColor.flatYellow()
         } else {
             changeTitle.backgroundColor = UIColor.flatBlue()
@@ -124,7 +98,7 @@ class LineListViewController: SwipeTableViewController, UITextFieldDelegate {
         return [deleteAction, findInTheMap, changeTitle]
     }
     
-    func temp() {
+    func goBackToMapView() {
         performSegue(withIdentifier: K.segueIdentifiers.lineListToMapView, sender: self)
     }
     

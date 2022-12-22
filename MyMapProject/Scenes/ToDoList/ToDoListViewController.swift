@@ -114,12 +114,12 @@ class ToDoListViewController: SwipeTableViewController, ToDoListViewControllerPr
         addButton.layer.cornerRadius = 32.5
         addButton.clipsToBounds = true
         addButton.addTarget(self, action: #selector(showAddItemAlert) ,
-                           for: .touchUpInside)
+                            for: .touchUpInside)
         
         tableView.separatorStyle = .singleLine
         tableView.backgroundView = UIImageView(image: UIImage(named: K.imagesFromXCAssets.picture7))
         tableView.backgroundView?.alpha = 0.3
-  
+        
         if let selectedGroup = selectedGroup {
             viewModel.loadItemsWithGroup(selectedGroup: selectedGroup)
         }
@@ -155,100 +155,68 @@ class ToDoListViewController: SwipeTableViewController, ToDoListViewControllerPr
             return
         }
         
-        var textField = UITextField()
-        
-        let alert = UIAlertController(title: NSLocalizedString("Add New Item", comment: ""), message: "", preferredStyle: .alert)
-        
-        var actionTitle = ""
-        switch itemType {
-        case .groupsItem:
-            actionTitle = NSLocalizedString("Add Items as Shared Group Item", comment: "")
-        case .fieldsItem:
-            actionTitle = NSLocalizedString("Add Field Item", comment: "")
-        case .linesItem:
-            actionTitle = NSLocalizedString("Add Line Item", comment: "")
-        case .placesItem:
-            actionTitle = NSLocalizedString("Add Place Item", comment: "")
-        }
-        
-        let action = UIAlertAction(title: actionTitle, style: .default) { (action) in
+        AlertsHelper.addNewItemAlert(on: self,
+                                     itemType: self.itemType) { [weak self] title in
+            guard let self = self else{ return }
+            if title.isEmpty {
+                AlertsHelper.errorAlert(on: self,
+                                        with: NSLocalizedString("Item needs a title.", comment: ""),
+                                        errorMessage: "")
+            } else {
+                switch self.itemType {
+                case .groupsItem:
+                    if let currentGroup = self.selectedGroup {
+                        self.viewModel.addNewToDoItemsToOverlay(title: title, overlay: currentGroup)
+                    }
+                case .fieldsItem:
+                    if let currentField = self.selectedField {
+                        self.viewModel.addNewToDoItemsToOverlay(title: title, overlay: currentField)
+                    }
+                case .linesItem:
+                    if let currentLine = self.selectedLine {
+                        self.viewModel.addNewToDoItemsToOverlay(title: title, overlay: currentLine)
+                    }
+                case .placesItem:
+                    if let currentPlace = self.selectedPlace {
+                        self.viewModel.addNewToDoItemsToOverlay(title: title, overlay: currentPlace)
+                    }
+                }
+            }
             
-            if let text = textField.text {
-                if text.isEmpty {
-                    let alert1 = UIAlertController(title: NSLocalizedString("Item needs a title.", comment: ""), message: "", preferredStyle: .alert)
-                    let action1 = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .cancel) { (action) in
-                        
-                    }
-                    alert1.addAction(action1)
-                    alert1.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
-                    self.present(alert1, animated: true, completion: nil)
-                } else {
-                    switch self.itemType {
-                    case .groupsItem:
-                        if let currentGroup = self.selectedGroup {
-                            self.viewModel.addNewToDoItemsToOverlay(title: text, overlay: currentGroup)
-                        }
-                    case .fieldsItem:
-                        if let currentField = self.selectedField {
-                            self.viewModel.addNewToDoItemsToOverlay(title: text, overlay: currentField)
-                        }
-                    case .linesItem:
-                        if let currentLine = self.selectedLine {
-                            self.viewModel.addNewToDoItemsToOverlay(title: text, overlay: currentLine)
-                        }
-                    case .placesItem:
-                        if let currentPlace = self.selectedPlace {
-                            self.viewModel.addNewToDoItemsToOverlay(title: text, overlay: currentPlace)
-                        }
-                    }
-                    
-                }
-            }
+        } forAllGroupAction: { [weak self] title in
+            guard let self = self,
+                  let currentGroup = self.selectedGroup else { return }
+            self.viewModel.addToDoItemsForAllGroup(group: currentGroup, title: title)
         }
-        
-        alert.addTextField { (alertTextField) in
-            alertTextField.placeholder = NSLocalizedString("Create new item", comment: "")
-            textField = alertTextField
-            alertTextField.delegate = self
-        }
-        
-        alert.addAction(action)
-        
-        if itemType == TodoItemType.groupsItem {
-            let action1 = UIAlertAction(title: NSLocalizedString("Add Items as Individual Field Item", comment: ""), style: .default) { [self] (action) in
-                if let currentGroup = self.selectedGroup, let text = textField.text {
-                    viewModel.addToDoItemsForAllGroup(group: currentGroup, title: text)
-                }
-            }
-            alert.addAction(action1)
-        }
-        alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
-        present(alert, animated: true, completion: nil)
     }
+    
+    
     
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
         
+        
+        
         let deleteAction = SwipeAction(style: .destructive, title: NSLocalizedString("Delete", comment: "")) { action, indexPath in
-           
-            let alert = UIAlertController(title: NSLocalizedString("Delete Item", comment: ""), message: NSLocalizedString("Item will be deleted.", comment: ""), preferredStyle: .alert)
-            alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { [self] (uiAlertAction) in
-                viewModel.deleteItem(at: indexPath, itemType: itemType)
-            }))
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-            self.present(alert, animated: true, completion: nil)
+            
+            AlertsHelper.deleteAlert(on: self,
+                                     with: .item,
+                                     overlayTitle: "") { [weak self] in
+                guard let self = self else { return }
+                self.viewModel.deleteItem(at: indexPath, itemType: self.itemType)
+            }
         }
-
+        
         // customize the action appearance
         deleteAction.image = UIImage(named: "delete-icon")
         
         return [deleteAction]
     }
-
+    
     //MARK: - numberOfRowsInSection
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return viewModel.getToDoItemsCount(itemType: itemType)
     }
-
+    
     //MARK: - cellForRowAt
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
@@ -272,7 +240,7 @@ class ToDoListViewController: SwipeTableViewController, ToDoListViewControllerPr
                     cell.textLabel?.text = item.title
                     cell.detailTextLabel?.text = df.string(from: item.startDate) + " - " + df.string(from: item.endDate)
                     statusIndex = item.status
-                
+                    
                 } else {
                     cell.textLabel?.text = NSLocalizedString("No Items Added", comment: "")
                 }

@@ -437,7 +437,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             } else {
                 if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
                     
-                    AlertsHelper.authInfoAlert(on: self) {
+                    AuthAlertsHelper.authInfoAlert(on: self) {
                         self.performSegue(withIdentifier: K.segueIdentifiers.goToLoginViewController, sender: self)
                     }
                 }
@@ -1226,7 +1226,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             case .settings:
                 self.selectSegue(segueIdentifier: K.segueIdentifiers.goToSettings)
             case .importFile:
-                AlertsHelper.importExportAlert(on: self) {
+                ImportExportAlertsHelper.importExportAlert(on: self) {
                     self.importFile()
                 } exportAction: {
                     self.exportFileType()
@@ -2120,7 +2120,7 @@ extension MapViewController: UIDocumentPickerDelegate,UINavigationControllerDele
         
         if myURL.pathExtension == "geojson" {
             geo.renderGeoJSON(url: myURL, fieldsController: fieldsController!, linesController: linesController!, placesController: placesController!, mapView: mapView) {
-                AlertsHelper.importFileTaskCompletedAlert(on: self)
+                ImportExportAlertsHelper.importFileTaskCompletedAlert(on: self)
             }
         }
     }
@@ -2138,7 +2138,7 @@ extension MapViewController: UIDocumentPickerDelegate,UINavigationControllerDele
     }
     //MARK: - exportFiles
     func exportFileContent() {
-        AlertsHelper.exportTypesAlert(on: self) { exportType in
+        ImportExportAlertsHelper.exportTypesAlert(on: self) { exportType in
             self.exportFileFinal(exportType: exportType)
         }
     }
@@ -2146,7 +2146,7 @@ extension MapViewController: UIDocumentPickerDelegate,UINavigationControllerDele
     func exportFileFinal(exportType: ExportTypes) {
         let geo = GeoJsonTemplates()
         geo.makeGeojsonFile(exportType: exportType, fieldsController: fieldsController!, linesController: linesController!, placesController: placesController!, completion: {
-            AlertsHelper.exportFileTaskCompletedAlert(on: self)
+            ImportExportAlertsHelper.exportFileTaskCompletedAlert(on: self)
         })
     }
     

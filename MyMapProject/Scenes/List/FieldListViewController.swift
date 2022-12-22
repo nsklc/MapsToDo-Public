@@ -10,6 +10,7 @@ import UIKit
 import ChameleonFramework
 import SwipeCellKit
 import GoogleMaps
+import RealmSwift
 
 final class FieldListViewController: SwipeTableViewController, UITextFieldDelegate {
     
@@ -18,10 +19,10 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
     var selectedGroup: Group?
     var isMetric: Bool?
     var groupsCollectionView:UICollectionView?
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         fieldsController!.loadFieldsAndGroups()
         self.tableView.reloadData()
         
@@ -62,7 +63,7 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
         groupsCollectionView.delegate = self
         groupsCollectionView.register(UICollectionViewCell.self, forCellWithReuseIdentifier: "MyCell")
         groupsCollectionView.backgroundColor = UIColor.flatWhite()
-
+        
         self.view.addSubview(groupsCollectionView)
         hideFilterGroupCollection(hide: true)
     }
@@ -72,22 +73,20 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
         options.expansionStyle = .selection
         return options
     }
-
+    
     //MARK: - editActionsForRowAt
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
-        guard orientation == .right else { return nil }
+        guard orientation == .right, let fieldsController = fieldsController else { return nil }
         
-//        cameraPositionForMapView[0] =  (fieldsController!.fields?[indexPath.row].polygonMarkersPositions[0].latitude)!
-//        cameraPositionForMapView[1] = (fieldsController!.fields?[indexPath.row].polygonMarkersPositions[1].longitude)!
-//        cameraPositionForMapView[2] = fabs((-0.008 * (fieldsController!.fields?[indexPath.row].circumference)!) + 22)
-        if let polygon = self.fieldsController!.polygons.first(where: {$0.title == fieldsController!.fields![indexPath.row].id}) {
+        
+        if let polygon = self.fieldsController!.polygons.first(where: {$0.title == fieldsController.fields![indexPath.row].id}) {
             cameraPositionPath = polygon.path
         }
         
         let deleteAction = SwipeAction(style: .destructive, title: NSLocalizedString("Delete", comment: "")) { [self] action, indexPath in
             // handle action by updating model with deletion
             
-            deleteField(field: (fieldsController?.fields![indexPath.row])!)
+            deleteField(field: (fieldsController.fields![indexPath.row]))
             
         }
         
@@ -98,70 +97,28 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
             // handle action by updating model with go to map
             
             //_ = self.navigationController?.popViewController(animated: true)
-            self.temp()
-             
+            self.goBackToMapView()
+            
         }
-
+        
         // customize the action appearance
         findInTheMap.image = UIImage(systemName: K.systemImages.locationFill)
         findInTheMap.backgroundColor = #colorLiteral(red: 0.03921568627, green: 0.5176470588, blue: 1, alpha: 1)
         
         let changeTitle = SwipeAction(style: .default, title: NSLocalizedString("Title", comment: "")) { action, indexPath in
-            var textField = UITextField()
-            
-            let alert = UIAlertController(title: String(format: NSLocalizedString("Change %@'s Title", comment: ""), self.fieldsController!.fields![indexPath.row].title), message: "", preferredStyle: .alert)
-           
-            let action = UIAlertAction(title: NSLocalizedString("Change", comment: ""), style: .default) { (action) in
-                if let title = textField.text {
-                    var isValidName = true
-                    var errorMessage = NSLocalizedString("Field needs a title.", comment: "")
-                    if title.count == 0 {
-                        isValidName = false
-                        errorMessage = NSLocalizedString("Field needs a title.", comment: "")
-                    }
-                    for field in self.fieldsController!.fields! {
-                        if field.title == title {
-                            isValidName = false
-                            errorMessage = NSLocalizedString("Fields cannot have the same title.", comment: "")
-                        }
-                    }
-                    
-                    if isValidName {
-                        self.fieldsController?.changeFieldTitle(field: self.fieldsController!.fields![indexPath.row], title: title)
-                        self.fieldsController?.changeFieldTitleAtCloud(field: self.fieldsController!.fields![indexPath.row], title: title)
-                        self.tableView.reloadData()
-                    } else {
-                        let alert = UIAlertController(title: errorMessage, message: "", preferredStyle: .alert)
-                        
-                        let editItemsAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .cancel) { (action) in
-                            //self.arrowButton.isHidden = false
-                        }
-                        
-                        alert.addAction(editItemsAction)
-                        
-                        self.present(alert, animated: true, completion: nil)
-                    }
-                }
+            guard let fieldsControllerFields = fieldsController.fields else { return }
+            AlertsHelper.changeTitleAlert(on: self,
+                                          title: fieldsControllerFields[indexPath.row].title,
+                                          overlayType: .field) { newTitle in
+                fieldsController.changeFieldTitle(field: fieldsController.fields![indexPath.row], title: newTitle)
+                fieldsController.changeFieldTitleAtCloud(field: fieldsController.fields![indexPath.row], title: newTitle)
+                tableView.reloadData()
             }
-            
-            let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { (action) in
-            }
-            
-            alert.addTextField { (alertTextField) in
-                alertTextField.placeholder = NSLocalizedString("New Title", comment: "")
-                textField = alertTextField
-                alertTextField.delegate = self
-            }
-            
-            alert.addAction(action)
-            alert.addAction(cancelAction)
-           
-            self.present(alert, animated: true, completion: nil)
         }
-
+        
         // customize the action appearance
         changeTitle.image = UIImage(systemName: K.systemImages.rectangleAndPencilAndEllipsisrtl)
-        if fieldsController!.fields![indexPath.row].color != UIColor.flatYellow().hexValue() {
+        if fieldsController.fields![indexPath.row].color != UIColor.flatYellow().hexValue() {
             changeTitle.backgroundColor = UIColor.flatYellow()
         } else {
             changeTitle.backgroundColor = UIColor.flatBlue()
@@ -169,64 +126,49 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
         
         
         let changeGroup = SwipeAction(style: .default, title: NSLocalizedString("Group", comment: "")) { action, indexPath in
-            var textField = UITextField()
             
-            let alert = UIAlertController(title: String(format: NSLocalizedString("Change %@'s Group", comment: ""), self.fieldsController!.fields![indexPath.row].title), message: "", preferredStyle: .alert)
-           
-            let action = UIAlertAction(title: NSLocalizedString("Change", comment: ""), style: .default) { [self] (action) in
+            guard let fieldsController = self.fieldsController,
+                  let fields = fieldsController.fields else { return }
+            
+            AlertsHelper.changeFieldGroupAlert(on: self,
+                                               fieldTitle: fields[indexPath.row].title) { [weak self] groupTitle in
+                guard let self = self,
+                      let fieldsController = self.fieldsController,
+                      let fields = fieldsController.fields else { return }
                 
-                if let field = self.fieldsController!.fields!.first(where: {$0.id == fieldsController!.fields![indexPath.row].id}) {
-                    
-                    if let groupTitle = textField.text {
-                        if let newGroup = fieldsController!.groups!.first(where: {$0.title == groupTitle}) {
+                if let field = fields.first(where: {$0.id == fields[indexPath.row].id}) {
+                    if let newGroup = fieldsController.groups!.first(where: {$0.title == groupTitle}) {
+                        if let polygon = self.fieldsController!.polygons.first(where: {$0.title == field.id}) {
+                            fieldsController.changeFieldGroup(field: field, oldGroup: (field.parentGroup.first)!, newGroup: newGroup, polygon: polygon)
+                            fieldsController.changeFieldGroupAtCloud(field: field, newGroup: newGroup)
+                            fieldsController.setColor(color: newGroup.color, field: field)
+                            fieldsController.saveColor(field: field, color: newGroup.color)
+                        }
+                    } else {
+                        if groupTitle.count != 0 {
                             if let polygon = self.fieldsController!.polygons.first(where: {$0.title == field.id}) {
-                                fieldsController!.changeFieldGroup(field: field, oldGroup: (field.parentGroup.first)!, newGroup: newGroup, polygon: polygon)
-                                fieldsController!.changeFieldGroupAtCloud(field: field, newGroup: newGroup)
-                                fieldsController!.setColor(color: newGroup.color, field: field)
-                                fieldsController!.saveColor(field: field, color: newGroup.color)
+                                let newGroup = Group()
+                                newGroup.title = groupTitle
+                                newGroup.color = UIColor.flatBlueDark().hexValue()
+                                fieldsController.addNewGroup(newGroup: newGroup)
+                                fieldsController.saveGroupToCloud(group: newGroup)
+                                fieldsController.changeFieldGroup(field: field, oldGroup: (field.parentGroup.first)!, newGroup: newGroup, polygon: polygon)
+                                fieldsController.changeFieldGroupAtCloud(field: field, newGroup: newGroup)
+                                fieldsController.loadFieldsAndGroups()
                             }
                         } else {
-                            if groupTitle.count != 0 {
-                                if let polygon = self.fieldsController!.polygons.first(where: {$0.title == field.id}) {
-                                    let newGroup = Group()
-                                    newGroup.title = groupTitle
-                                    newGroup.color = UIColor.flatBlueDark().hexValue()
-                                    fieldsController!.addNewGroup(newGroup: newGroup)
-                                    fieldsController!.saveGroupToCloud(group: newGroup)
-                                    fieldsController!.changeFieldGroup(field: field, oldGroup: (field.parentGroup.first)!, newGroup: newGroup, polygon: polygon)
-                                    fieldsController!.changeFieldGroupAtCloud(field: field, newGroup: newGroup)
-                                    fieldsController!.loadFieldsAndGroups()
-                                }
-                            } else {
-                                
-                            }
+                            AlertsHelper.errorAlert(on: self,
+                                                    with: NSLocalizedString("Oops!", comment: ""), errorMessage: NSLocalizedString("Group needs a title.", comment: ""))
                         }
                     }
-                    
                 }
-                
-                
                 tableView.reloadData()
             }
-            
-            let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { (action) in
-            }
-            
-            alert.addTextField { (alertTextField) in
-                alertTextField.placeholder = NSLocalizedString("New Group Title", comment: "")
-                textField = alertTextField
-                alertTextField.delegate = self
-            }
-            
-            alert.addAction(action)
-            alert.addAction(cancelAction)
-           
-            self.present(alert, animated: true, completion: nil)
         }
-
+        
         // customize the action appearance
         changeGroup.image = UIImage(systemName: K.systemImages.rectangleAndPencilAndEllipsisrtl)
-        if fieldsController!.fields![indexPath.row].color != UIColor.flatLime().hexValue() {
+        if fieldsController.fields![indexPath.row].color != UIColor.flatLime().hexValue() {
             changeGroup.backgroundColor = UIColor.flatLime()
         } else {
             changeGroup.backgroundColor = UIColor.flatBlue()
@@ -237,31 +179,26 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
     //MARK: - deleteField
     func deleteField(field: Field) {
         fieldsController?.selectedField = field
-        
-        let alert = UIAlertController(title: String(format: NSLocalizedString("Delete %@", comment: ""), fieldsController!.selectedField.title), message: NSLocalizedString("Field's overlay, to-do items and photos will be deleted.", comment: ""), preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { [self] (uiAlertAction) in
-            
-            
-            fieldsController?.deleteFieldFromCloud(field: fieldsController!.selectedField)
-            fieldsController?.deleteFieldFromDB(field: fieldsController!.selectedField)
-            fieldsController!.loadFieldsAndGroups()
-            tableView.reloadData()
-            
-        }))
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-        present(alert, animated: true, completion: nil)
-        
-       
+        AlertsHelper.deleteAlert(on: self,
+                                 with: .field,
+                                 overlayTitle: field.title) { [weak self] in
+            guard let self = self,
+                  let fieldsController = self.fieldsController else { return }
+            fieldsController.deleteFieldFromCloud(field: fieldsController.selectedField)
+            fieldsController.deleteFieldFromDB(field: fieldsController.selectedField)
+            fieldsController.loadFieldsAndGroups()
+            self.tableView.reloadData()
+        }
     }
     
     // Use this if you have a UITextField
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         // get the current text, or use an empty string if that failed
         let currentText = textField.text ?? ""
-
+        
         // attempt to read the range they are trying to change, or exit if we can't
         guard let stringRange = Range(range, in: currentText) else { return false }
-
+        
         // add their new text to the existing text
         let updatedText = currentText.replacingCharacters(in: stringRange, with: string)
         
@@ -271,16 +208,13 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
         } else {
             textField.layer.borderWidth = 0
         }
-
+        
         // make sure the result is under 16 characters
         return updatedText.count <= 20
     }
     
-    //MARK: - temp
-    func temp() {
-        
-        
-        
+    //MARK: - goBackToMapView
+    func goBackToMapView() {
         performSegue(withIdentifier: K.segueIdentifiers.backToMapView, sender: self)
     }
     //MARK: - prepare
@@ -305,46 +239,46 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return fieldsController!.fields?.count ?? 1
-       }
+    }
     
-       //MARK: - cellForRowAt
-       override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    //MARK: - cellForRowAt
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-            let cell = super.tableView(tableView, cellForRowAt: indexPath)
-          
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
+        
         if let field = fieldsController!.fields?[indexPath.row]{
             
-                cell.textLabel!.text = field.title
-               
-                guard let fieldColor =  UIColor(hexString: field.color) else {fatalError()}
-                
-                cell.backgroundColor = UIColor.flatWhite()
-                
-                cell.textLabel?.textColor = ContrastColorOf(cell.backgroundColor!, returnFlat: true)
-                
-                let label = UILabel()
-                label.text = field.parentGroup.first?.title
-                label.textAlignment = .center
-                label.adjustsFontSizeToFitWidth = true
-                label.textColor = ContrastColorOf(fieldColor, returnFlat: true)
-                label.backgroundColor = fieldColor
-                label.translatesAutoresizingMaskIntoConstraints = false
-                cell.addSubview(label)
-                label.heightAnchor.constraint(equalTo: cell.heightAnchor, constant: 0).isActive = true
-                label.widthAnchor.constraint(equalTo: cell.widthAnchor, multiplier: 0.4).isActive = true
-                //label.centerXAnchor.constraint(equalTo: cell.centerXAnchor, constant: 0).isActive = true
-                label.rightAnchor.constraint(equalTo: cell.rightAnchor, constant: 0).isActive = true
-            }
-            cell.backgroundColor = UIColor.clear
-            //cell.contentView.alpha = 0.5
-            return cell
-       }
+            cell.textLabel!.text = field.title
+            
+            guard let fieldColor =  UIColor(hexString: field.color) else {fatalError()}
+            
+            cell.backgroundColor = UIColor.flatWhite()
+            
+            cell.textLabel?.textColor = ContrastColorOf(cell.backgroundColor!, returnFlat: true)
+            
+            let label = UILabel()
+            label.text = field.parentGroup.first?.title
+            label.textAlignment = .center
+            label.adjustsFontSizeToFitWidth = true
+            label.textColor = ContrastColorOf(fieldColor, returnFlat: true)
+            label.backgroundColor = fieldColor
+            label.translatesAutoresizingMaskIntoConstraints = false
+            cell.addSubview(label)
+            label.heightAnchor.constraint(equalTo: cell.heightAnchor, constant: 0).isActive = true
+            label.widthAnchor.constraint(equalTo: cell.widthAnchor, multiplier: 0.4).isActive = true
+            //label.centerXAnchor.constraint(equalTo: cell.centerXAnchor, constant: 0).isActive = true
+            label.rightAnchor.constraint(equalTo: cell.rightAnchor, constant: 0).isActive = true
+        }
+        cell.backgroundColor = UIColor.clear
+        //cell.contentView.alpha = 0.5
+        return cell
+    }
     
     //MARK: - Table Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: K.segueIdentifiers.goToItems, sender: self)
     }
-   
+    
 }
 
 extension FieldListViewController: UINavigationControllerDelegate, UICollectionViewDataSource, UICollectionViewDelegate {
@@ -361,7 +295,7 @@ extension FieldListViewController: UINavigationControllerDelegate, UICollectionV
             myCell.backgroundColor = UIColor(hexString: (fieldsController?.groups![indexPath.row].color)!)
             
             title.textColor = ContrastColorOf( UIColor(hexString: (fieldsController?.groups![indexPath.row].color)!)! , returnFlat: true)
-    
+            
             title.text = fieldsController?.groups![indexPath.row].title
         } else {
             myCell.backgroundColor = UIColor.flatWhiteDark()

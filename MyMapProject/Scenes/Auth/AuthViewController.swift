@@ -72,26 +72,9 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate, UITe
             if let email = user?.email {
                 emailTextField.text = email
             }
-       
-            /*if let providerData = user?.providerData {
-                for info in (providerData) {
-                      switch info.providerID {
-                      case GoogleAuthProviderID:
-                        changePasswordButton.isHidden = true
-                        print("google")
-                      case EmailAuthProviderID:
-                        changePasswordButton.isHidden = false
-                        print("email")
-                      default:
-                        changePasswordButton.isHidden = true
-                        print("default")
-                      }
-                }
-            }*/
-            changePasswordButton.isHidden = true
             
+            changePasswordButton.isHidden = true
         }
-        
         setAutoLayout()
     }
     override func viewWillDisappear(_ animated: Bool) {
@@ -139,82 +122,26 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate, UITe
     
     //MARK: - changePasswordButtonTapped
     @IBAction func changePasswordButtonTapped(_ sender: UIButton) {
-        //Needs Re-authenticate User
-        let ac1 = UIAlertController(title: NSLocalizedString("Change Password", comment: ""), message: NSLocalizedString("If you select 'send email', a password forgot mail will be sent", comment: ""), preferredStyle: .alert)
-        let changePasswordAction = UIAlertAction(title: NSLocalizedString("Enter Password", comment: ""), style: .default) {_ in
-            let ac = UIAlertController(title: NSLocalizedString("Change Password", comment: ""), message: nil, preferredStyle: .alert)
-              ac.addTextField()
-            ac.addTextField()
-            ac.addTextField()
-            ac.textFields![0].placeholder = NSLocalizedString("Current Password", comment: "")
-            ac.textFields![1].placeholder = NSLocalizedString("New Password", comment: "")
-            ac.textFields![2].placeholder = NSLocalizedString("Confirm Password", comment: "")
-            ac.textFields![0].textContentType = .password
-            ac.textFields![1].textContentType = .newPassword
-            ac.textFields![2].textContentType = .newPassword
-            ac.textFields![0].isSecureTextEntry = true
-            ac.textFields![1].isSecureTextEntry = true
-            ac.textFields![2].isSecureTextEntry = true
-            
-
-            let submitAction = UIAlertAction(title: NSLocalizedString("Submit", comment: ""), style: .default) { [self, unowned ac] _ in
-                if let password = ac.textFields![0].text {
-                    let isCurrentPasswordTrue = reAuth(password: password)
-                    if isCurrentPasswordTrue {
-                        if let newPass1 = ac.textFields![1].text, let newPass2 = ac.textFields![2].text {
-                            if newPass1 == newPass2 {
-                                changePassword(newPassword: newPass1)
-                            } else {
-                                let ac3 = UIAlertController(title: NSLocalizedString("Oops!", comment: ""), message: NSLocalizedString("New pasword and confirm password must to be same.", comment: ""), preferredStyle: .alert)
-                                let okAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .destructive)
-                                ac3.addAction(okAction)
-                                self.present(ac3, animated: true)
-                            }
-                        }
-                    }
-                }
-              }
-            let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .destructive)
-            ac.addAction(cancelAction)
-            ac.addAction(submitAction)
-            
-            self.present(ac, animated: true)
-          }
-        let sendEmailAction = UIAlertAction(title: NSLocalizedString("Send Email", comment: ""), style: .default) { _ in
-            if let email = Auth.auth().currentUser?.email {
-                Auth.auth().sendPasswordReset(withEmail: email) { [self] error in
-                    let ac = UIAlertController(title: NSLocalizedString("Email Sent", comment: ""), message: NSLocalizedString("An password reset email will be sent.", comment: ""), preferredStyle: .alert)
-                    if let error = error {
-                        if let errCode = AuthErrorCode(rawValue: error._code) {
-                            switch errCode {
-                                case .missingEmail:
-                                    ac.message = NSLocalizedString("You must enter an email address.", comment: "")
-                                default:
-                                    ac.message = error.localizedDescription
-                            }
-                        }
-                        let okAction = UIAlertAction(title: NSLocalizedString(NSLocalizedString("OK", comment: ""), comment: ""), style: .default)
-                        ac.addAction(okAction)
-
-                        present(ac, animated: true)
+        AuthAlertsHelper.changePasswordAlert(on: self) {
+            AuthAlertsHelper.enterPasswordAlert(on: self) { [weak self] password, newPassword, newPassword1 in
+                guard let self = self else { return }
+                let isCurrentPasswordTrue = self.reAuth(password: password)
+                if isCurrentPasswordTrue {
+                    if newPassword == newPassword1 {
+                        self.changePassword(newPassword: newPassword)
                     } else {
-                        ac.message = NSLocalizedString("An password reset email sent.", comment: "")
-                        let okAction = UIAlertAction(title: NSLocalizedString(NSLocalizedString("OK", comment: ""), comment: ""), style: .default)
-                        ac.addAction(okAction)
-
-                        present(ac, animated: true)
+                        AuthAlertsHelper.samePasswordAlert(on: self)
                     }
                 }
             }
+        } sendEmailAction: {
+            if let email = Auth.auth().currentUser?.email {
+                Auth.auth().sendPasswordReset(withEmail: email) { [weak self] error in
+                    guard let self = self else { return }
+                    AuthAlertsHelper.passwordResetEmailAlert(on: self, error: error)
+                }
+            }
         }
-        let cancelAction1 = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .destructive)
-        
-        ac1.addAction(changePasswordAction)
-        ac1.addAction(sendEmailAction)
-        ac1.addAction(cancelAction1)
-        present(ac1, animated: true)
-        
-        
     }
     //MARK: - reAuth
     func reAuth(password: String) -> Bool {
@@ -224,47 +151,14 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate, UITe
         credential = EmailAuthProvider.credential(withEmail: (user?.email)!, password: password)
         // Prompt the user to re-provide their sign-in credentials
         user?.reauthenticate(with: credential) { (result, error)  in
-            if let error = error {
-                let ac = UIAlertController(title: NSLocalizedString(" Password Changed", comment: ""), message: nil, preferredStyle: .alert)
-                ac.title = NSLocalizedString("Oops!", comment: "")
-                    if let errCode = AuthErrorCode(rawValue: error._code) {
-                        switch errCode {
-                        case .wrongPassword:
-                            ac.message = NSLocalizedString("Current password was entered incorrectly.", comment: "")
-                        default:
-                            ac.message = error.localizedDescription
-                    }
-                }
-                let okAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default)
-                ac.addAction(okAction)
-                self.present(ac, animated: true)
-                isCurrentPasswordTrue = false
-            } else {
-                isCurrentPasswordTrue = true
-            }
+            isCurrentPasswordTrue = AuthAlertsHelper.reAuthAlert(on: self, error: error)
         }
         return isCurrentPasswordTrue
     }
     //MARK: - changePassword
     func changePassword(newPassword: String) {
         Auth.auth().currentUser?.updatePassword(to: newPassword) { (error) in
-            let ac = UIAlertController(title: NSLocalizedString("Password Changed", comment: ""), message: nil, preferredStyle: .alert)
-            if let error = error {
-                ac.title = NSLocalizedString("Oops!", comment: "")
-                if let errCode = AuthErrorCode(rawValue: error._code) {
-                    switch errCode {
-                    case .weakPassword:
-                        ac.message = NSLocalizedString("The password must be 6 characters long or more.", comment: "")
-                    default:
-                    ac.message = error.localizedDescription
-                    }
-                }
-            } else {
-                
-            }
-            let okAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default)
-            ac.addAction(okAction)
-            self.present(ac, animated: true)
+            AuthAlertsHelper.passwordChangedAlert(on: self, error: error)
         }
     }
     

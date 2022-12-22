@@ -13,6 +13,10 @@
 		BC7922CC29163CA700FD834C /* APIConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC7922CB29163CA700FD834C /* APIConstants.swift */; };
 		BC8A2A4428F53037001D2130 /* SettingViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC8A2A4328F53037001D2130 /* SettingViewModel.swift */; };
 		BC97357628F43CAE007F1EBC /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC97357528F43CAE007F1EBC /* SettingsViewController.swift */; };
+		BCAC6ADB2953BA5400B9F6AF /* DataTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAC6ADA2953BA5400B9F6AF /* DataTypes.swift */; };
+		BCAC6ADE29544D1100B9F6AF /* BaseAlertsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAC6ADD29544D1100B9F6AF /* BaseAlertsHelper.swift */; };
+		BCAC6AE029544D2700B9F6AF /* AuthAlertsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAC6ADF29544D2700B9F6AF /* AuthAlertsHelper.swift */; };
+		BCAC6AE229544F4700B9F6AF /* ImportExportAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAC6AE129544F4700B9F6AF /* ImportExportAlerts.swift */; };
 		BCCB20BE291B7FE80068F196 /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCB20BD291B7FE80068F196 /* MapViewModel.swift */; };
 		BCCB20C0291CEF5D0068F196 /* FieldPolygon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCB20BF291CEF5D0068F196 /* FieldPolygon.swift */; };
 		BCCB20C3291D13720068F196 /* UITextViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCB20C2291D13720068F196 /* UITextViewExtensions.swift */; };
@@ -78,6 +82,10 @@
 		BC7922CB29163CA700FD834C /* APIConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIConstants.swift; sourceTree = "<group>"; };
 		BC8A2A4328F53037001D2130 /* SettingViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewModel.swift; sourceTree = "<group>"; };
 		BC97357528F43CAE007F1EBC /* SettingsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
+		BCAC6ADA2953BA5400B9F6AF /* DataTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTypes.swift; sourceTree = "<group>"; };
+		BCAC6ADD29544D1100B9F6AF /* BaseAlertsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseAlertsHelper.swift; sourceTree = "<group>"; };
+		BCAC6ADF29544D2700B9F6AF /* AuthAlertsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthAlertsHelper.swift; sourceTree = "<group>"; };
+		BCAC6AE129544F4700B9F6AF /* ImportExportAlerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportExportAlerts.swift; sourceTree = "<group>"; };
 		BCCB20BD291B7FE80068F196 /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
 		BCCB20BF291CEF5D0068F196 /* FieldPolygon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldPolygon.swift; sourceTree = "<group>"; };
 		BCCB20C2291D13720068F196 /* UITextViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITextViewExtensions.swift; sourceTree = "<group>"; };
@@ -185,6 +193,17 @@
 			path = Workers/Controllers;
 			sourceTree = "<group>";
 		};
+		BCAC6ADC29544CF400B9F6AF /* Alerts */ = {
+			isa = PBXGroup;
+			children = (
+				BCAC6ADD29544D1100B9F6AF /* BaseAlertsHelper.swift */,
+				C298DFE426157DBA006669FE /* AlertsHelper.swift */,
+				BCAC6ADF29544D2700B9F6AF /* AuthAlertsHelper.swift */,
+				BCAC6AE129544F4700B9F6AF /* ImportExportAlerts.swift */,
+			);
+			path = Alerts;
+			sourceTree = "<group>";
+		};
 		BCCB20C1291D13590068F196 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
@@ -224,8 +243,9 @@
 		C257E47B26065B7D007B5701 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				BCAC6ADC29544CF400B9F6AF /* Alerts */,
 				C257E48126066904007B5701 /* SubscriptionsHelper.swift */,
-				C298DFE426157DBA006669FE /* AlertsHelper.swift */,
+				C2E1B80D2607A73E005900F0 /* AdMobHelper.swift */,
 				C264751C2619FB2B0021E88C /* MapStylesHelper.swift */,
 				BC540DFD2945AF6A0005DF3C /* UnitsHelper.swift */,
 				C288A787261DCB4100969BFE /* ImportGeoFileHelper.swift */,
@@ -233,6 +253,7 @@
 				BC7922CB29163CA700FD834C /* APIConstants.swift */,
 				C25598AB25BC466F0000080D /* Constants.swift */,
 				BC023EFC294AFAE9002FBCBD /* ExportTypes.swift */,
+				BCAC6ADA2953BA5400B9F6AF /* DataTypes.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -583,8 +604,10 @@
 				BCCB20CD291D1AB20068F196 /* ArrayExtensions.swift in Sources */,
 				C25598C925BC47470000080D /* PlacesController.swift in Sources */,
 				C25598BE25BC47190000080D /* Item.swift in Sources */,
+				BCAC6ADB2953BA5400B9F6AF /* DataTypes.swift in Sources */,
 				C28E2C3D262C538500C33FBB /* GeoJsonTemplates.swift in Sources */,
 				BC8A2A4428F53037001D2130 /* SettingViewModel.swift in Sources */,
+				BCAC6AE229544F4700B9F6AF /* ImportExportAlerts.swift in Sources */,
 				C2838C7525EE56C900F6E3CE /* PermissionsViewController.swift in Sources */,
 				C248C8C025D3DCDF005EC743 /* ItemsController.swift in Sources */,
 				C2E1B80E2607A73E005900F0 /* AdMobHelper.swift in Sources */,
@@ -593,6 +616,7 @@
 				C25598EF25BC49D30000080D /* MenuViewController.swift in Sources */,
 				C264751A26198EBC0021E88C /* OverlayView.swift in Sources */,
 				C257E4742605BB64007B5701 /* LoginViewController.swift in Sources */,
+				BCAC6AE029544D2700B9F6AF /* AuthAlertsHelper.swift in Sources */,
 				BC540DFE2945AF6A0005DF3C /* UnitsHelper.swift in Sources */,
 				C299C48B260DEF3E007DF470 /* PremiumViewController.swift in Sources */,
 				C257E47926062B51007B5701 /* AuthViewController.swift in Sources */,
@@ -601,6 +625,7 @@
 				BCCB20BE291B7FE80068F196 /* MapViewModel.swift in Sources */,
 				C25598C125BC47190000080D /* UserDefaults.swift in Sources */,
 				C257E4712605BB5D007B5701 /* EmailLoginViewController.swift in Sources */,
+				BCAC6ADE29544D1100B9F6AF /* BaseAlertsHelper.swift in Sources */,
 				C264751026198BF20021E88C /* PresentationController.swift in Sources */,
 				C257E48226066904007B5701 /* SubscriptionsHelper.swift in Sources */,
 				C25598FD25BC49DE0000080D /* LineListViewController.swift in Sources */,
