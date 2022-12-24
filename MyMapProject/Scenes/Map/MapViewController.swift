@@ -506,7 +506,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
                 }
             }
         } else {
-            
             let latitudeDifference = selectedMarker.position.latitude - markerFirstPosition[0]
             let longitudeDifference = selectedMarker.position.longitude - markerFirstPosition[1]
             
@@ -1212,71 +1211,46 @@ extension MapViewController{
         marker.groundAnchor = .init(x: 0.5, y: 0.5)
         
         switch editingOverlayType {
-        case .field:
-            break
-        case .line:
-            break
         case .place:
             placesController.increaseIconSize(place: placesController.selectedPlace, mapView: mapView)
+        default:
+            break
         }
         
     }
     //MARK: - didTapAt coordinate
     func mapView(_ mapView: GMSMapView, didTapAt coordinate: CLLocationCoordinate2D) {
         if !toolBar.isHidden {
-            let newMarker = GMSMarker()
-            if editingOverlayType != .place {
-                newMarker.map = mapView
-                newMarker.isDraggable = true
-                newMarker.icon = UIImage(systemName: K.systemImages.dotCircle)?.imageScaled(to: CGSize(width: 30, height: 30))
-                newMarker.groundAnchor = .init(x: 0.5, y: 0.5)
-                newMarker.position = CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
-            }
-            var closestMarkerIndex = 0
-            var secondClosestMarkerIndex = 0
-            var closestDistance = Double.greatestFiniteMagnitude
-            var secondClosestDistance = Double.greatestFiniteMagnitude
+            let newMarker = viewModel.createNewMarker(mapView, didTapAt: coordinate)
+            
+            var closestMarkers = (0,0)
             switch editingOverlayType {
             case .field:
-                for i in 0...fieldsController.selectedFieldMarkers.count-1 {
-                    let distance = GMSGeometryDistance(newMarker.position,fieldsController.selectedFieldMarkers[i].position)
-                    if distance < closestDistance {
-                        closestDistance = distance
-                        closestMarkerIndex = i
-                    }
-                }
-                for i in 0...fieldsController.selectedFieldMarkers.count-1 {
-                    let distance = GMSGeometryDistance(newMarker.position,fieldsController.selectedFieldMarkers[i].position)
-                    if distance < secondClosestDistance && distance > closestDistance {
-                        secondClosestDistance = distance
-                        secondClosestMarkerIndex = i
-                    }
-                }
+                closestMarkers = viewModel.findClosestMarkers(newMarker: newMarker, markers: fieldsController.selectedFieldMarkers)
                 
-                if (closestMarkerIndex == 0 && secondClosestMarkerIndex == (fieldsController.selectedFieldMarkers.count-1)) || (closestMarkerIndex == (fieldsController.selectedFieldMarkers.count-1)) && secondClosestMarkerIndex == 0 {
-                    if closestMarkerIndex == 0 {
-                        fieldsController.selectedFieldMarkers.insert(newMarker, at: closestMarkerIndex)
+                if (closestMarkers.0 == 0 && closestMarkers.1 == (fieldsController.selectedFieldMarkers.count-1)) || (closestMarkers.0 == (fieldsController.selectedFieldMarkers.count-1)) && closestMarkers.1 == 0 {
+                    if closestMarkers.0 == 0 {
+                        fieldsController.selectedFieldMarkers.insert(newMarker, at: closestMarkers.0)
                         if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
-                            fieldsController.arrangeSelectedFieldLengthMarker(i: 0, inside: true, add: true, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+                            fieldsController.arrangeSelectedFieldLengthMarker(i: closestMarkers.0, inside: true, add: true, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                         }
                     } else {
                         fieldsController.selectedFieldMarkers.append(newMarker)
-                        //fieldsController.arrangeSelectedFieldLengthMarker(i: markers.count-1, inside: true, add: true, mapView: mapView)
                         if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
                             fieldsController.setHideSelectedFieldLengthMarkers(mapView: nil, remove: true)
                             fieldsController.setSelectedFieldLengthMarkers(isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                             fieldsController.setHideSelectedFieldLengthMarkers(mapView: mapView, remove: true)
                         }
                     }
-                } else if closestMarkerIndex < secondClosestMarkerIndex {
-                    fieldsController.selectedFieldMarkers.insert(newMarker, at: secondClosestMarkerIndex)
+                } else if closestMarkers.0 < closestMarkers.1 {
+                    fieldsController.selectedFieldMarkers.insert(newMarker, at: closestMarkers.1)
                     if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
-                        fieldsController.arrangeSelectedFieldLengthMarker(i: secondClosestMarkerIndex, inside: true, add: true, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+                        fieldsController.arrangeSelectedFieldLengthMarker(i: closestMarkers.1, inside: true, add: true, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                     }
                 } else {
-                    fieldsController.selectedFieldMarkers.insert(newMarker, at: closestMarkerIndex)
+                    fieldsController.selectedFieldMarkers.insert(newMarker, at: closestMarkers.0)
                     if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
-                        fieldsController.arrangeSelectedFieldLengthMarker(i: closestMarkerIndex, inside: true, add: true, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+                        fieldsController.arrangeSelectedFieldLengthMarker(i: closestMarkers.0, inside: true, add: true, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                     }
                 }
                 
@@ -1288,43 +1262,30 @@ extension MapViewController{
                 fieldsController.selectedPolygon.map = mapView
                 areaLabelSet()
             case .line:
-                for i in 0...linesController.selectedLineMarkers.count-1 {
-                    let distance = GMSGeometryDistance(newMarker.position,linesController.selectedLineMarkers[i].position)
-                    if distance < closestDistance {
-                        closestDistance = distance
-                        closestMarkerIndex = i
-                    }
-                }
-                for i in 0...linesController.selectedLineMarkers.count-1 {
-                    let distance = GMSGeometryDistance(newMarker.position,linesController.selectedLineMarkers[i].position)
-                    if distance < secondClosestDistance && distance > closestDistance {
-                        secondClosestDistance = distance
-                        secondClosestMarkerIndex = i
-                    }
-                }
-                if closestMarkerIndex == 0 {
+                closestMarkers = viewModel.findClosestMarkers(newMarker: newMarker, markers: linesController.selectedLineMarkers)
+                if closestMarkers.0 == 0 {
                     linesController.selectedLineMarkers.removeAll()
                     linesController.selectedLineMarkers.append(newMarker)
                     for marker in linesController.selectedLineMarkers {
                         linesController.selectedLineMarkers.append(marker)
                     }
                     if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
-                        linesController.arrangeSelectedLineLengthMarker(i: closestMarkerIndex, inside: false, add: true, mapView: mapView, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+                        linesController.arrangeSelectedLineLengthMarker(i: closestMarkers.0, inside: false, add: true, mapView: mapView, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                     }
-                } else if closestMarkerIndex == (linesController.selectedLineMarkers.count-1) {
+                } else if closestMarkers.0 == (linesController.selectedLineMarkers.count-1) {
                     linesController.selectedLineMarkers.append(newMarker)
                     if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
                         linesController.arrangeSelectedLineLengthMarker(i: linesController.selectedLineMarkers.count-2, inside: false, add: true, mapView: mapView, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                     }
-                } else if closestMarkerIndex < secondClosestMarkerIndex {
-                    linesController.selectedLineMarkers.insert(newMarker, at: secondClosestMarkerIndex)
+                } else if closestMarkers.0 < closestMarkers.1 {
+                    linesController.selectedLineMarkers.insert(newMarker, at: closestMarkers.1)
                     if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
-                        linesController.arrangeSelectedLineLengthMarker(i: secondClosestMarkerIndex, inside: true, add: true, mapView: mapView, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+                        linesController.arrangeSelectedLineLengthMarker(i: closestMarkers.1, inside: true, add: true, mapView: mapView, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                     }
                 } else {
-                    linesController.selectedLineMarkers.insert(newMarker, at: closestMarkerIndex)
+                    linesController.selectedLineMarkers.insert(newMarker, at: closestMarkers.0)
                     if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
-                        linesController.arrangeSelectedLineLengthMarker(i: closestMarkerIndex, inside: true, add: true, mapView: mapView, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+                        linesController.arrangeSelectedLineLengthMarker(i: closestMarkers.0, inside: true, add: true, mapView: mapView, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                     }
                 }
                 

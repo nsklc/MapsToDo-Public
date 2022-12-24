@@ -19,6 +19,8 @@ protocol MapViewModelProtocol: AnyObject {
     func saveCameraPosition(latitude: Double, longitude: Double, zoom: Float)
     func saveMapType(with mapType: String)
     func getMyLocation() -> CLLocation?
+    func createNewMarker(_ mapView: GMSMapView, didTapAt coordinate: CLLocationCoordinate2D) -> GMSMarker
+    func findClosestMarkers(newMarker: GMSMarker, markers: [GMSMarker]) -> (Int,Int)
 }
 
 class MapViewModel: NSObject, MapViewModelProtocol {
@@ -106,6 +108,37 @@ class MapViewModel: NSObject, MapViewModelProtocol {
         } catch {
             print(K.errorSavingContext + "\(error)")
         }
+    }
+    
+    //Marker adding helpers
+    func createNewMarker(_ mapView: GMSMapView, didTapAt coordinate: CLLocationCoordinate2D) -> GMSMarker {
+        let newMarker = GMSMarker()
+        newMarker.map = mapView
+        newMarker.isDraggable = true
+        newMarker.icon = UIImage(systemName: K.systemImages.dotCircle)?.imageScaled(to: CGSize(width: 30, height: 30))
+        newMarker.groundAnchor = .init(x: 0.5, y: 0.5)
+        newMarker.position = CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        return newMarker
+    }
+    
+    func findClosestMarkers(newMarker: GMSMarker, markers: [GMSMarker]) -> (Int,Int) {
+        var closestMarkerIndex = 0
+        var secondClosestMarkerIndex = 0
+        var closestDistance = Double.greatestFiniteMagnitude
+        var secondClosestDistance = Double.greatestFiniteMagnitude
+        for i in 0..<markers.count {
+            let distance = GMSGeometryDistance(newMarker.position, markers[i].position)
+            if distance < closestDistance {
+                secondClosestDistance = closestDistance
+                secondClosestMarkerIndex = closestMarkerIndex
+                closestDistance = distance
+                closestMarkerIndex = i
+            } else if distance < secondClosestDistance {
+                secondClosestDistance = distance
+                secondClosestMarkerIndex = i
+            }
+        }
+        return (closestMarkerIndex, secondClosestMarkerIndex)
     }
     
     fileprivate func createUserDefaults() {

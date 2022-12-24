@@ -17,6 +17,7 @@
 		BCAC6ADE29544D1100B9F6AF /* BaseAlertsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAC6ADD29544D1100B9F6AF /* BaseAlertsHelper.swift */; };
 		BCAC6AE029544D2700B9F6AF /* AuthAlertsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAC6ADF29544D2700B9F6AF /* AuthAlertsHelper.swift */; };
 		BCAC6AE229544F4700B9F6AF /* ImportExportAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAC6AE129544F4700B9F6AF /* ImportExportAlerts.swift */; };
+		BCBD14B829570CA600AF1E0B /* OverlaysController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCBD14B729570CA600AF1E0B /* OverlaysController.swift */; };
 		BCCB20BE291B7FE80068F196 /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCB20BD291B7FE80068F196 /* MapViewModel.swift */; };
 		BCCB20C0291CEF5D0068F196 /* FieldPolygon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCB20BF291CEF5D0068F196 /* FieldPolygon.swift */; };
 		BCCB20C3291D13720068F196 /* UITextViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCB20C2291D13720068F196 /* UITextViewExtensions.swift */; };
@@ -86,6 +87,7 @@
 		BCAC6ADD29544D1100B9F6AF /* BaseAlertsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseAlertsHelper.swift; sourceTree = "<group>"; };
 		BCAC6ADF29544D2700B9F6AF /* AuthAlertsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthAlertsHelper.swift; sourceTree = "<group>"; };
 		BCAC6AE129544F4700B9F6AF /* ImportExportAlerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportExportAlerts.swift; sourceTree = "<group>"; };
+		BCBD14B729570CA600AF1E0B /* OverlaysController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlaysController.swift; sourceTree = "<group>"; };
 		BCCB20BD291B7FE80068F196 /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
 		BCCB20BF291CEF5D0068F196 /* FieldPolygon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldPolygon.swift; sourceTree = "<group>"; };
 		BCCB20C2291D13720068F196 /* UITextViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITextViewExtensions.swift; sourceTree = "<group>"; };
@@ -183,6 +185,7 @@
 		BC8A2A4528FEC144001D2130 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				BCBD14B729570CA600AF1E0B /* OverlaysController.swift */,
 				C25598C825BC47470000080D /* FieldsController.swift */,
 				C25598C725BC47460000080D /* LinesController.swift */,
 				C25598C625BC47460000080D /* PlacesController.swift */,
@@ -578,6 +581,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BCBD14B829570CA600AF1E0B /* OverlaysController.swift in Sources */,
 				C25598E825BC49D30000080D /* MapViewController.swift in Sources */,
 				C25598C225BC47190000080D /* Group.swift in Sources */,
 				C255990125BC49DE0000080D /* SwipeTableViewController.swift in Sources */,
