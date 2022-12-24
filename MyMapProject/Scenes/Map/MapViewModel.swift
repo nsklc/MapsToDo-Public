@@ -10,70 +10,136 @@ import Foundation
 import RealmSwift
 import Firebase
 import CoreLocation
+import GoogleMaps
 
 protocol MapViewModelProtocol: AnyObject {
+    var userDefaults: UserDefaults! { get }
     var viewController: MapViewControllerProtocol? { get set }
-    func notifyViewDidLoad(with latLon: (Double?, Double?))
-    func notifyViewWillAppear()
+    func notifyViewDidLoad()
+    func saveCameraPosition(latitude: Double, longitude: Double, zoom: Float)
+    func saveMapType(with mapType: String)
+    func getMyLocation() -> CLLocation?
 }
 
-class MapViewModel: MapViewModelProtocol {
-  
+class MapViewModel: NSObject, MapViewModelProtocol {
+    
     weak var viewController: MapViewControllerProtocol?
     
     let realm = try! Realm()
     
-    private var userDefaults: Results<UserDefaults>?
+    var userDefaults: UserDefaults!
+    private let locationManager = CLLocationManager()
     
     private var handle: AuthStateDidChangeListenerHandle?
     private let user = Auth.auth().currentUser
     
-    init() {
-        userDefaults = realm.objects(UserDefaults.self)
+    override init() {
+        
     }
     
-    func notifyViewDidLoad(with latLon: (Double?, Double?)) {
-        if userDefaults?.count == 0 {
-            createUserDefaults(with: latLon)
+    func notifyViewDidLoad() {
+        
+        // Get userDefaults in the realm
+        let allUserDefaults = realm.objects(UserDefaults.self)
+        
+        // For use in foreground
+        self.locationManager.requestWhenInUseAuthorization()
+        
+        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
+            guard let self = self else { return }
+            if CLLocationManager.locationServicesEnabled() {
+                self.locationManager.delegate = self
+                self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
+                self.locationManager.startUpdatingLocation()
+            }
+        }
+        
+        if allUserDefaults.count == 0 {
+            createUserDefaults()
         } else {
-            if let userDefaults = userDefaults, let userDefaultsFirst = userDefaults.first {
-                viewController?.setUserDefaultSettings(latitude: userDefaultsFirst.cameraPosition?.latitude, longitude: userDefaultsFirst.cameraPosition?.longitude, zoom: userDefaultsFirst.cameraPosition?.zoom, mapType: userDefaultsFirst.mapType, customMapStyle: userDefaultsFirst.customMapStyle, isBatterySaveModeActive: userDefaultsFirst.isBatterySaveModeActive)
+            userDefaults = allUserDefaults.first
+        }
+        
+        viewController?.setMapView(latitude: userDefaults.cameraPosition?.latitude,
+                                   longitude: userDefaults.cameraPosition?.longitude,
+                                   zoom: userDefaults.cameraPosition?.zoom,
+                                   mapType: userDefaults.mapType,
+                                   customMapStyle: userDefaults.customMapStyle,
+                                   isBatterySaveModeActive: userDefaults.isBatterySaveModeActive)
+        
+        
+        if let userID = user?.uid {
+            do {
+                try realm.write({
+                    userDefaults.bossID = userID
+                    userDefaults.bossEmail = user?.email ?? ""
+                })
+            } catch {
+                print("Error saving context, \(error)")
             }
         }
     }
     
-    private func createUserDefaults(with latLon: (Double?, Double?)) {
-        let userDefault = UserDefaults()
-        userDefault.title = ""
-        userDefault.mapType = K.mapTypes.satellite
-        userDefault.cameraPosition = CameraPosition()
-        if let latitude = latLon.0, let longitude = latLon.1 {
-            userDefault.cameraPosition?.latitude = latitude
-            userDefault.cameraPosition?.longitude = longitude
-        } else {
-            userDefault.cameraPosition?.latitude = 37.3348
-            userDefault.cameraPosition?.longitude = -122.0091
-        }
-        userDefault.cameraPosition?.zoom = 16.5
+    func getMyLocation() -> CLLocation? {
+        return locationManager.location
+    }
     
+    func saveCameraPosition(latitude: Double, longitude: Double, zoom: Float) {
         do {
             try realm.write({
-                realm.add(userDefault)
+                userDefaults.cameraPosition?.latitude = latitude
+                userDefaults.cameraPosition?.longitude = longitude
+                userDefaults.cameraPosition?.zoom = zoom
+                realm.add(userDefaults)
+            })
+        } catch {
+            print(K.errorSavingContext + " \(error)")
+        }
+    }
+    
+    func saveMapType(with mapType: String) {
+        do {
+            try realm.write({
+                userDefaults.mapType = mapType
+                realm.add(userDefaults)
+            })
+        } catch {
+            print(K.errorSavingContext + "\(error)")
+        }
+    }
+    
+    fileprivate func createUserDefaults() {
+        let userDefaults = UserDefaults()
+        userDefaults.title = ""
+        userDefaults.mapType = K.mapTypes.satellite
+        userDefaults.cameraPosition = CameraPosition()
+        if let latitude = locationManager.location?.coordinate.latitude, let longitude = locationManager.location?.coordinate.longitude {
+            userDefaults.cameraPosition?.latitude = latitude
+            userDefaults.cameraPosition?.longitude = longitude
+        } else {
+            userDefaults.cameraPosition?.latitude = 37.3348
+            userDefaults.cameraPosition?.longitude = -122.0091
+        }
+        userDefaults.cameraPosition?.zoom = 16.5
+        
+        do {
+            try realm.write({
+                realm.add(userDefaults)
             })
         } catch {
             print("Error saving context, \(error)")
         }
-        userDefaults = realm.objects(UserDefaults.self)
+        self.userDefaults = userDefaults
     }
-    
-    func notifyViewWillAppear() {
-        if userDefaults?.first?.accountType != K.invites.accountTypes.proAccount {
-            viewController?.arrangeUI(isProAccount: true)
-        } else {
-            viewController?.arrangeUI(isProAccount: false)
-        }
-    }
-    
     
 }
+
+extension MapViewModel: CLLocationManagerDelegate {
+    //MARK: - Location Manager delegates
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        locationManager.stopUpdatingLocation()
+        viewController?.setMapViewLocationEnabled(isEnabled: true)
+    }
+}
+
 

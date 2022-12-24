@@ -18,8 +18,8 @@ import MobileCoreServices
 import UniformTypeIdentifiers
 
 protocol MapViewControllerProtocol: AnyObject {
-    func setUserDefaultSettings(latitude: Double?, longitude: Double?, zoom: Float?, mapType: String?, customMapStyle: String?, isBatterySaveModeActive: Bool)
-    func arrangeUI(isProAccount: Bool)
+    func setMapView(latitude: Double?, longitude: Double?, zoom: Float?, mapType: String?, customMapStyle: String, isBatterySaveModeActive: Bool)
+    func setMapViewLocationEnabled(isEnabled: Bool)
 }
 
 enum OverlayType {
@@ -32,11 +32,10 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     
     private let realm = try! Realm()
     
-    private var fieldsController: FieldsController?
-    private var linesController: LinesController?
-    private var placesController: PlacesController?
-    
-    private var userDefaults: Results<UserDefaults>?
+    private var viewModel: MapViewModelProtocol!
+    private var fieldsController: FieldsController!
+    private var linesController: LinesController!
+    private var placesController: PlacesController!
     
     @IBOutlet weak var navBar: UINavigationItem! 
     @IBOutlet weak var authenticationNavBarButton: UIBarButtonItem!
@@ -70,7 +69,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     @IBOutlet weak var mapTypeSelectButton: UIButton!
     @IBOutlet weak var mapTypeStackView: UIStackView!
     
-    let locationManager = CLLocationManager()
+//    let locationManager = CLLocationManager()
     @IBOutlet weak var myLocationButton: UIButton!
     var cameraPositionPath: GMSPath?
     
@@ -87,8 +86,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     
     private var positionMarker: GMSMarker?
     
-    private var handle: AuthStateDidChangeListenerHandle?
-    private let user = Auth.auth().currentUser
+//    private var handle: AuthStateDidChangeListenerHandle?
+//    private let user = Auth.auth().currentUser
     
     var centerYConstraint: NSLayoutConstraint!
     
@@ -108,153 +107,27 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         
         navBar.title = K.appName
         
-        // For use in foreground
-        self.locationManager.requestWhenInUseAuthorization()
-        
-        DispatchQueue.global(qos: .userInteractive).async { [weak self] in
-            guard let self = self else { return }
-            if CLLocationManager.locationServicesEnabled() {
-                self.locationManager.delegate = self
-                self.locationManager.desiredAccuracy = kCLLocationAccuracyBest
-                self.locationManager.startUpdatingLocation()
-            }
-        }
-        
-        
-        // Get userDefaults in the realm
-        userDefaults = realm.objects(UserDefaults.self)
-        
-        if userDefaults?.count == 0 {
-            let userDefault = UserDefaults()
-            userDefault.title = ""
-            userDefault.mapType = K.mapTypes.satellite
-            userDefault.cameraPosition = CameraPosition()
-            if let latitude = locationManager.location?.coordinate.latitude, let longitude = locationManager.location?.coordinate.longitude {
-                userDefault.cameraPosition?.latitude = latitude
-                userDefault.cameraPosition?.longitude = longitude
-            } else {
-                userDefault.cameraPosition?.latitude = 37.3348
-                userDefault.cameraPosition?.longitude = -122.0091
-            }
-            userDefault.cameraPosition?.zoom = 16.5
-        
-            do {
-                try realm.write({
-                    realm.add(userDefault)
-                })
-            } catch {
-                print("Error saving context, \(error)")
-            }
-            userDefaults = realm.objects(UserDefaults.self)
-        }
+        viewModel = MapViewModel()
+        viewModel.notifyViewDidLoad()
         
         // Create a GMSCameraPosition that tells the map to display the coordinate.
         let camera = GMSCameraPosition.camera(withLatitude: 39.738185, longitude: 37.088220, zoom: 16)
         
         mapView = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
-        
         mapView.mapType = .normal
-    
-        if let userDefault = userDefaults?.first {
-            if let latitude = userDefault.cameraPosition?.latitude, let longitude = userDefault.cameraPosition?.longitude, let zoom = userDefault.cameraPosition?.zoom {
-                let camera = GMSCameraPosition.camera(withLatitude: latitude, longitude: longitude, zoom: zoom)
-                mapView = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
-            }
-            
-            switch userDefault.mapType {
-            case K.mapTypes.normal:
-                mapView.mapType = .normal
-            case K.mapTypes.satellite:
-                mapView.mapType = .satellite
-            case K.mapTypes.terrain:
-                mapView.mapType = .terrain
-            case K.mapTypes.custom:
-                mapView.mapType = .normal
-                let overlayView = OverlayView()
-                overlayView.mapView = mapView
-                overlayView.setMapStyle(to: userDefault.customMapStyle)
-            default:
-                mapView.mapType = .normal
-            }
+        mapView.delegate = self
         
-            arrowButton.layer.borderWidth = 2
-            myLocationButton.layer.borderWidth = 2
-            mapTypeSelectButton.layer.borderWidth = 2
-        
-            let tintColor = UIColor(hexString: K.colors.secondaryColor)
-            let backgroundColor = UIColor(hexString: K.colors.thirdColor)
-            
-            arrowButton.layer.borderColor = tintColor?.cgColor
-            myLocationButton.layer.borderColor = tintColor?.cgColor
-            mapTypeSelectButton.layer.borderColor = tintColor?.cgColor
-            
-            arrowButton.tintColor = tintColor
-            myLocationButton.tintColor = tintColor
-            mapTypeSelectButton.tintColor = tintColor
-            
-            arrowButton.backgroundColor = backgroundColor
-            myLocationButton.backgroundColor = backgroundColor
-            mapTypeSelectButton.backgroundColor = backgroundColor
-            
-            toolBar.barTintColor = UIColor(hexString: K.colors.primaryColor)
-            saveButton.tintColor = UIColor.flatGreen()
-            toolBar.tintColor = UIColor(hexString: K.colors.fifthColor)
-            selectAllButton.tintColor = UIColor.flatBlue()
-            
-            if let navBar = navigationController?.navigationBar {
-                navBar.tintColor = UIColor(hexString: K.colors.secondaryColor)
-                navBar.barTintColor = UIColor(hexString: K.colors.primaryColor)//f9e0ae ffd460
-            }
-            if userDefault.isBatterySaveModeActive {
-                mapView.preferredFrameRate = .conservative
-            } else {
-                mapView.preferredFrameRate = .maximum
-            }
-            
-        }
-        
-        view.addSubview(mapView)
-        mapView.translatesAutoresizingMaskIntoConstraints = false
-        mapView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
-        mapView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        mapView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor).isActive = true
-        mapView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-        
-        titleTextField.isUserInteractionEnabled = true
-        titleTextField.adjustsFontSizeToFitWidth = true
-        groupTitleTextField.adjustsFontSizeToFitWidth = true
-        
-        self.view.addSubview(toolBar)
-        toolBar.translatesAutoresizingMaskIntoConstraints = false
+        navigationItem.hidesBackButton = true
         
         addToolBarConstraints()
-        
-        toolBar.isHidden = true
-        
-        self.mapView.delegate = self
-        
-        self.navigationItem.hidesBackButton = true
-        
         addSubViewsConstraints()
+        
         if  cameraPositionPath != nil {
             changeCameraPosition()
         }
         
         titleTextField.delegate = self
         groupTitleTextField.delegate = self
-        
-        if let userID = user?.uid {
-            
-            do {
-                try realm.write({
-                    userDefaults?.first?.bossID = userID
-                    userDefaults?.first?.bossEmail = user?.email ?? ""
-                })
-            } catch {
-                print("Error saving context, \(error)")
-            }
-            
-        }
         
         // Get groups and fields in the realm
         fieldsController = FieldsController(mapView: mapView)
@@ -265,40 +138,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         // Get Places in the realm
         placesController = PlacesController(mapView: mapView)
         
-        if UIDevice.current.userInterfaceIdiom == .pad {
-            NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
-            NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
-        }
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(deleteDB), name: NSNotification.Name("deleteDB"), object: nil)
-        
-        
-        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name("hasNoSubscription"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(professionalSubscriptionStarted), name: NSNotification.Name("professionalSubscriptionStarted"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(openPremiumViewController), name: NSNotification.Name("openPremiumViewController"), object: nil)
-        
-        //Handle Banner
-        //Production adUnitID
-        bannerView.adUnitID = APIConstants.ProductionAdUnitID
-        //Test adUnitID
-//        bannerView.adUnitID = Constants.TestAdUnitID
-        bannerView.rootViewController = self
-        bannerView.load(GADRequest())
-        
-        bannerView.delegate = self
-        
-        let request = GADRequest()
-        GADInterstitialAd.load(withAdUnitID: APIConstants.GADInterstitialAdUnitID1,
-                               request: request,
-                               completionHandler: { [self] ad, error in
-                                if let error = error {
-                                    print("Failed to load interstitial ad with error: \(error.localizedDescription)")
-                                    return
-                                }
-                                interstitial = ad
-                                interstitial?.fullScreenContentDelegate = self
-                               }
-        )
+        setupObservers()
+        setupBannerView()
         
         do {
             // Set the map style by passing the URL of the local file.
@@ -311,6 +152,17 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         } catch {
             NSLog("One or more of the map styles failed to load. \(error)")
         }
+    }
+    
+    fileprivate func setupObservers() {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
+            NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
+        }
+        NotificationCenter.default.addObserver(self, selector: #selector(deleteDB), name: NSNotification.Name("deleteDB"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: NSNotification.Name("hasNoSubscription"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(professionalSubscriptionStarted), name: NSNotification.Name("professionalSubscriptionStarted"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(openPremiumViewController), name: NSNotification.Name("openPremiumViewController"), object: nil)
     }
     
     //MARK: - hasNoSubscription
@@ -364,25 +216,25 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     }
     //MARK: - deleteDB
     @objc func deleteDB() {
-        placesController?.placeMarkers.forEach({ (marker) in
+        placesController.placeMarkers.forEach({ (marker) in
             marker.map = nil
         })
-        linesController?.polylines.forEach({ (GMSPolyline) in
+        linesController.polylines.forEach({ (GMSPolyline) in
             GMSPolyline.map = nil
         })
-        fieldsController?.polygons.forEach({ (GMSPolygon) in
+        fieldsController.polygons.forEach({ (GMSPolygon) in
             GMSPolygon.map = nil
         })
-        placesController?.placeMarkers.removeAll()
-        linesController?.polylines.removeAll()
-        fieldsController?.polygons.removeAll()
+        placesController.placeMarkers.removeAll()
+        linesController.polylines.removeAll()
+        fieldsController.polygons.removeAll()
         
         do {
             try realm.write({
-                self.realm.delete(fieldsController!.fields!)
-                self.realm.delete(fieldsController!.groups!)
-                self.realm.delete(linesController!.lines!)
-                self.realm.delete(placesController!.places!)
+                self.realm.delete(fieldsController.fields!)
+                self.realm.delete(fieldsController.groups!)
+                self.realm.delete(linesController.lines!)
+                self.realm.delete(placesController.places!)
             })
         } catch {
             print("Error saving context, \(error)")
@@ -407,7 +259,10 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         
         SubscriptionsHelper.app.checkUserSubscription()
         
-        if userDefaults?.first?.accountType != K.invites.accountTypes.proAccount {
+        teamNavBarButton.isEnabled = false
+        teamNavBarButton.image = UIImage()
+        
+        if viewModel.userDefaults.accountType != K.invites.accountTypes.proAccount {
             
             authenticationNavBarButton.image = UIImage(systemName: "star.circle")
             
@@ -421,7 +276,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             title = "\(K.appName) Pro"
         }
         bannerView.isHidden = true
-        if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
+        if viewModel.userDefaults.accountType == K.invites.accountTypes.proAccount {
             bannerView.isHidden = false
         }
         
@@ -431,11 +286,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         
         _ = Auth.auth().addStateDidChangeListener { [self] (auth, user) in
             if user != nil {
-                if self.userDefaults?.first?.accountType != "activeMember" {
+                if self.viewModel.userDefaults.accountType != "activeMember" {
                     
                 }
             } else {
-                if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
+                if viewModel.userDefaults.accountType == K.invites.accountTypes.proAccount {
                     
                     AuthAlertsHelper.authInfoAlert(on: self) {
                         self.performSegue(withIdentifier: K.segueIdentifiers.goToLoginViewController, sender: self)
@@ -447,19 +302,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         navigationController?.isNavigationBarHidden = false
     }
     
-    //MARK: - viewWillDisappear
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-    }
-    
-    //MARK: - Location Manager delegates
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        self.locationManager.stopUpdatingLocation()
-        self.mapView.isMyLocationEnabled = true
-    }
     //MARK: - myLocationButtonTapped
     @IBAction func myLocationButtonTapped(_ sender: UIButton) {
-        let location = locationManager.location
+        let location = viewModel.getMyLocation()
         
         if let latitude = mapView.myLocation?.coordinate.latitude, let longitude = mapView.myLocation?.coordinate.longitude {
             let camera = GMSCameraPosition.camera(withLatitude: latitude, longitude: longitude, zoom: mapView.camera.zoom)
@@ -481,30 +326,26 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     func mapView(_ mapView: GMSMapView, didEndDragging selectedMarker: GMSMarker) {
         switch editingOverlayType {
         case .field:
-            if let markers = fieldsController?.selectedFieldMarkers {
-                for marker in markers {
+            for marker in fieldsController.selectedFieldMarkers {
+                marker.map = mapView
+            }
+            if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+                for marker in fieldsController.selectedFieldLengthMarkers {
                     marker.map = mapView
-                }
-                if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-                    for marker in fieldsController!.selectedFieldLengthMarkers {
-                        marker.map = mapView
-                    }
                 }
             }
         case .line:
-            if let markers = linesController?.selectedLineMarkers {
-                for marker in markers {
-                    marker.map = mapView
-                }
+            for marker in linesController.selectedLineMarkers {
+                marker.map = mapView
             }
-            if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-                for marker in linesController!.selectedLineLengthMarkers {
+            if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+                for marker in linesController.selectedLineLengthMarkers {
                     marker.map = mapView
                 }
             }
         case .place:
-            placesController?.selectedPlaceMarker.position = selectedMarker.position
-            //placesController?.savePlaceToDB(place: placesController!.selectedPlace, groundOverlay: placesController!.selectedGroundOverlay)
+            placesController.selectedPlaceMarker.position = selectedMarker.position
+            //placesController.savePlaceToDB(place: placesController.selectedPlace, groundOverlay: placesController.selectedGroundOverlay)
         }
         if editingOverlayType != .place {
             positionMarker?.map = nil
@@ -531,21 +372,19 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         switch editingOverlayType {
         case .field:
             if marker.title != "lengthMarker" {
-                if let markers = fieldsController?.selectedFieldMarkers {
-                    selectDeleteMarker(selectedMarker: marker, markers: markers)
-                }
+                selectDeleteMarker(selectedMarker: marker, markers: fieldsController.selectedFieldMarkers)
             } else {
-                let temp = UnitsHelper.app.getPlaceholderAndUnitLengthType(isMeasureSystemMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
+                let temp = UnitsHelper.app.getPlaceholderAndUnitLengthType(isMeasureSystemMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                 
                 AlertsHelper.didTapMarkerAlert(on: self, placeholderTitle: temp.first!.key, unitLength: temp.first!.value) { [weak self] length, unitLength  in
                     guard let self = self else { return }
                     var dragedMarker: GMSMarker?
-                    if self.userDefaults!.first!.isMeasureSystemMetric {
+                    if self.viewModel.userDefaults.isMeasureSystemMetric {
                         let lengthWithUnit = Measurement.init(value: length, unit: unitLength)
-                        dragedMarker = self.fieldsController!.setEdgeLength(lengthMarkerIndex: self.fieldsController!.selectedFieldLengthMarkers.firstIndex(of: marker)!, edgeLength: lengthWithUnit.converted(to: UnitLength.meters).value)
+                        dragedMarker = self.fieldsController.setEdgeLength(lengthMarkerIndex: self.fieldsController.selectedFieldLengthMarkers.firstIndex(of: marker)!, edgeLength: lengthWithUnit.converted(to: UnitLength.meters).value)
                     } else {
                         let lengthWithUnit = Measurement.init(value: length, unit: unitLength)
-                        dragedMarker = self.fieldsController!.setEdgeLength(lengthMarkerIndex: self.fieldsController!.selectedFieldLengthMarkers.firstIndex(of: marker)!, edgeLength: lengthWithUnit.converted(to: UnitLength.meters).value)
+                        dragedMarker = self.fieldsController.setEdgeLength(lengthMarkerIndex: self.fieldsController.selectedFieldLengthMarkers.firstIndex(of: marker)!, edgeLength: lengthWithUnit.converted(to: UnitLength.meters).value)
                     }
                     if let draggedMarker = dragedMarker {
                         self.markerDidDrag(didDrag: draggedMarker, isDraggedByCalculation: true)
@@ -554,22 +393,20 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             }
         case .line:
             if marker.title != "lengthMarker" {
-                if let markers = linesController?.selectedLineMarkers {
-                    selectDeleteMarker(selectedMarker: marker, markers: markers)
-                }
+                selectDeleteMarker(selectedMarker: marker, markers: linesController.selectedLineMarkers)
             } else {
                 
-                let temp = UnitsHelper.app.getPlaceholderAndUnitLengthType(isMeasureSystemMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
+                let temp = UnitsHelper.app.getPlaceholderAndUnitLengthType(isMeasureSystemMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                 
                 AlertsHelper.didTapMarkerAlert(on: self, placeholderTitle: temp.first!.key, unitLength: temp.first!.value) { [weak self] length, unitLength in
                     guard let self = self else { return }
                     var dragedMarker: GMSMarker?
-                    if self.userDefaults!.first!.isMeasureSystemMetric {
+                    if self.viewModel.userDefaults.isMeasureSystemMetric {
                         let lengthWithUnit = Measurement.init(value: length, unit: unitLength)
-                        dragedMarker = self.linesController!.setEdgeLength(lengthMarkerIndex: self.linesController!.selectedLineLengthMarkers.firstIndex(of: marker)!, edgeLength: lengthWithUnit.converted(to: UnitLength.meters).value)
+                        dragedMarker = self.linesController.setEdgeLength(lengthMarkerIndex: self.linesController.selectedLineLengthMarkers.firstIndex(of: marker)!, edgeLength: lengthWithUnit.converted(to: UnitLength.meters).value)
                     } else {
                         let lengthWithUnit = Measurement.init(value: length, unit: unitLength)
-                        dragedMarker = self.linesController!.setEdgeLength(lengthMarkerIndex: self.linesController!.selectedLineLengthMarkers.firstIndex(of: marker)!, edgeLength: lengthWithUnit.converted(to: UnitLength.meters).value)
+                        dragedMarker = self.linesController.setEdgeLength(lengthMarkerIndex: self.linesController.selectedLineLengthMarkers.firstIndex(of: marker)!, edgeLength: lengthWithUnit.converted(to: UnitLength.meters).value)
                     }
                     if let draggedMarker = dragedMarker {
                         self.markerDidDrag(didDrag: draggedMarker, isDraggedByCalculation: true)
@@ -607,11 +444,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         switch editingOverlayType {
         case .field:
             if let marker = markers.firstIndex(of: selectedMarker) {
-                fieldsController!.setEditableSelectedFieldLengthMarker(index: marker)
+                fieldsController.setEditableSelectedFieldLengthMarker(index: marker)
             }
         case .line:
             if let marker = markers.firstIndex(of: selectedMarker) {
-                linesController!.setEditableSelectedLineLengthMarker(index: marker)
+                linesController.setEditableSelectedLineLengthMarker(index: marker)
             }
         case .place:
             break
@@ -637,9 +474,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         
         switch editingOverlayType {
         case .field:
-            markers = fieldsController!.selectedFieldMarkers
+            markers = fieldsController.selectedFieldMarkers
         case .line:
-            markers = linesController!.selectedLineMarkers
+            markers = linesController.selectedLineMarkers
         case .place:
             break
         }
@@ -650,21 +487,21 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
        
         if editingOverlayType == .place {
             
-            placesController?.selectedPlaceMarker.position = CLLocationCoordinate2D(latitude: selectedMarker.position.latitude, longitude: selectedMarker.position.longitude)
+            placesController.selectedPlaceMarker.position = CLLocationCoordinate2D(latitude: selectedMarker.position.latitude, longitude: selectedMarker.position.longitude)
             
         } else if selectAllButton.image == UIImage(systemName: K.systemImages.circleGrid3x3Fill) || isDraggedByCalculation {
             
             rect.replaceCoordinate(at: UInt(markers.firstIndex(of: selectedMarker) ?? 0), with: CLLocationCoordinate2D(latitude: selectedMarker.position.latitude, longitude: selectedMarker.position.longitude))
             if editingOverlayType == .field {
-                if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-                    fieldsController!.arrangeSelectedFieldLengthMarker(i: fieldsController!.selectedFieldMarkers.firstIndex(of: selectedMarker)!, inside: true, add: false, isMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
+                if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+                    fieldsController.arrangeSelectedFieldLengthMarker(i: fieldsController.selectedFieldMarkers.firstIndex(of: selectedMarker)!, inside: true, add: false, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                 }
             } else if editingOverlayType == .line {
-                if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-                    if (linesController!.selectedLineMarkers.firstIndex(of: selectedMarker)! != 0) && (linesController!.selectedLineMarkers.firstIndex(of: selectedMarker)! != linesController!.selectedLineMarkers.count - 1) {
-                        linesController!.arrangeSelectedLineLengthMarker(i: linesController!.selectedLineMarkers.firstIndex(of: selectedMarker)!, inside: true, add: false, mapView: mapView, isMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
+                if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+                    if (linesController.selectedLineMarkers.firstIndex(of: selectedMarker)! != 0) && (linesController.selectedLineMarkers.firstIndex(of: selectedMarker)! != linesController.selectedLineMarkers.count - 1) {
+                        linesController.arrangeSelectedLineLengthMarker(i: linesController.selectedLineMarkers.firstIndex(of: selectedMarker)!, inside: true, add: false, mapView: mapView, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                     } else {
-                        linesController!.arrangeSelectedLineLengthMarker(i: linesController!.selectedLineMarkers.firstIndex(of: selectedMarker)!, inside: false, add: false, mapView: mapView, isMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
+                        linesController.arrangeSelectedLineLengthMarker(i: linesController.selectedLineMarkers.firstIndex(of: selectedMarker)!, inside: false, add: false, mapView: mapView, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                     }
                 }
             }
@@ -682,16 +519,16 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
                     rect.replaceCoordinate(at: UInt(markers.firstIndex(of: marker) ?? 0), with: CLLocationCoordinate2D(latitude: marker.position.latitude, longitude: marker.position.longitude))
                 }
             }
-            if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
+            if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
                 if editingOverlayType == .field {
-                    for marker in fieldsController!.selectedFieldLengthMarkers {
+                    for marker in fieldsController.selectedFieldLengthMarkers {
                         marker.map = nil
                         marker.position.latitude += latitudeDifference
                         marker.position.longitude += longitudeDifference
                         
                     }
                 } else if editingOverlayType == .line {
-                    for marker in linesController!.selectedLineLengthMarkers {
+                    for marker in linesController.selectedLineLengthMarkers {
                         marker.map = nil
                         marker.position.latitude += latitudeDifference
                         marker.position.longitude += longitudeDifference
@@ -704,12 +541,12 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         }
         switch editingOverlayType {
         case .field:
-            fieldsController?.selectedPolygon.path = rect
-            fieldsController?.selectedPolygon.map = mapView
+            fieldsController.selectedPolygon.path = rect
+            fieldsController.selectedPolygon.map = mapView
             areaLabelSet()
         case .line:
-            linesController?.selectedPolyline.path = rect
-            linesController?.selectedPolyline.map = mapView
+            linesController.selectedPolyline.path = rect
+            linesController.selectedPolyline.map = mapView
             areaLabelSet()
         case .place:
             areaLabelSet()
@@ -736,12 +573,10 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         selectAllButton.isEnabled = true
         selectAllButton.image = UIImage(systemName: K.systemImages.circleGrid3x3Fill)
         
-        fieldsController?.selectedField = realm.object(ofType: Field.self, forPrimaryKey: polygon.title)!
-        fieldsController?.selectedPolygon = polygon
+        fieldsController.selectedField = realm.object(ofType: Field.self, forPrimaryKey: polygon.title)!
+        fieldsController.selectedPolygon = polygon
         
-        if let color = fieldsController?.selectedField.color {
-            self.colorBarButtonItem.tintColor = UIColor(hexString: color)
-        }
+        colorBarButtonItem.tintColor = UIColor(hexString: fieldsController.selectedField.color)
         
         if !isInitialState {
             guard let fieldsController = fieldsController else { return }
@@ -766,7 +601,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         
         tappableSettings(to: false)
         
-        for marker in fieldsController!.selectedFieldMarkers {
+        for marker in fieldsController.selectedFieldMarkers {
             marker.title = "notDelete"
             
             marker.map = mapView
@@ -776,9 +611,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         
         areaLabelSet()
         
-        if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-            fieldsController!.setSelectedFieldLengthMarkers(isMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
-            fieldsController!.setHideSelectedFieldLengthMarkers(mapView: mapView, remove: true)
+        if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+            fieldsController.setSelectedFieldLengthMarkers(isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+            fieldsController.setHideSelectedFieldLengthMarkers(mapView: mapView, remove: true)
         }
         
         timer = Timer.scheduledTimer(timeInterval: K.freeAccountLimitations.toolBarTimer, target: self, selector: #selector(fireTimer), userInfo: nil, repeats: false)
@@ -795,8 +630,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         selectAllButton.image = UIImage(systemName: K.systemImages.circleGrid3x3Fill)
         
         //self.selectedLineTitle = overlay.title ?? "1"
-        if let line = linesController?.lines?.first(where: {$0.id == polyline.title}) {
-            linesController?.selectedLine = line
+        if let line = linesController.lines?.first(where: {$0.id == polyline.title}) {
+            linesController.selectedLine = line
         }
         
         if !isInitialState {
@@ -816,10 +651,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     }
     //MARK: - editLineMapActions
     func editLineMapActions() {
-        
-        if let color = linesController?.selectedLine.color {
-            self.colorBarButtonItem.tintColor = UIColor(hexString: color)
-        }
+        colorBarButtonItem.tintColor = UIColor(hexString: linesController.selectedLine.color)
         
         //self.navBar.title = self.selectedLineTitle
         hideView(view: bannerView, hidden: true)
@@ -829,7 +661,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         
         tappableSettings(to: false)
         
-        for marker in linesController!.selectedLineMarkers {
+        for marker in linesController.selectedLineMarkers {
             marker.title = "notDelete"
             marker.map = mapView
         }
@@ -837,9 +669,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         self.hideView(view: self.arrowButton, hidden: true)
         
         areaLabelSet()
-        if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-            linesController!.setSelectedLineLengthMarkers(isMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
-            linesController!.setHideSelectedLineLengthMarkers(mapView: mapView, remove: true)
+        if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+            linesController.setSelectedLineLengthMarkers(isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+            linesController.setHideSelectedLineLengthMarkers(mapView: mapView, remove: true)
         }
         
         timer = Timer.scheduledTimer(timeInterval: K.freeAccountLimitations.toolBarTimer, target: self, selector: #selector(fireTimer), userInfo: nil, repeats: false)
@@ -855,8 +687,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         
         placeMarker.isDraggable = true
         
-        if let place = placesController!.places!.first(where: {$0.id == placeMarker.title}) {
-            placesController?.selectedPlace = place
+        if let place = placesController.places!.first(where: {$0.id == placeMarker.title}) {
+            placesController.selectedPlace = place
         }
         
         if !isInitialState {
@@ -884,11 +716,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         areaLabelSet()
         hideView(view: areaLabel, hidden: false)
         
-        if let color = placesController?.selectedPlace.color {
-            self.colorBarButtonItem.tintColor = UIColor(hexString: color)
-        }
+        colorBarButtonItem.tintColor = UIColor(hexString: placesController.selectedPlace.color)
         
-        let moveMarker = GMSMarker(position: (placesController?.selectedPlaceMarker.position)!)
+        let moveMarker = GMSMarker(position: (placesController.selectedPlaceMarker.position))
         moveMarker.isDraggable = true
         moveMarker.isTappable = true
         moveMarker.icon = UIImage.init(systemName: K.systemImages.circleFill)!.imageScaled(to: CGSize(width: 100, height: 100))
@@ -907,34 +737,34 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         case .field:
             
             // Field area calculation
-            fieldsController?.setAreaAndCircumference()
-            areaLabel.text = String(format: NSLocalizedString(" Field: %@ ", comment: ""), fieldsController!.selectedField.title) + "\n"
-            let area = Measurement(value: fieldsController!.updatedArea, unit: UnitArea.squareMeters)
-            let circumference = Measurement(value: fieldsController!.updatedCircumference, unit: UnitLength.meters)
+            fieldsController.setAreaAndCircumference()
+            areaLabel.text = String(format: NSLocalizedString(" Field: %@ ", comment: ""), fieldsController.selectedField.title) + "\n"
+            let area = Measurement(value: fieldsController.updatedArea, unit: UnitArea.squareMeters)
+            let circumference = Measurement(value: fieldsController.updatedCircumference, unit: UnitLength.meters)
             
-            areaLabel.text! += UnitsHelper.app.getUnitForField(isShowAllUnitsSelected: userDefaults!.first!.isShowAllUnitsSelected, isMeasureSystemMetric: userDefaults!.first!.isMeasureSystemMetric, area: area, circumference: circumference, distanceUnit: userDefaults!.first!.distanceUnit, areaUnit: userDefaults!.first!.areaUnit)
+            areaLabel.text! += UnitsHelper.app.getUnitForField(isShowAllUnitsSelected: viewModel.userDefaults.isShowAllUnitsSelected, isMeasureSystemMetric: viewModel.userDefaults.isMeasureSystemMetric, area: area, circumference: circumference, distanceUnit: viewModel.userDefaults.distanceUnit, areaUnit: viewModel.userDefaults.areaUnit)
             
         case .line:
             // line length calculation
-            areaLabel.text = String(format: NSLocalizedString(" Line: %@ ", comment: ""), linesController!.selectedLine.title) + "\n"
-            let length = Measurement(value: GMSGeometryLength((linesController!.selectedPolyline.path)!), unit: UnitLength.meters)
+            areaLabel.text = String(format: NSLocalizedString(" Line: %@ ", comment: ""), linesController.selectedLine.title) + "\n"
+            let length = Measurement(value: GMSGeometryLength((linesController.selectedPolyline.path)!), unit: UnitLength.meters)
             
-            areaLabel.text! += UnitsHelper.app.getUnitForLine(isShowAllUnitsSelected: userDefaults!.first!.isShowAllUnitsSelected, isMeasureSystemMetric: userDefaults!.first!.isMeasureSystemMetric, length: length, distanceUnit: userDefaults!.first!.distanceUnit)
+            areaLabel.text! += UnitsHelper.app.getUnitForLine(isShowAllUnitsSelected: viewModel.userDefaults.isShowAllUnitsSelected, isMeasureSystemMetric: viewModel.userDefaults.isMeasureSystemMetric, length: length, distanceUnit: viewModel.userDefaults.distanceUnit)
             
-            linesController?.setSelectedLineLength(length: GMSGeometryLength((linesController?.selectedPolyline.path)!))
+            linesController.setSelectedLineLength(length: GMSGeometryLength((linesController.selectedPolyline.path)!))
         case .place:
             // Place Location
             
-            areaLabel.text = String(format: NSLocalizedString(" Place: %@", comment: ""), placesController!.selectedPlace.title) + "\n" +
-                NSLocalizedString(" Lat:", comment: "") + " \(String(format: "%.5f", placesController!.selectedPlaceMarker.position.latitude))" + "\n" +
-                NSLocalizedString(" Lon:", comment: "") + " \(String(format: "%.5f", placesController!.selectedPlaceMarker.position.longitude))"
+            areaLabel.text = String(format: NSLocalizedString(" Place: %@", comment: ""), placesController.selectedPlace.title) + "\n" +
+                NSLocalizedString(" Lat:", comment: "") + " \(String(format: "%.5f", placesController.selectedPlaceMarker.position.latitude))" + "\n" +
+                NSLocalizedString(" Lon:", comment: "") + " \(String(format: "%.5f", placesController.selectedPlaceMarker.position.longitude))"
         }
     }
     //MARK: - tapableSettings
     func tappableSettings(to tapable: Bool) {
-        fieldsController?.changePolygonsTappableBoolean(to: tapable)
-        linesController?.changePolylinesTappableBoolean(to: tapable)
-        placesController?.changeGroundOverlayTappableBoolean(to: tapable)
+        fieldsController.changePolygonsTappableBoolean(to: tapable)
+        linesController.changePolylinesTappableBoolean(to: tapable)
+        placesController.changeGroundOverlayTappableBoolean(to: tapable)
     }
     
     //MARK: - Prepare for seque
@@ -947,19 +777,19 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             
             switch editingOverlayType {
             case .field:
-                destinationVC.selectedGroup = fieldsController?.selectedField.parentGroup.first
-                destinationVC.selectedField = fieldsController?.selectedField
+                destinationVC.selectedGroup = fieldsController.selectedField.parentGroup.first
+                destinationVC.selectedField = fieldsController.selectedField
             case .line:
-                destinationVC.selectedLine = linesController?.selectedLine
+                destinationVC.selectedLine = linesController.selectedLine
             case .place:
-                destinationVC.selectedPlace = placesController?.selectedPlace
+                destinationVC.selectedPlace = placesController.selectedPlace
             }
             
         case K.segueIdentifiers.infoView:
             let destinationVC = segue.destination as! FieldListViewController
-            destinationVC.selectedGroup = fieldsController?.selectedField.parentGroup.first
+            destinationVC.selectedGroup = fieldsController.selectedField.parentGroup.first
             destinationVC.fieldsController = fieldsController
-            destinationVC.isMetric = userDefaults?.first?.isMeasureSystemMetric
+            destinationVC.isMetric = viewModel.userDefaults.isMeasureSystemMetric
             
         case K.segueIdentifiers.goToGroups:
             let destinationVC = segue.destination as! GroupListViewController
@@ -984,11 +814,11 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             
             switch editingOverlayType {
             case .field:
-                destinationVC.selectedField = fieldsController?.selectedField
+                destinationVC.selectedField = fieldsController.selectedField
             case .line:
-                destinationVC.selectedLine = linesController?.selectedLine
+                destinationVC.selectedLine = linesController.selectedLine
             case .place:
-                destinationVC.selectedPlace = placesController?.selectedPlace
+                destinationVC.selectedPlace = placesController.selectedPlace
             }
             
         default:
@@ -1007,13 +837,13 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             case .field:
                 addType = .field
                 if let groupTitle = groupTitleTextField.text {
-                    errorMessage = (fieldsController?.checkTitleAvailable(title: title, groupTitle: groupTitle))!
+                    errorMessage = (fieldsController.checkTitleAvailable(title: title, groupTitle: groupTitle))
                 }
             case .line:
-                errorMessage = (linesController?.checkTitleAvailable(title: title))!
+                errorMessage = (linesController.checkTitleAvailable(title: title))
                 addType = .line
             case .place:
-                errorMessage = (placesController?.checkTitleAvailable(title: title))!
+                errorMessage = (placesController.checkTitleAvailable(title: title))
                 addType = .place
             }
         }
@@ -1050,8 +880,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     //MARK: - addFieldButtonTapped
     @IBAction func addFieldButtonTapped(_ sender: UIButton) {
         
-        if userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
-            if let fieldCount = fieldsController?.fields?.count {
+        if viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
+            if let fieldCount = fieldsController.fields?.count {
                 
                 if fieldCount >= K.freeAccountLimitations.overlayLimit {
                     AlertsHelper.addingExtraFieldAlert(on: self)
@@ -1068,8 +898,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     //MARK: - addLineButtonTapped
     @IBAction func addLineButtonTapped(_ sender: UIButton) {
         
-        if userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
-            if let lineCount = linesController?.lines?.count {
+        if viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
+            if let lineCount = linesController.lines?.count {
                 
                 if lineCount >= K.freeAccountLimitations.overlayLimit {
                     AlertsHelper.addingExtraLineAlert(on: self)
@@ -1087,8 +917,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     //MARK: - addPlaceButtonTapped
     @IBAction func addPlaceButtonTapped(_ sender: UIButton) {
         
-        if userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
-            if let placeCount = placesController?.places?.count {
+        if viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
+            if let placeCount = placesController.places?.count {
                 
                 if placeCount >= K.freeAccountLimitations.overlayLimit {
                     AlertsHelper.addingExtraPlaceAlert(on: self)
@@ -1133,27 +963,27 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         asd.setMapStyle(to: MapStylesHelper.standard)
         
         mapView.mapType = .normal
-        writeUserDefaultsToRealm(mapType: K.mapTypes.normal)
+        viewModel.saveMapType(with: K.mapTypes.normal)
         hideView(view: mapTypeSelectButton, hidden: false)
         hideView(view: mapTypeStackView, hidden: true)
     }
     @IBAction func mapTypeSataliteButtonTapped(_ sender: UIButton) {
         mapView.mapType = .satellite
-        writeUserDefaultsToRealm(mapType: K.mapTypes.satellite)
+        viewModel.saveMapType(with: K.mapTypes.satellite)
         hideView(view: mapTypeSelectButton, hidden: false)
         hideView(view: mapTypeStackView, hidden: true)
     }
     @IBAction func mapTypeTerrainButtonTapped(_ sender: UIButton) {
         mapView.mapType = .terrain
-        writeUserDefaultsToRealm(mapType: K.mapTypes.terrain)
+        viewModel.saveMapType(with: K.mapTypes.terrain)
         hideView(view: mapTypeSelectButton, hidden: false)
         hideView(view: mapTypeStackView, hidden: true)
     }
     @IBAction func customButtonTapped(_ sender: UIButton) {
-        writeUserDefaultsToRealm(mapType: K.mapTypes.custom)
+        viewModel.saveMapType(with: K.mapTypes.custom)
         hideView(view: mapTypeSelectButton, hidden: false)
         hideView(view: mapTypeStackView, hidden: true)
-        writeUserDefaultsToRealm(mapType: K.mapTypes.custom)
+        viewModel.saveMapType(with: K.mapTypes.custom)
         showMiracle()
     }
     
@@ -1165,20 +995,6 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         slideVC.mapView = mapView
         self.present(slideVC, animated: true, completion: nil)
         
-    }
-    
-    //MARK: - writeUserDefaultsToRealm
-    func writeUserDefaultsToRealm(mapType: String) {
-        if let userDefault = userDefaults?.first {
-            do {
-                try realm.write({
-                    userDefault.mapType = mapType
-                    realm.add(userDefault)
-                })
-            } catch {
-                print(K.errorSavingContext + "\(error)")
-            }
-        }
     }
     //MARK: - colorButtonTapped
     @IBAction func colorButtonTapped(_ sender: UIButton) {
@@ -1196,7 +1012,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     @IBAction func authenticationButtonTapped(_ sender: UIBarButtonItem) {
        
         _ = Auth.auth().addStateDidChangeListener { [self] (auth, user) in
-            if userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
+            if viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
                 performSegue(withIdentifier: K.segueIdentifiers.mapViewToPremiumView, sender: self)
             } else {
                 if user != nil {
@@ -1291,22 +1107,22 @@ extension MapViewController: UICollectionViewDelegate {
         if toolBar.isHidden == false {
             switch editingOverlayType {
             case .field:
-                if fieldsController?.selectedField.parentGroup.first?.id == fieldsController?.grouplessGroupID {
-                    fieldsController?.setColor(color: colors[indexPath.row].hexValue(), field: fieldsController!.selectedField)
+                if fieldsController.selectedField.parentGroup.first?.id == fieldsController.grouplessGroupID {
+                    fieldsController.setColor(color: colors[indexPath.row].hexValue(), field: fieldsController.selectedField)
                 } else {
-                    if let tempGroup = fieldsController!.selectedField.parentGroup.first {
+                    if let tempGroup = fieldsController.selectedField.parentGroup.first {
                         if let color = colorButton.backgroundColor?.hexValue() {
                             if tempGroup.color != color {
-                                fieldsController?.changeGroupColor(group: tempGroup, color: color)
-                                fieldsController?.changeGroupColorAtCloud(group: tempGroup, color: color)
+                                fieldsController.changeGroupColor(group: tempGroup, color: color)
+                                fieldsController.changeGroupColorAtCloud(group: tempGroup, color: color)
                             }
                         }
                     }
                 }
             case .line:
-                linesController?.setColor(color: colors[indexPath.row].hexValue(), line: linesController!.selectedLine, mapView: mapView)
+                linesController.setColor(color: colors[indexPath.row].hexValue(), line: linesController.selectedLine, mapView: mapView)
             case .place:
-                placesController!.setColor(color: colors[indexPath.row].hexValue(), place: placesController!.selectedPlace, mapView: mapView)
+                placesController.setColor(color: colors[indexPath.row].hexValue(), place: placesController.selectedPlace, mapView: mapView)
             }
         }
     }
@@ -1328,12 +1144,12 @@ extension MapViewController{
             AlertsHelper.deleteAlert(on: self,
                                      with: .field,
                                      overlayTitle: fieldsController.selectedField.title) { [unowned self] in
-                if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
+                if viewModel.userDefaults.accountType == K.invites.accountTypes.proAccount {
                     fieldsController.deleteFieldFromCloud(field: fieldsController.selectedField)
                 }
                 fieldsController.deleteFieldFromDB(field: fieldsController.selectedField)
                 endEditing()
-                if userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
+                if viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
                     hideView(view: bannerView, hidden: false)
                 }
             }
@@ -1345,7 +1161,7 @@ extension MapViewController{
                 linesController.deleteLineFromCloud(line: linesController.selectedLine)
                 linesController.deleteSelectedLineFromDB(line: linesController.selectedLine)
                 endEditing()
-                if userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
+                if viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
                     hideView(view: bannerView, hidden: false)
                 }
             }
@@ -1358,7 +1174,7 @@ extension MapViewController{
                 placesController.deletePlaceFromCloud(place: placesController.selectedPlace)
                 placesController.deletePlaceFromDB(place: placesController.selectedPlace)
                 endEditing()
-                if userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
+                if viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
                     hideView(view: bannerView, hidden: false)
                 }
             }
@@ -1401,13 +1217,12 @@ extension MapViewController{
         case .line:
             break
         case .place:
-            placesController!.increaseIconSize(place: placesController!.selectedPlace, mapView: mapView)
+            placesController.increaseIconSize(place: placesController.selectedPlace, mapView: mapView)
         }
         
     }
     //MARK: - didTapAt coordinate
     func mapView(_ mapView: GMSMapView, didTapAt coordinate: CLLocationCoordinate2D) {
-        //print("You tapped at \(coordinate.latitude), \(coordinate.longitude)")
         if !toolBar.isHidden {
             let newMarker = GMSMarker()
             if editingOverlayType != .place {
@@ -1423,114 +1238,102 @@ extension MapViewController{
             var secondClosestDistance = Double.greatestFiniteMagnitude
             switch editingOverlayType {
             case .field:
-                if let markers = fieldsController?.selectedFieldMarkers {
-                    for i in 0...markers.count-1 {
-                        let distance = GMSGeometryDistance(newMarker.position,markers[i].position)
-                        if distance < closestDistance {
-                            closestDistance = distance
-                            closestMarkerIndex = i
-                        }
+                for i in 0...fieldsController.selectedFieldMarkers.count-1 {
+                    let distance = GMSGeometryDistance(newMarker.position,fieldsController.selectedFieldMarkers[i].position)
+                    if distance < closestDistance {
+                        closestDistance = distance
+                        closestMarkerIndex = i
                     }
-                    for i in 0...markers.count-1 {
-                        let distance = GMSGeometryDistance(newMarker.position,markers[i].position)
-                        if distance < secondClosestDistance && distance > closestDistance {
-                            secondClosestDistance = distance
-                            secondClosestMarkerIndex = i
-                        }
+                }
+                for i in 0...fieldsController.selectedFieldMarkers.count-1 {
+                    let distance = GMSGeometryDistance(newMarker.position,fieldsController.selectedFieldMarkers[i].position)
+                    if distance < secondClosestDistance && distance > closestDistance {
+                        secondClosestDistance = distance
+                        secondClosestMarkerIndex = i
                     }
-                    
-                    if (closestMarkerIndex == 0 && secondClosestMarkerIndex == (markers.count-1)) || (closestMarkerIndex == (markers.count-1)) && secondClosestMarkerIndex == 0 {
-                        if closestMarkerIndex == 0 {
-                            fieldsController?.selectedFieldMarkers.insert(newMarker, at: closestMarkerIndex)
-                            if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-                                fieldsController!.arrangeSelectedFieldLengthMarker(i: 0, inside: true, add: true, isMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
-                            }
-                        } else {
-                            fieldsController?.selectedFieldMarkers.append(newMarker)
-                            //fieldsController!.arrangeSelectedFieldLengthMarker(i: markers.count-1, inside: true, add: true, mapView: mapView)
-                            if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-                                fieldsController?.setHideSelectedFieldLengthMarkers(mapView: nil, remove: true)
-                                fieldsController?.setSelectedFieldLengthMarkers(isMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
-                                fieldsController?.setHideSelectedFieldLengthMarkers(mapView: mapView, remove: true)
-                            }
-                        }
-                    } else if closestMarkerIndex < secondClosestMarkerIndex {
-                        fieldsController?.selectedFieldMarkers.insert(newMarker, at: secondClosestMarkerIndex)
-                        if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-                            fieldsController!.arrangeSelectedFieldLengthMarker(i: secondClosestMarkerIndex, inside: true, add: true, isMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
+                }
+                
+                if (closestMarkerIndex == 0 && secondClosestMarkerIndex == (fieldsController.selectedFieldMarkers.count-1)) || (closestMarkerIndex == (fieldsController.selectedFieldMarkers.count-1)) && secondClosestMarkerIndex == 0 {
+                    if closestMarkerIndex == 0 {
+                        fieldsController.selectedFieldMarkers.insert(newMarker, at: closestMarkerIndex)
+                        if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+                            fieldsController.arrangeSelectedFieldLengthMarker(i: 0, inside: true, add: true, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                         }
                     } else {
-                        fieldsController?.selectedFieldMarkers.insert(newMarker, at: closestMarkerIndex)
-                        if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-                            fieldsController!.arrangeSelectedFieldLengthMarker(i: closestMarkerIndex, inside: true, add: true, isMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
+                        fieldsController.selectedFieldMarkers.append(newMarker)
+                        //fieldsController.arrangeSelectedFieldLengthMarker(i: markers.count-1, inside: true, add: true, mapView: mapView)
+                        if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+                            fieldsController.setHideSelectedFieldLengthMarkers(mapView: nil, remove: true)
+                            fieldsController.setSelectedFieldLengthMarkers(isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+                            fieldsController.setHideSelectedFieldLengthMarkers(mapView: mapView, remove: true)
                         }
+                    }
+                } else if closestMarkerIndex < secondClosestMarkerIndex {
+                    fieldsController.selectedFieldMarkers.insert(newMarker, at: secondClosestMarkerIndex)
+                    if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+                        fieldsController.arrangeSelectedFieldLengthMarker(i: secondClosestMarkerIndex, inside: true, add: true, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+                    }
+                } else {
+                    fieldsController.selectedFieldMarkers.insert(newMarker, at: closestMarkerIndex)
+                    if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+                        fieldsController.arrangeSelectedFieldLengthMarker(i: closestMarkerIndex, inside: true, add: true, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                     }
                 }
                 
                 let rect = GMSMutablePath()
-                if let markers = fieldsController?.selectedFieldMarkers {
-                    for marker in markers {
-                        rect.add(marker.position)
-                    }
+                for marker in fieldsController.selectedFieldMarkers {
+                    rect.add(marker.position)
                 }
-                fieldsController?.selectedPolygon.path = rect
-                fieldsController?.selectedPolygon.map = mapView
+                fieldsController.selectedPolygon.path = rect
+                fieldsController.selectedPolygon.map = mapView
                 areaLabelSet()
             case .line:
-                closestMarkerIndex = 0
-                closestDistance = Double.greatestFiniteMagnitude
-                secondClosestMarkerIndex = 0
-                secondClosestDistance = Double.greatestFiniteMagnitude
-                if let markers = linesController?.selectedLineMarkers {
-                    for i in 0...markers.count-1 {
-                        let distance = GMSGeometryDistance(newMarker.position,markers[i].position)
-                        if distance < closestDistance {
-                            closestDistance = distance
-                            closestMarkerIndex = i
-                        }
+                for i in 0...linesController.selectedLineMarkers.count-1 {
+                    let distance = GMSGeometryDistance(newMarker.position,linesController.selectedLineMarkers[i].position)
+                    if distance < closestDistance {
+                        closestDistance = distance
+                        closestMarkerIndex = i
                     }
-                    for i in 0...markers.count-1 {
-                        let distance = GMSGeometryDistance(newMarker.position,markers[i].position)
-                        if distance < secondClosestDistance && distance > closestDistance {
-                            secondClosestDistance = distance
-                            secondClosestMarkerIndex = i
-                        }
+                }
+                for i in 0...linesController.selectedLineMarkers.count-1 {
+                    let distance = GMSGeometryDistance(newMarker.position,linesController.selectedLineMarkers[i].position)
+                    if distance < secondClosestDistance && distance > closestDistance {
+                        secondClosestDistance = distance
+                        secondClosestMarkerIndex = i
                     }
-                    if closestMarkerIndex == 0 {
-                        linesController?.selectedLineMarkers.removeAll()
-                        linesController?.selectedLineMarkers.append(newMarker)
-                        for marker in markers {
-                            linesController?.selectedLineMarkers.append(marker)
-                        }
-                        if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-                            linesController!.arrangeSelectedLineLengthMarker(i: closestMarkerIndex, inside: false, add: true, mapView: mapView, isMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
-                        }
-                    } else if closestMarkerIndex == (markers.count-1) {
-                        linesController?.selectedLineMarkers.append(newMarker)
-                        if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-                            linesController!.arrangeSelectedLineLengthMarker(i: linesController!.selectedLineMarkers.count-2, inside: false, add: true, mapView: mapView, isMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
-                        }
-                    } else if closestMarkerIndex < secondClosestMarkerIndex {
-                        linesController?.selectedLineMarkers.insert(newMarker, at: secondClosestMarkerIndex)
-                        if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-                            linesController!.arrangeSelectedLineLengthMarker(i: secondClosestMarkerIndex, inside: true, add: true, mapView: mapView, isMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
-                        }
-                    } else {
-                        linesController?.selectedLineMarkers.insert(newMarker, at: closestMarkerIndex)
-                        if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-                            linesController!.arrangeSelectedLineLengthMarker(i: closestMarkerIndex, inside: true, add: true, mapView: mapView, isMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
-                        }
+                }
+                if closestMarkerIndex == 0 {
+                    linesController.selectedLineMarkers.removeAll()
+                    linesController.selectedLineMarkers.append(newMarker)
+                    for marker in linesController.selectedLineMarkers {
+                        linesController.selectedLineMarkers.append(marker)
+                    }
+                    if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+                        linesController.arrangeSelectedLineLengthMarker(i: closestMarkerIndex, inside: false, add: true, mapView: mapView, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+                    }
+                } else if closestMarkerIndex == (linesController.selectedLineMarkers.count-1) {
+                    linesController.selectedLineMarkers.append(newMarker)
+                    if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+                        linesController.arrangeSelectedLineLengthMarker(i: linesController.selectedLineMarkers.count-2, inside: false, add: true, mapView: mapView, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+                    }
+                } else if closestMarkerIndex < secondClosestMarkerIndex {
+                    linesController.selectedLineMarkers.insert(newMarker, at: secondClosestMarkerIndex)
+                    if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+                        linesController.arrangeSelectedLineLengthMarker(i: secondClosestMarkerIndex, inside: true, add: true, mapView: mapView, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+                    }
+                } else {
+                    linesController.selectedLineMarkers.insert(newMarker, at: closestMarkerIndex)
+                    if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+                        linesController.arrangeSelectedLineLengthMarker(i: closestMarkerIndex, inside: true, add: true, mapView: mapView, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                     }
                 }
                 
                 let rect = GMSMutablePath()
-                if let markers = linesController?.selectedLineMarkers {
-                    for marker in markers {
-                        rect.add(marker.position)
-                    }
+                for marker in linesController.selectedLineMarkers {
+                    rect.add(marker.position)
                 }
-                linesController?.selectedPolyline.path = rect
-                linesController?.selectedPolyline.map = mapView
+                linesController.selectedPolyline.path = rect
+                linesController.selectedPolyline.map = mapView
                 areaLabelSet()
             case .place:
                 break
@@ -1554,28 +1357,28 @@ extension MapViewController{
                 if let groupTitle = groupTitleTextField.text {
                     if let title = titleTextField.text {
                         if let color = colorButton.backgroundColor?.hexValue() {
-                            fieldsController!.addField(title: title, groupTitle: groupTitle, color: color, initialMarkers: initialMarkers, id: nil, isGeodesic: userDefaults!.first!.isGeodesicActive)
+                            fieldsController.addField(title: title, groupTitle: groupTitle, color: color, initialMarkers: initialMarkers, id: nil, isGeodesic: viewModel.userDefaults.isGeodesicActive)
                         }
                     }
                 }
                 isComplete = true
-                editField(polygon: (fieldsController?.polygons.last)!)
+                editField(polygon: (fieldsController.polygons.last)!)
             } else if addType == .line && initialMarkers.count == 2 {
                 if let title = titleTextField.text {
                     if let color = colorButton.backgroundColor?.hexValue() {
-                        linesController!.addLine(title: title, color: color, initialMarkers: initialMarkers, mapView: mapView, isGeodesic: userDefaults!.first!.isGeodesicActive, id: nil)
+                        linesController.addLine(title: title, color: color, initialMarkers: initialMarkers, mapView: mapView, isGeodesic: viewModel.userDefaults.isGeodesicActive, id: nil)
                     }
                 }
                 isComplete = true
-                editLine(polyline: (linesController?.polylines.last)!)
+                editLine(polyline: (linesController.polylines.last)!)
             } else if addType == .place && initialMarkers.count == 1 {
                 if let title = titleTextField.text {
                     if let color = colorButton.backgroundColor?.hexValue() {
-                        placesController!.addPlace(title: title, color: color, mapView: mapView, initialMarker: initialMarkers[0], id: nil, iconSize: nil)
+                        placesController.addPlace(title: title, color: color, mapView: mapView, initialMarker: initialMarkers[0], id: nil, iconSize: nil)
                     }
                 }
                 isComplete = true
-                editPlace(placeMarker: (placesController?.placeMarkers.last)!)
+                editPlace(placeMarker: (placesController.placeMarkers.last)!)
             }
             if isComplete {
                 for marker in initialMarkers {
@@ -1602,107 +1405,99 @@ extension MapViewController{
     @IBAction func minusButtonTapped(_ sender: UIBarButtonItem) {
         switch editingOverlayType {
         case .field:
-            if let markers = fieldsController?.selectedFieldMarkers {
-                if markers.count > 3 {
-                    //var deleteThisMarker = GMSMarker()
-                    let markersCount = fieldsController?.selectedFieldMarkers.count
-                    
-                    var deletedMarkerIndex = 0;
-                    for marker in markers {
-                        if marker.title == "delete" {
-                            deletedMarkerIndex = (fieldsController?.selectedFieldMarkers.firstIndex(of: marker))!
-                            fieldsController?.selectedFieldMarkers[deletedMarkerIndex].map = nil
-                            fieldsController?.selectedFieldMarkers.remove(at: deletedMarkerIndex)
-                            fieldsController?.selectedPolygon.map = nil
-                            fieldsController?.selectedPolygon.map = mapView
-                        }
+            if fieldsController.selectedFieldMarkers.count > 3 {
+                //var deleteThisMarker = GMSMarker()
+                let markersCount = fieldsController.selectedFieldMarkers.count
+                
+                var deletedMarkerIndex = 0;
+                for marker in fieldsController.selectedFieldMarkers {
+                    if marker.title == "delete" {
+                        deletedMarkerIndex = (fieldsController.selectedFieldMarkers.firstIndex(of: marker))!
+                        fieldsController.selectedFieldMarkers[deletedMarkerIndex].map = nil
+                        fieldsController.selectedFieldMarkers.remove(at: deletedMarkerIndex)
+                        fieldsController.selectedPolygon.map = nil
+                        fieldsController.selectedPolygon.map = mapView
                     }
-                    
-                    if markersCount == fieldsController?.selectedFieldMarkers.count {
-                        AlertsHelper.errorAlert(on: self,
-                                                with: NSLocalizedString("Oops!", comment: ""), errorMessage: K.errorMessages.deletingCornerErrorMessage)
-                    } else {
-                        if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-                            fieldsController?.deleteSelectedFieldLengthMarker(index: deletedMarkerIndex, isMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
-                        }
-                        let rect = GMSMutablePath()
-                        if let markers = fieldsController?.selectedFieldMarkers {
-                            for marker in markers {
-                                rect.add(marker.position)
-                            }
-                        }
-                        fieldsController?.selectedPolygon.path = rect
-                        fieldsController?.selectedPolygon.map = mapView
-                        areaLabelSet()
-                    }
-                } else {
-                    AlertsHelper.errorAlert(on: self, with: (fieldsController?.selectedField.title)! + K.errorMessages.tooFewCornerCountForFieldErrorMessage, errorMessage: "")
                 }
+                
+                if markersCount == fieldsController.selectedFieldMarkers.count {
+                    AlertsHelper.errorAlert(on: self,
+                                            with: NSLocalizedString("Oops!", comment: ""), errorMessage: K.errorMessages.deletingCornerErrorMessage)
+                } else {
+                    if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+                        fieldsController.deleteSelectedFieldLengthMarker(index: deletedMarkerIndex, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+                    }
+                    let rect = GMSMutablePath()
+                    for marker in fieldsController.selectedFieldMarkers {
+                        rect.add(marker.position)
+                    }
+                    fieldsController.selectedPolygon.path = rect
+                    fieldsController.selectedPolygon.map = mapView
+                    areaLabelSet()
+                }
+            } else {
+                AlertsHelper.errorAlert(on: self, with: (fieldsController.selectedField.title) + K.errorMessages.tooFewCornerCountForFieldErrorMessage, errorMessage: "")
             }
         case .line:
-            if let markers = linesController?.selectedLineMarkers {
-                if markers.count > 2 {
-                    //var deleteThisMarker = GMSMarker()
-                    let markersCount = linesController?.selectedLineMarkers.count
-                    
-                    var deletedMarkerIndex = 0;
-                    for marker in markers {
-                        if marker.title == "delete" {
-                            markers[markers.firstIndex(of: marker)!].map = nil
-                            deletedMarkerIndex = (linesController?.selectedLineMarkers.firstIndex(of: marker))!
-                            linesController?.selectedLineMarkers.remove(at: (deletedMarkerIndex))
-                            linesController?.selectedPolyline.map = nil
-                            linesController?.selectedPolyline.map = mapView
-                        }
+            if linesController.selectedLineMarkers.count > 2 {
+                //var deleteThisMarker = GMSMarker()
+                let markersCount = linesController.selectedLineMarkers.count
+                
+                var deletedMarkerIndex = 0;
+                for marker in linesController.selectedLineMarkers {
+                    if marker.title == "delete" {
+                        linesController.selectedLineMarkers[linesController.selectedLineMarkers.firstIndex(of: marker)!].map = nil
+                        deletedMarkerIndex = (linesController.selectedLineMarkers.firstIndex(of: marker))!
+                        linesController.selectedLineMarkers.remove(at: (deletedMarkerIndex))
+                        linesController.selectedPolyline.map = nil
+                        linesController.selectedPolyline.map = mapView
                     }
-                    
-                    if markersCount == linesController?.selectedLineMarkers.count {
-                        AlertsHelper.errorAlert(on: self, with: NSLocalizedString("Oops!", comment: ""), errorMessage: K.errorMessages.deletingCornerErrorMessage)
-                    } else {
-                        if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-                            linesController?.deleteSelectedLineLengthMarker(index: deletedMarkerIndex, isMetric: userDefaults!.first!.isMeasureSystemMetric, distanceUnit: userDefaults!.first!.distanceUnit)
-                        }
-                    }
-                    
-                    let rect = GMSMutablePath()
-                    if let markers = linesController?.selectedLineMarkers {
-                        for marker in markers {
-                            rect.add(marker.position)
-                        }
-                    }
-                    linesController?.selectedPolyline.path = rect
-                    linesController?.selectedPolyline.map = mapView
-                    areaLabelSet()
-                } else {
-                    AlertsHelper.errorAlert(on: self,
-                                            with: (fieldsController?.selectedField.title)! + K.errorMessages.tooFewCornerCountForLineErrorMessage,
-                                            errorMessage: "")
                 }
+                
+                if markersCount == linesController.selectedLineMarkers.count {
+                    AlertsHelper.errorAlert(on: self, with: NSLocalizedString("Oops!", comment: ""), errorMessage: K.errorMessages.deletingCornerErrorMessage)
+                } else {
+                    if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+                        linesController.deleteSelectedLineLengthMarker(index: deletedMarkerIndex, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+                    }
+                }
+                
+                let rect = GMSMutablePath()
+                for marker in linesController.selectedLineMarkers {
+                    rect.add(marker.position)
+                }
+                linesController.selectedPolyline.path = rect
+                linesController.selectedPolyline.map = mapView
+                areaLabelSet()
+            } else {
+                AlertsHelper.errorAlert(on: self,
+                                        with: (fieldsController.selectedField.title) + K.errorMessages.tooFewCornerCountForLineErrorMessage,
+                                        errorMessage: "")
             }
         case .place:
-            placesController!.decreaseIconSize(place: placesController!.selectedPlace, mapView: mapView)
+            placesController.decreaseIconSize(place: placesController.selectedPlace, mapView: mapView)
         }
     }
     //MARK: - saveButtonTapped
     @IBAction func saveButtonTapped(_ sender: UIBarButtonItem) {
-        if userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
+        if viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
             hideView(view: bannerView, hidden: false)
         }
         switch editingOverlayType {
         case .field:
-            fieldsController?.saveFieldToDB()
-            fieldsController?.saveFieldToCloud(field: fieldsController!.selectedField)
+            fieldsController.saveFieldToDB()
+            fieldsController.saveFieldToCloud(field: fieldsController.selectedField)
             
         case .line:
-            linesController?.saveLineToDB(line: linesController!.selectedLine)
+            linesController.saveLineToDB(line: linesController.selectedLine)
         
         case .place:
-            placesController?.savePlaceToDB(place: placesController!.selectedPlace, placeMarker: placesController!.selectedPlaceMarker)
-            placesController?.selectedPlaceMarker.isDraggable = false
+            placesController.savePlaceToDB(place: placesController.selectedPlace, placeMarker: placesController.selectedPlaceMarker)
+            placesController.selectedPlaceMarker.isDraggable = false
         }
         endEditing()
         
-        if interstitial != nil && showAd && userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
+        if interstitial != nil && showAd && viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
             
             interstitial?.present(fromRootViewController: self)
             
@@ -1719,25 +1514,21 @@ extension MapViewController{
         tappableSettings(to: true)
         switch editingOverlayType {
         case .field:
-            if let markers = fieldsController?.selectedFieldMarkers {
-                for marker in markers {
-                    marker.map = nil
-                }
+            for marker in fieldsController.selectedFieldMarkers {
+                marker.map = nil
             }
-            fieldsController?.selectedFieldMarkers.removeAll()
-            if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-                fieldsController?.setHideSelectedFieldLengthMarkers(mapView: nil, remove: true)
+            fieldsController.selectedFieldMarkers.removeAll()
+            if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+                fieldsController.setHideSelectedFieldLengthMarkers(mapView: nil, remove: true)
             }
             
         case .line:
-            if let markers = linesController?.selectedLineMarkers {
-                for marker in markers {
-                    marker.map = nil
-                }
+            for marker in linesController.selectedLineMarkers {
+                marker.map = nil
             }
-            linesController?.selectedLineMarkers.removeAll()
-            if ((userDefaults!.first!.showDistancesBetweenTwoCorners)) {
-                linesController?.setHideSelectedLineLengthMarkers(mapView: nil, remove: true)
+            linesController.selectedLineMarkers.removeAll()
+            if ((viewModel.userDefaults.showDistancesBetweenTwoCorners)) {
+                linesController.setHideSelectedLineLengthMarkers(mapView: nil, remove: true)
             }
         
         case .place:
@@ -1758,20 +1549,9 @@ extension MapViewController{
         if !toolBar.isHidden {
             saveButtonTapped(saveButton)
         }
-        if let userDefault = userDefaults?.first {
-            do {
-                try realm.write({
-                    userDefault.cameraPosition?.latitude = mapView.camera.target.latitude
-                    userDefault.cameraPosition?.longitude = mapView.camera.target.longitude
-                    userDefault.cameraPosition?.zoom = mapView.camera.zoom
-                    
-                    realm.add(userDefault)
-                })
-            } catch {
-                print(K.errorSavingContext + " \(error)")
-            }
-        }
-        userDefaults = realm.objects(UserDefaults.self)
+        viewModel.saveCameraPosition(latitude: mapView.camera.target.latitude,
+                                     longitude: mapView.camera.target.longitude,
+                                     zoom: mapView.camera.zoom)
     }
 }
 
@@ -1781,7 +1561,7 @@ extension MapViewController: UITextFieldDelegate {
         colorButton.setTitle(NSLocalizedString("Group Color", comment: "") , for: .normal)
         if textField == groupTitleTextField {
             groupTitleTextField.resignFirstResponder()
-            if let groups = fieldsController!.groups {
+            if let groups = fieldsController.groups {
                 for group in groups {
                     if group.title == textField.text {
                         colorButton.backgroundColor = UIColor(hexString: group.color)
@@ -1843,6 +1623,51 @@ extension MapViewController {
     }
     //MARK: - addSubViewsConstraints
     func addSubViewsConstraints() {
+        
+        arrowButton.layer.borderWidth = 2
+        myLocationButton.layer.borderWidth = 2
+        mapTypeSelectButton.layer.borderWidth = 2
+    
+        let tintColor = UIColor(hexString: K.colors.secondaryColor)
+        let backgroundColor = UIColor(hexString: K.colors.thirdColor)
+        
+        arrowButton.layer.borderColor = tintColor?.cgColor
+        myLocationButton.layer.borderColor = tintColor?.cgColor
+        mapTypeSelectButton.layer.borderColor = tintColor?.cgColor
+        
+        arrowButton.tintColor = tintColor
+        myLocationButton.tintColor = tintColor
+        mapTypeSelectButton.tintColor = tintColor
+        
+        arrowButton.backgroundColor = backgroundColor
+        myLocationButton.backgroundColor = backgroundColor
+        mapTypeSelectButton.backgroundColor = backgroundColor
+        
+        toolBar.barTintColor = UIColor(hexString: K.colors.primaryColor)
+        saveButton.tintColor = UIColor.flatGreen()
+        toolBar.tintColor = UIColor(hexString: K.colors.fifthColor)
+        selectAllButton.tintColor = UIColor.flatBlue()
+        
+        if let navBar = navigationController?.navigationBar {
+            navBar.tintColor = UIColor(hexString: K.colors.secondaryColor)
+            navBar.barTintColor = UIColor(hexString: K.colors.primaryColor)//f9e0ae ffd460
+        }
+        
+        view.addSubview(mapView)
+        mapView.translatesAutoresizingMaskIntoConstraints = false
+        mapView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
+        mapView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        mapView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor).isActive = true
+        mapView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        
+        titleTextField.isUserInteractionEnabled = true
+        titleTextField.adjustsFontSizeToFitWidth = true
+        groupTitleTextField.adjustsFontSizeToFitWidth = true
+        
+        view.addSubview(toolBar)
+        toolBar.translatesAutoresizingMaskIntoConstraints = false
+        toolBar.isHidden = true
+        
         self.view.addSubview(addStackView)
         
         addStackView.translatesAutoresizingMaskIntoConstraints = false
@@ -2009,6 +1834,31 @@ extension MapViewController {
             addBannerViewToView(bannerView)
         }
     }
+    //MARK: - setupBannerView
+    fileprivate func setupBannerView() {
+        //Handle Banner
+        //Production adUnitID
+        bannerView.adUnitID = APIConstants.ProductionAdUnitID
+        //Test adUnitID
+        //        bannerView.adUnitID = Constants.TestAdUnitID
+        bannerView.rootViewController = self
+        bannerView.load(GADRequest())
+        
+        bannerView.delegate = self
+        
+        let request = GADRequest()
+        GADInterstitialAd.load(withAdUnitID: APIConstants.GADInterstitialAdUnitID1,
+                               request: request,
+                               completionHandler: { [self] ad, error in
+            if let error = error {
+                print("Failed to load interstitial ad with error: \(error.localizedDescription)")
+                return
+            }
+            interstitial = ad
+            interstitial?.fullScreenContentDelegate = self
+        }
+        )
+    }
 }
 //MARK: - GADBannerViewDelegate
 extension MapViewController: GADBannerViewDelegate {
@@ -2119,7 +1969,7 @@ extension MapViewController: UIDocumentPickerDelegate,UINavigationControllerDele
         let geo = GeoJSON(mapView: mapView)
         
         if myURL.pathExtension == "geojson" {
-            geo.renderGeoJSON(url: myURL, fieldsController: fieldsController!, linesController: linesController!, placesController: placesController!, mapView: mapView) {
+            geo.renderGeoJSON(url: myURL, fieldsController: fieldsController, linesController: linesController, placesController: placesController, mapView: mapView) {
                 ImportExportAlertsHelper.importFileTaskCompletedAlert(on: self)
             }
         }
@@ -2145,7 +1995,7 @@ extension MapViewController: UIDocumentPickerDelegate,UINavigationControllerDele
     //MARK: - exportFileFinal
     func exportFileFinal(exportType: ExportTypes) {
         let geo = GeoJsonTemplates()
-        geo.makeGeojsonFile(exportType: exportType, fieldsController: fieldsController!, linesController: linesController!, placesController: placesController!, completion: {
+        geo.makeGeojsonFile(exportType: exportType, fieldsController: fieldsController, linesController: linesController, placesController: placesController, completion: {
             ImportExportAlertsHelper.exportFileTaskCompletedAlert(on: self)
         })
     }
@@ -2175,8 +2025,42 @@ extension MapViewController: UIDocumentPickerDelegate,UINavigationControllerDele
     }
     
 }
-    
-    
-    
-  
 
+extension MapViewController: MapViewControllerProtocol {
+    //MARK: - setMapView
+    func setMapView(latitude: Double?, longitude: Double?, zoom: Float?, mapType: String?, customMapStyle: String, isBatterySaveModeActive: Bool) {
+        
+        if let latitude = latitude,
+           let longitude = longitude,
+           let zoom = zoom {
+            let camera = GMSCameraPosition.camera(withLatitude: latitude, longitude: longitude, zoom: zoom)
+            mapView = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
+        }
+        
+        switch mapType {
+        case K.mapTypes.normal:
+            mapView.mapType = .normal
+        case K.mapTypes.satellite:
+            mapView.mapType = .satellite
+        case K.mapTypes.terrain:
+            mapView.mapType = .terrain
+        case K.mapTypes.custom:
+            mapView.mapType = .normal
+            let overlayView = OverlayView()
+            overlayView.mapView = mapView
+            overlayView.setMapStyle(to: customMapStyle)
+        default:
+            mapView.mapType = .normal
+        }
+        
+        if isBatterySaveModeActive {
+            mapView.preferredFrameRate = .conservative
+        } else {
+            mapView.preferredFrameRate = .maximum
+        }
+    }
+    //MARK: - setMapViewLocationEnabled
+    func setMapViewLocationEnabled(isEnabled: Bool) {
+        mapView.isMyLocationEnabled = isEnabled
+    }
+}
