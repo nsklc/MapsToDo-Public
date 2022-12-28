@@ -21,12 +21,12 @@ class GroupListViewController: SwipeTableViewController, UITextFieldDelegate {
         
         title = NSLocalizedString("Groups", comment: "")
 
-        tableView.backgroundView = UIImageView(image: UIImage(named: K.imagesFromXCAssets.picture7))
+        tableView.backgroundView = UIImageView(image: UIImage(named: K.ImagesFromXCAssets.picture7))
         tableView.backgroundView?.alpha = 0.3
         loadGroups()
     }
    
-    //MARK: - editActionsForRowAt
+    // MARK: - editActionsForRowAt
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
         guard orientation == .right else { return nil }
         
@@ -34,7 +34,7 @@ class GroupListViewController: SwipeTableViewController, UITextFieldDelegate {
               let fieldsController = self.fieldsController,
               let groups = fieldsController.groups else { return nil }
         
-        let deleteAction = SwipeAction(style: .destructive, title: NSLocalizedString("Delete", comment: "")){ action, indexPath in
+        let deleteAction = SwipeAction(style: .destructive, title: NSLocalizedString("Delete", comment: "")) { _, indexPath in
             
             AlertsHelper.deleteAlert(on: self,
                                      with: .group,
@@ -57,9 +57,9 @@ class GroupListViewController: SwipeTableViewController, UITextFieldDelegate {
         }
 
         // customize the action appearance
-        deleteAction.image = UIImage(systemName: K.systemImages.trashFill)
+        deleteAction.image = UIImage(systemName: K.SystemImages.trashFill)
   
-        let changeTitle = SwipeAction(style: .default, title: NSLocalizedString("Title", comment: "")) { action, indexPath in
+        let changeTitle = SwipeAction(style: .default, title: NSLocalizedString("Title", comment: "")) { _, indexPath in
             
             guard let fieldsController = self.fieldsController,
                   let groups = fieldsController.groups else { return }
@@ -77,12 +77,12 @@ class GroupListViewController: SwipeTableViewController, UITextFieldDelegate {
                             fieldsController.changeFieldGroup(field: field, oldGroup: oldGroup, newGroup: group, polygon: polygon)
                         }
                         fieldsController.changeFieldGroupAtCloud(field: field, newGroup: group)
-                        //fieldsController!.setColor(color: group.color, field: field)
+                        // fieldsController!.setColor(color: group.color, field: field)
                     }
                     fieldsController.deleteGroupFromCloud(group: oldGroup)
                     fieldsController.deleteGroupFromDB(group: oldGroup)
                 } else {
-                    if newTitle.count != 0 {
+                    if !newTitle.isEmpty {
                         fieldsController.changeGroupTitle(group: oldGroup, title: newTitle)
                         fieldsController.changeGroupTitleAtCloud(group: oldGroup, title: newTitle)
                     } else {
@@ -95,9 +95,8 @@ class GroupListViewController: SwipeTableViewController, UITextFieldDelegate {
         }
 
         // customize the action appearance
-        changeTitle.image = UIImage(systemName: K.systemImages.rectangleAndPencilAndEllipsisrtl)
+        changeTitle.image = UIImage(systemName: K.SystemImages.rectangleAndPencilAndEllipsisrtl)
         changeTitle.backgroundColor = UIColor.flatYellow()
-
       
         return [deleteAction, changeTitle]
     }
@@ -130,11 +129,10 @@ class GroupListViewController: SwipeTableViewController, UITextFieldDelegate {
         return options
     }
     
-    
-    //MARK: - TableView DataSource Methods
+    // MARK: - TableView DataSource Methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return fieldsController!.groups?.count ?? 1
+        fieldsController!.groups?.count ?? 1
        }
 
     /*override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -148,22 +146,22 @@ class GroupListViewController: SwipeTableViewController, UITextFieldDelegate {
     
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
           
-        if let group = fieldsController!.groups?[indexPath.row]{
+        if let group = fieldsController!.groups?[indexPath.row] {
         
-        //cell.textLabel!.text = group.title
+        // cell.textLabel!.text = group.title
         
         guard let groupColor =  UIColor(hexString: group.color) else {fatalError()}
             
-        //cell.backgroundColor = groupColor
+        // cell.backgroundColor = groupColor
         
-        if group.fields.count == 0 || group.fields.count == 1{
+        if group.fields.isEmpty || group.fields.count == 1 {
             cell.detailTextLabel?.text = String(format: NSLocalizedString("%ld Field", comment: ""), group.fields.count)
         } else {
             cell.detailTextLabel?.text = String(format: NSLocalizedString("%ld Fields", comment: ""), group.fields.count)
         }
-        //cell.textLabel?.textColor = ContrastColorOf(groupColor, returnFlat: true)
+        // cell.textLabel?.textColor = ContrastColorOf(groupColor, returnFlat: true)
         
-        //cell.detailTextLabel?.textColor = ContrastColorOf(cell.backgroundColor!, returnFlat: true)
+        // cell.detailTextLabel?.textColor = ContrastColorOf(cell.backgroundColor!, returnFlat: true)
         
         let label = UILabel()
         label.text = group.title
@@ -175,35 +173,34 @@ class GroupListViewController: SwipeTableViewController, UITextFieldDelegate {
         cell.addSubview(label)
         label.heightAnchor.constraint(equalTo: cell.heightAnchor, constant: 0).isActive = true
         label.widthAnchor.constraint(equalTo: cell.widthAnchor, multiplier: 0.4).isActive = true
-        //label.centerXAnchor.constraint(equalTo: cell.centerXAnchor, constant: 0).isActive = true
+        // label.centerXAnchor.constraint(equalTo: cell.centerXAnchor, constant: 0).isActive = true
         label.leftAnchor.constraint(equalTo: cell.leftAnchor, constant: 0).isActive = true
         
         cell.backgroundColor = UIColor.clear
     }
         return cell
     }
-    //MARK: - loadGroups
+    // MARK: - loadGroups
     func loadGroups() {
         
-        //fieldsController!.groups = realm.objects(Group.self)
+        // fieldsController!.groups = realm.objects(Group.self)
         
         self.tableView.reloadData()
     }
-    //MARK: - Table Delegate Methods
+    // MARK: - Table Delegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        performSegue(withIdentifier: K.segueIdentifiers.goToItems, sender: self)
+        performSegue(withIdentifier: K.SegueIdentifiers.goToItems, sender: self)
     }
    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == K.segueIdentifiers.goToItems {
-            let destinationVC = segue.destination as! ToDoListViewController
+        if segue.identifier == K.SegueIdentifiers.goToItems {
+            let destinationVC = segue.destination as? ToDoListViewController
             
             if let indexPath = tableView.indexPathForSelectedRow {
-                destinationVC.selectedGroup = fieldsController!.groups?[indexPath.row]
+                destinationVC?.selectedGroup = fieldsController!.groups?[indexPath.row]
             }
         }
     }
     
 }
-

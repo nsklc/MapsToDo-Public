@@ -10,7 +10,7 @@ import Foundation
 
 class UnitsHelper {
     static var app: UnitsHelper = {
-        return UnitsHelper()
+        UnitsHelper()
     }()
 
     func getUnitForField(isShowAllUnitsSelected: Bool, isMeasureSystemMetric: Bool, area: Measurement<UnitArea>, circumference: Measurement<UnitLength>, distanceUnit: Int, areaUnit: Int) -> String {
@@ -181,35 +181,35 @@ class UnitsHelper {
         
     }
     
-    func getPlaceholderAndUnitLengthType(isMeasureSystemMetric: Bool, distanceUnit: Int) -> [String:UnitLength] {
+    func getPlaceholderAndUnitLengthType(isMeasureSystemMetric: Bool, distanceUnit: Int) -> [String: UnitLength] {
         
         if isMeasureSystemMetric {
             switch distanceUnit {
             case 0:
-                return [NSLocalizedString("cm", comment: ""):UnitLength.centimeters]
+                return [NSLocalizedString("cm", comment: ""): UnitLength.centimeters]
             case 1:
-                return [NSLocalizedString("m", comment: ""):UnitLength.meters]
+                return [NSLocalizedString("m", comment: ""): UnitLength.meters]
             case 2:
-                return [NSLocalizedString("km", comment: ""):UnitLength.kilometers]
+                return [NSLocalizedString("km", comment: ""): UnitLength.kilometers]
             default:
                 break
             }
         } else {
             switch distanceUnit {
             case 0:
-                return [NSLocalizedString("in", comment: ""):UnitLength.inches]
+                return [NSLocalizedString("in", comment: ""): UnitLength.inches]
             case 1:
-                return [NSLocalizedString("ft", comment: ""):UnitLength.feet]
+                return [NSLocalizedString("ft", comment: ""): UnitLength.feet]
             case 2:
-                return [NSLocalizedString("yd", comment: ""):UnitLength.yards]
+                return [NSLocalizedString("yd", comment: ""): UnitLength.yards]
             case 3:
-                return [NSLocalizedString("mi", comment: ""):UnitLength.miles]
+                return [NSLocalizedString("mi", comment: ""): UnitLength.miles]
             default:
                 break
             }
         }
         
-        return ["asd":UnitLength.centimeters]
+        return ["asd": UnitLength.centimeters]
     }
     
 }

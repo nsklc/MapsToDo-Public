@@ -12,10 +12,10 @@ class BaseAlertHelper {
     
     static let nc = NotificationCenter.default
     
-    static func showBasicAlertWithAction(on vc: UIViewController, with title: String, message: String,  okAction: @escaping () -> Void) {
+    static func showBasicAlertWithAction(on vc: UIViewController, with title: String, message: String, okAction: @escaping () -> Void) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
-        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default, handler: { (action) in
+        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default, handler: { (_) in
             okAction()
         }))
         DispatchQueue.main.async {

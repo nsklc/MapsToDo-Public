@@ -13,7 +13,7 @@ import Firebase
 import FirebaseFirestore
 
 class FieldsController {
-    private let realm = try! Realm()
+    private let realm: Realm! = try? Realm()
     
     var userDefaults: Results<UserDefaults>?
     
@@ -31,7 +31,7 @@ class FieldsController {
             for position in selectedField.polygonMarkersPositions {
                 let marker = GMSMarker()
                 marker.isDraggable = true
-                marker.icon = UIImage(systemName: K.systemImages.dotCircle)?.imageScaled(to: CGSize(width: 30, height: 30))
+                marker.icon = UIImage(systemName: K.SystemImages.dotCircle)?.imageScaled(to: CGSize(width: 30, height: 30))
                 marker.groundAnchor = .init(x: 0.5, y: 0.5)
                 marker.position = CLLocationCoordinate2D(latitude: position.latitude, longitude: position.longitude)
                 selectedFieldMarkers.append(marker)
@@ -53,12 +53,12 @@ class FieldsController {
     private let db = Firestore.firestore()
     private let user = Auth.auth().currentUser
     
-    //MARK: - loadFieldsAndGroups
+    // MARK: - loadFieldsAndGroups
     func loadFieldsAndGroups() {
         fields = realm.objects(Field.self)
         groups = realm.objects(Group.self)
     }
-    //MARK: - init
+    // MARK: - init
     init(mapView: GMSMapView) {
         userDefaults = realm.objects(UserDefaults.self)
         listenGroupsDocuments(mapView: mapView)
@@ -81,7 +81,7 @@ class FieldsController {
                 newPolygon.title = field.id
                 if let grouplessGroup = groups!.first(where: {$0.title == NSLocalizedString("Groupless Group", comment: "")}) {
                     grouplessGroupID = grouplessGroup.id
-                    //print(grouplessGroupID)
+                    // print(grouplessGroupID)
                 }
                 
                 if let parentGroup = field.parentGroup.first {
@@ -115,9 +115,9 @@ class FieldsController {
         }
         self.mapView = mapView
     }
-    //MARK: - addField
+    // MARK: - addField
     func addField(title: String, groupTitle: String, color: String, initialMarkers: [GMSMarker], id: String?, isGeodesic: Bool) {
-        var fieldsGroup: Group? = nil
+        var fieldsGroup: Group?
         
         if realm.object(ofType: Group.self, forPrimaryKey: grouplessGroupID) == nil {
             
@@ -133,7 +133,7 @@ class FieldsController {
                 print("Error saving context, \(error)")
             }
             groups = realm.objects(Group.self)
-            //grouplessGroupID = grouplessGroup.id
+            // grouplessGroupID = grouplessGroup.id
             saveGroupToCloud(group: grouplessGroup)
         }
         
@@ -143,13 +143,13 @@ class FieldsController {
                     do {
                         try realm.write({
                             group.color = color
-                            //realm.add(group)
+                            // realm.add(group)
                         })
                     } catch {
                         print("Error saving context, \(error)")
                     }
                     for field in group.fields {
-                        setColor(color: color, field: field)
+                        setColor(colorHex: color, field: field)
                     }
                 }
                 
@@ -157,8 +157,8 @@ class FieldsController {
             }
         }
         
-        if fieldsGroup == nil  {
-            if groupTitle.count != 0 {
+        if fieldsGroup == nil {
+            if !groupTitle.isEmpty {
                 let newGroup = Group()
                 newGroup.title = groupTitle
                 newGroup.color = color
@@ -237,15 +237,16 @@ class FieldsController {
         polygons[polygons.count-1].map = mapView
         loadFieldsAndGroups()
     }
-    //MARK: - checkTitleAvailable
+    // MARK: - checkTitleAvailable
     func checkTitleAvailable(title: String, groupTitle: String) -> String {
         var isValidName = true
         var errorMessage = NSLocalizedString("Field needs a title.", comment: "")
-        if title.count == 0 {
+        if title.isEmpty {
             isValidName = false
             errorMessage = NSLocalizedString("Field needs a title.", comment: "")
         }
-        for field in fields! {
+        guard let fields = fields else { return "" }
+        for field in fields {
             if field.title == title {
                 isValidName = false
                 errorMessage = NSLocalizedString("Fields cannot have the same title.", comment: "")
@@ -258,23 +259,23 @@ class FieldsController {
         }
     }
     
-    //MARK: - changePolygonsTappableBoolean
+    // MARK: - changePolygonsTappableBoolean
     func changePolygonsTappableBoolean(to bool: Bool) {
         for polygon in polygons {
             polygon.isTappable = bool
         }
     }
-    //MARK: - setColor
-    func setColor(color: String, field: Field){
-        if let polygon = polygons.first(where: {$0.title == field.id}) {
+    // MARK: - setColor
+    func setColor(colorHex: String, field: Field) {
+        if let polygon = polygons.first(where: {$0.title == field.id}), let color = UIColor(hexString: colorHex) {
             selectedPolygon = polygon
             polygon.map = nil
-            updatedColor = color
-            polygon.fillColor = UIColor(hexString: color)!
+            updatedColor = colorHex
+            polygon.fillColor = color
             polygon.map = mapView
         }
     }
-    //MARK: - saveColor
+    // MARK: - saveColor
     func saveColor(field: Field, color: String) {
         do {
             try realm.write({
@@ -284,12 +285,13 @@ class FieldsController {
             print("Error saving context, \(error)")
         }
     }
-    //MARK: - setAreaAndCircumference
+    // MARK: - setAreaAndCircumference
     func setAreaAndCircumference() {
         updatedArea = GMSGeometryArea((selectedPolygon.path!))
-        updatedCircumference = GMSGeometryLength((selectedPolygon.path!)) + GMSGeometryDistance((selectedPolygon.path?.coordinate(at: 0))!, (selectedPolygon.path?.coordinate(at: (selectedPolygon.path?.count())!-1))!)
+        updatedCircumference = GMSGeometryLength((selectedPolygon.path!)) + GMSGeometryDistance((selectedPolygon.path?.coordinate(at: 0))!,
+                                                                                                (selectedPolygon.path?.coordinate(at: (selectedPolygon.path?.count())!-1))!)
     }
-    //MARK: - saveFieldToDB
+    // MARK: - saveFieldToDB
     func saveFieldToDB() {
         updateTime = Date()
         do {
@@ -311,7 +313,7 @@ class FieldsController {
         }
     }
     
-    //MARK: - deleteSelectedFieldFromDB +
+    // MARK: - deleteSelectedFieldFromDB +
     func deleteFieldFromDB(field: Field) {
         if let polygon = polygons.first(where: {$0.title == field.id}) {
             // Delete photos ?????
@@ -328,22 +330,21 @@ class FieldsController {
                 }
             }
             
-            //realm.delete(realm.objects(Field.self).filter("id=%@",field.id))
-            //if let fieldToDelete = realm.object(ofType: Field.self, forPrimaryKey: field.id) {
+            // realm.delete(realm.objects(Field.self).filter("id=%@",field.id))
+            // if let fieldToDelete = realm.object(ofType: Field.self, forPrimaryKey: field.id) {
                 do {
                     try self.realm.write {
                         field.parentGroup.first?.fields.remove(at: (field.parentGroup.first?.fields.index(of: field)!)!)
                         self.realm.delete(field)
                         
-                        
                     }
                 } catch {
                     print("Error Deleting field, \(error)")
                 }
-            //}
+            // }
         }
         
-        if field == selectedField && selectedFieldMarkers.count != 0 {
+        if field == selectedField && !selectedFieldMarkers.isEmpty {
             for marker in selectedFieldMarkers {
                 marker.map = nil
             }
@@ -352,11 +353,11 @@ class FieldsController {
         
     }
     
-    //MARK: - loadFields with groupTitle
+    // MARK: - loadFields with groupTitle
     func loadFields(with groupTitle: String) {
         fields = realm.objects(Field.self).filter("ANY parentGroup.title = %@", groupTitle)
     }
-    //MARK: - changeFieldTitle +
+    // MARK: - changeFieldTitle +
     func changeFieldTitle(field: Field, title: String) {
         do {
             try self.realm.write({
@@ -366,7 +367,7 @@ class FieldsController {
             print("Error chancing field's title, \(error)")
         }
     }
-    //MARK: - addNewGroup +
+    // MARK: - addNewGroup +
     func addNewGroup(newGroup: Group) {
         do {
             try self.realm.write({
@@ -376,7 +377,7 @@ class FieldsController {
             print("Error Changing Group Title, \(error)")
         }
     }
-    //MARK: - changeGroupColor +
+    // MARK: - changeGroupColor +
     func changeGroupColor(group: Group, color: String) {
         updatedColor = color
         do {
@@ -391,7 +392,7 @@ class FieldsController {
             print("Error Changing Group Title, \(error)")
         }
     }
-    //MARK: - changeGroupTitle +
+    // MARK: - changeGroupTitle +
     func changeGroupTitle(group: Group, title: String) {
         do {
             try self.realm.write({
@@ -401,8 +402,8 @@ class FieldsController {
             print("Error Changing Group Title, \(error)")
         }
     }
-    //MARK: - changeFieldGroup +
-    func changeFieldGroup(field: Field,oldGroup: Group,newGroup: Group, polygon: GMSPolygon) {
+    // MARK: - changeFieldGroup +
+    func changeFieldGroup(field: Field, oldGroup: Group, newGroup: Group, polygon: GMSPolygon) {
         do {
             try self.realm.write {
                 newGroup.fields.append(field)
@@ -416,7 +417,7 @@ class FieldsController {
         polygon.fillColor = UIColor(hexString: newGroup.color)
         polygon.map = mapView
     }
-    //MARK: - deleteGroupFromDB +
+    // MARK: - deleteGroupFromDB +
     func deleteGroupFromDB(group: Group) {
         if let groupToDelete = realm.object(ofType: Group.self, forPrimaryKey: group.id) {
             do {
@@ -429,21 +430,21 @@ class FieldsController {
         }
     }
     
-    //MARK: - FIREBASE
+    // MARK: - FIREBASE
     
-    //MARK: - saveFieldToCloud
+    // MARK: - saveFieldToCloud
     func saveFieldToCloud(field: Field) {
         if let user = user {
-            var positions = [[String : Any]]()
+            var positions = [[String: Any]]()
             
             for position in field.polygonMarkersPositions {
                 positions.append(position.dictionaryWithValues(forKeys: ["latitude", "longitude"]))
             }
             
-            var photos = [[String : Any]]()
+            var photos = [[String: Any]]()
             
             for photo in field.photos {
-                photos.append([photo:""])
+                photos.append([photo: ""])
             }
             
             let fieldGroup = field.parentGroup.first!
@@ -452,67 +453,67 @@ class FieldsController {
                 if let err = err {
                     print("Error writing document: \(err)")
                 } else {
-                    //print("Document successfully written!")
-                    db.collection(userDefaults!.first!.bossID).document("Fields").setData(["updatedBy": user.uid, field.id : self.updateTime], merge: true)
+                    // print("Document successfully written!")
+                    db.collection(userDefaults!.first!.bossID).document("Fields").setData(["updatedBy": user.uid, field.id: self.updateTime], merge: true)
                 }
             }
         }
     }
-    //MARK: - saveGroupToCloud
+    // MARK: - saveGroupToCloud
     func saveGroupToCloud(group: Group) {
         if let user = user {
             db.collection(userDefaults!.first!.bossID).document("Groups").collection("Groups").document(group.id).setData(["updatedBy": user.uid, group.id: group.dictionaryWithValues(forKeys: ["title", "color"])]) { [self] err in
                 if let err = err {
                     print("Error writing document: \(err)")
                 } else {
-                    //print("Document successfully written!")
-                    db.collection(userDefaults!.first!.bossID).document("Groups").setData(["updatedBy": user.uid, group.id : self.updateTime], merge: true)
+                    // print("Document successfully written!")
+                    db.collection(userDefaults!.first!.bossID).document("Groups").setData(["updatedBy": user.uid, group.id: self.updateTime], merge: true)
                 }
             }
         }
     }
-    //MARK: - changeFieldGroupAtCloud
-    func changeFieldGroupAtCloud(field: Field,newGroup: Group) {
+    // MARK: - changeFieldGroupAtCloud
+    func changeFieldGroupAtCloud(field: Field, newGroup: Group) {
         if let user = user {
-            db.collection(userDefaults!.first!.bossID).document("Fields").collection("Fields").document(field.id).setData(["updatedBy": user.uid, "group" : newGroup.id], merge: true)
+            db.collection(userDefaults!.first!.bossID).document("Fields").collection("Fields").document(field.id).setData(["updatedBy": user.uid, "group": newGroup.id], merge: true)
         }
     }
-    //MARK: - changeFieldTitleAtCloud
+    // MARK: - changeFieldTitleAtCloud
     func changeFieldTitleAtCloud(field: Field, title: String) {
         if let user = user {
             db.collection(userDefaults!.first!.bossID).document("Fields").collection("Fields").document(field.id).setData(["updatedBy": user.uid, field.id: field.dictionaryWithValues(forKeys: ["title"])], merge: true)
         }
     }
-    //MARK: - deleteFieldFromCloud
+    // MARK: - deleteFieldFromCloud
     func deleteFieldFromCloud(field: Field) {
         if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
             self.db.collection(userDefaults!.first!.bossID).document("Fields").collection("Fields").document(field.id).delete()
-            self.db.collection(userDefaults!.first!.bossID).document("Fields").updateData([field.id : FieldValue.delete()])
+            self.db.collection(userDefaults!.first!.bossID).document("Fields").updateData([field.id: FieldValue.delete()])
         }
     }
-    //MARK: - deleteGroupFromCloud
+    // MARK: - deleteGroupFromCloud
     func deleteGroupFromCloud(group: Group) {
         if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
             self.db.collection(userDefaults!.first!.bossID).document("Groups").collection("Groups").document(group.id).delete()
-            self.db.collection(userDefaults!.first!.bossID).document("Groups").updateData([group.id : FieldValue.delete()])
+            self.db.collection(userDefaults!.first!.bossID).document("Groups").updateData([group.id: FieldValue.delete()])
         }
     }
-    //MARK: - changeGroupTitleAtCloud
+    // MARK: - changeGroupTitleAtCloud
     func changeGroupTitleAtCloud(group: Group, title: String) {
         if let user = user {
             self.db.collection(userDefaults!.first!.bossID).document("Groups").collection("Groups").document(group.id).setData(["updatedBy": user.uid, group.id: group.dictionaryWithValues(forKeys: ["title"])], merge: true)
-            self.db.collection(userDefaults!.first!.bossID).document("Groups").setData(["updatedBy": user.uid, group.id : updateTime], merge: true)
+            self.db.collection(userDefaults!.first!.bossID).document("Groups").setData(["updatedBy": user.uid, group.id: updateTime], merge: true)
         }
     }
-    //MARK: - changeGroupColorAtCloud
+    // MARK: - changeGroupColorAtCloud
     func changeGroupColorAtCloud(group: Group, color: String) {
         if let user = user {
             self.db.collection(userDefaults!.first!.bossID).document("Groups").collection("Groups").document(group.id).setData(["updatedBy": user.uid, group.id: group.dictionaryWithValues(forKeys: ["color"])], merge: true)
-            self.db.collection(userDefaults!.first!.bossID).document("Groups").setData(["updatedBy": user.uid, group.id : updateTime], merge: true)
+            self.db.collection(userDefaults!.first!.bossID).document("Groups").setData(["updatedBy": user.uid, group.id: updateTime], merge: true)
         }
     }
     
-    //MARK: - listenGroupsDocuments
+    // MARK: - listenGroupsDocuments
     func listenGroupsDocuments(mapView: GMSMapView) {
         if let user = user {
             self.db.collection(userDefaults!.first!.bossID).document("Groups").collection("Groups").addSnapshotListener { [self] querySnapshot, error in
@@ -521,7 +522,6 @@ class FieldsController {
                     return
                 }
                 if realm.object(ofType: Group.self, forPrimaryKey: grouplessGroupID) == nil {
-                    
                     
                     let grouplessGroup = Group()
                     grouplessGroup.title = NSLocalizedString("Groupless Group", comment: "")
@@ -535,7 +535,7 @@ class FieldsController {
                         print("Error saving context, \(error)")
                     }
                     groups = realm.objects(Group.self)
-                    //grouplessGroupID = grouplessGroup.id
+                    // grouplessGroupID = grouplessGroup.id
                     saveGroupToCloud(group: grouplessGroup)
                 }
                 snapshot.documentChanges.forEach { diff in
@@ -546,19 +546,19 @@ class FieldsController {
                             }
                         }
                     }*/
-                    //MARK: - added
-                    if (diff.type == .added) {
-                        //print("New group: \(diff.document.data())")
-                        //print(diff.document.documentID)
+                    // MARK: - added
+                    if diff.type == .added {
+                        // print("New group: \(diff.document.data())")
+                        // print(diff.document.documentID)
                         if realm.object(ofType: Group.self, forPrimaryKey: diff.document.documentID) != nil {
                         } else {
-                            //if diff.document.data()["updatedBy"] as? String != user.uid {
+                            // if diff.document.data()["updatedBy"] as? String != user.uid {
                                 if diff.document.documentID != grouplessGroupID {
                                     let group = Group()
                                     group.id = diff.document.documentID
-                                    //print(diff.document.data())
-                                    if let groupData = diff.document.data()[diff.document.documentID] as? [String:Any] {
-                                        if let title = groupData["title"] as? String, let color = groupData["color"] as? String{
+                                    // print(diff.document.data())
+                                    if let groupData = diff.document.data()[diff.document.documentID] as? [String: Any] {
+                                        if let title = groupData["title"] as? String, let color = groupData["color"] as? String {
                                             group.title = title
                                             group.color = color
                                         }
@@ -571,17 +571,17 @@ class FieldsController {
                                         print("Error saving context, \(error)")
                                     }
                                 }
-                            //}
+                            // }
                         }
                     }
-                    //MARK: - modified
-                    if (diff.type == .modified) {
-                        //print("Modified group: \(diff.document.data())")
+                    // MARK: - modified
+                    if diff.type == .modified {
+                        // print("Modified group: \(diff.document.data())")
                         if let specificGroup = realm.object(ofType: Group.self, forPrimaryKey: diff.document.documentID) {
                             if diff.document.data()["updatedBy"] as? String != user.uid {
                                 if diff.document.documentID != grouplessGroupID {
-                                    var color1: String? = nil
-                                    if let groupData = diff.document.data()[diff.document.documentID] as? [String:Any] {
+                                    var color1: String?
+                                    if let groupData = diff.document.data()[diff.document.documentID] as? [String: Any] {
                                         if let title = groupData["title"] as? String, let color = groupData["color"] as? String {
                                             print("title")
                                             do {
@@ -611,9 +611,9 @@ class FieldsController {
                             
                         }
                     }
-                    //MARK: - removed
-                    if (diff.type == .removed) {
-                        //print("Removed group: \(diff.document.data())")
+                    // MARK: - removed
+                    if diff.type == .removed {
+                        // print("Removed group: \(diff.document.data())")
                         if let specificGroup = realm.object(ofType: Group.self, forPrimaryKey: diff.document.documentID) {
                             deleteGroupFromDB(group: specificGroup)
                         }
@@ -623,8 +623,7 @@ class FieldsController {
         }
     }
     
-    
-    //MARK: - listenFieldDocuments
+    // MARK: - listenFieldDocuments
     func listenFieldDocuments(mapView: GMSMapView) {
         if let user = user {
             self.db.collection(userDefaults!.first!.bossID).document("Fields").collection("Fields").addSnapshotListener { [self] querySnapshot, error in
@@ -633,16 +632,16 @@ class FieldsController {
                     return
                 }
                 snapshot.documentChanges.forEach { diff in
-                    //MARK: - added
-                    if (diff.type == .added) {
-                        //print("New field: \(diff.document.data())")
-                        //print(grouplessGroupID)
-                        //print(diff.document.documentID)
+                    // MARK: - added
+                    if diff.type == .added {
+                        // print("New field: \(diff.document.data())")
+                        // print(grouplessGroupID)
+                        // print(diff.document.documentID)
                         if realm.object(ofType: Field.self, forPrimaryKey: diff.document.documentID) != nil {
                         } else {
-                            //if diff.document.data()["updatedBy"] as? String != user.uid {
+                            // if diff.document.data()["updatedBy"] as? String != user.uid {
                                 var markers = [GMSMarker]()
-                                if let positions = diff.document.data()["positions"] as? [[String:Any]] {
+                                if let positions = diff.document.data()["positions"] as? [[String: Any]] {
                                     for position in positions {
                                         if let lat = position["latitude"] as? Double, let lon = position["longitude"] as? Double {
                                             let marker = GMSMarker(position: CLLocationCoordinate2D(latitude: lat, longitude: lon))
@@ -650,14 +649,14 @@ class FieldsController {
                                         }
                                     }
                                 }
-                                if let fieldData = diff.document.data()[diff.document.documentID] as? [String:Any] {
-                                    if let title = fieldData["title"] as? String, let color = fieldData["color"] as? String, let groupID = diff.document.data()["group"] as? String  {
+                                if let fieldData = diff.document.data()[diff.document.documentID] as? [String: Any] {
+                                    if let title = fieldData["title"] as? String, let color = fieldData["color"] as? String, let groupID = diff.document.data()["group"] as? String {
                                         
                                         let docRef = db.collection(userDefaults!.first!.bossID).document("Groups").collection("Groups").document(groupID)
 
-                                        docRef.getDocument { (document, error) in
+                                        docRef.getDocument { (document, _) in
                                             if let document = document, document.exists {
-                                                if let groupArray = document[groupID] as? [String:Any] {
+                                                if let groupArray = document[groupID] as? [String: Any] {
                                                     if let groupTitle = groupArray["title"] as? String {
                                                         addField(title: title, groupTitle: groupTitle, color: color, initialMarkers: markers, id: diff.document.documentID, isGeodesic: isGeodesic)
                                                     }
@@ -668,19 +667,19 @@ class FieldsController {
                                         }
                                     }
                                 }
-                            //}
+                            // }
                         }
                     }
-                    //MARK: - modified
-                    if (diff.type == .modified) {
-                        //print("Modified field: \(diff.document.data())")
+                    // MARK: - modified
+                    if diff.type == .modified {
+                        // print("Modified field: \(diff.document.data())")
                         if let specificField = realm.object(ofType: Field.self, forPrimaryKey: diff.document.documentID) {
                             if selectedField == specificField && selectedFieldMarkers.count != 0 {
                                 let nc = NotificationCenter.default
                                 nc.post(name: Notification.Name("EndEditing"), object: nil)
                             }
                             if diff.document.data()["updatedBy"] as? String != user.uid {
-                                if let fieldData = diff.document.data()[diff.document.documentID] as? [String:Any] {
+                                if let fieldData = diff.document.data()[diff.document.documentID] as? [String: Any] {
                                     if let title = fieldData["title"] as? String, let color = fieldData["color"] as? String {
                                         do {
                                             try realm.write({
@@ -701,7 +700,7 @@ class FieldsController {
                                             if let newGroup = groups!.first(where: {$0.id == groupID}) {
                                                 if let polygon = polygons.first(where: {$0.title == specificField.id}) {
                                                     changeFieldGroup(field: specificField, oldGroup: specificField.parentGroup.first!, newGroup: newGroup, polygon: polygon)
-                                                    setColor(color: newGroup.color, field: specificField)
+                                                    setColor(colorHex: newGroup.color, field: specificField)
                                                     saveColor(field: specificField, color: newGroup.color)
                                                 }
                                             }
@@ -709,7 +708,7 @@ class FieldsController {
                                     }
                                 }
                                 
-                                if let positions = diff.document.data()["positions"] as? [[String:Double]] {
+                                if let positions = diff.document.data()["positions"] as? [[String: Double]] {
                                     do {
                                         try realm.write({
                                             specificField.polygonMarkersPositions.removeAll()
@@ -733,9 +732,9 @@ class FieldsController {
                             }
                         }
                     }
-                    //MARK: - removed
-                    if (diff.type == .removed) {
-                        //print("Removed field: \(diff.document.data())")
+                    // MARK: - removed
+                    if diff.type == .removed {
+                        // print("Removed field: \(diff.document.data())")
                         if let specificField = realm.object(ofType: Field.self, forPrimaryKey: diff.document.documentID) {
                             if selectedField != specificField {
                                 deleteFieldFromDB(field: specificField)
@@ -754,7 +753,7 @@ class FieldsController {
             }
         }
     }
-    //MARK: - updatePolygon
+    // MARK: - updatePolygon
     func updatePolygon(field: Field, polygon: GMSPolygon, mapView: GMSMapView) {
         let path = GMSMutablePath()
         for position in field.polygonMarkersPositions {
@@ -765,14 +764,14 @@ class FieldsController {
         polygon.map = mapView
     }
     
-    //MARK: - LENGTH MARKERS
+    // MARK: - LENGTH MARKERS
     
-    //MARK: - arrangeSelectedFieldLengthMarker
+    // MARK: - arrangeSelectedFieldLengthMarker
     func arrangeSelectedFieldLengthMarker(i: Int, inside: Bool, add: Bool, isMetric: Bool, distanceUnit: Int) {
         let secondIndex = i
         
         var firstIndex: Int {
-            get{
+            get {
                 if secondIndex != 0 {
                     return i - 1
                 } else {
@@ -782,7 +781,7 @@ class FieldsController {
         }
         
         var thirdIndex: Int {
-            get{
+            get {
                 if secondIndex != selectedFieldMarkers.count - 1 {
                     return i + 1
                 } else {
@@ -832,7 +831,7 @@ class FieldsController {
             }
         }
     }
-    //MARK: - setSelectedFieldLengthMarkers
+    // MARK: - setSelectedFieldLengthMarkers
     func setSelectedFieldLengthMarkers(isMetric: Bool, distanceUnit: Int) {
         for i in 0...selectedFieldMarkers.count-1 {
             let firstIndex = i
@@ -840,7 +839,8 @@ class FieldsController {
             if i == selectedFieldMarkers.count-1 {
                 secondIndex = 0
             }
-            let tempMarker = GMSMarker(position: GMSUnproject( GMSMapPointInterpolate(GMSProject((selectedFieldMarkers[firstIndex].position)), GMSProject((selectedFieldMarkers[secondIndex].position)), 0.5)))
+            let tempMarker = GMSMarker(position: GMSUnproject( GMSMapPointInterpolate(GMSProject((selectedFieldMarkers[firstIndex].position)),
+                                                                                      GMSProject((selectedFieldMarkers[secondIndex].position)), 0.5)))
             let tempLength = GMSGeometryDistance(selectedFieldMarkers[firstIndex].position, selectedFieldMarkers[secondIndex].position)
             tempMarker.groundAnchor = .init(x: 0.5, y: 0.5)
             tempMarker.isTappable = false
@@ -850,7 +850,7 @@ class FieldsController {
             selectedFieldLengthMarkers.append(tempMarker)
         }
     }
-    //MARK: - setHideSelectedFieldLengthMarkers
+    // MARK: - setHideSelectedFieldLengthMarkers
     func setHideSelectedFieldLengthMarkers(mapView: GMSMapView?, remove: Bool) {
         for marker in selectedFieldLengthMarkers {
             marker.map = mapView
@@ -859,7 +859,7 @@ class FieldsController {
             selectedFieldLengthMarkers.removeAll()
         }
     }
-    //MARK: - deleteSelectedFieldLengthMarker
+    // MARK: - deleteSelectedFieldLengthMarker
     func deleteSelectedFieldLengthMarker(index: Int, isMetric: Bool, distanceUnit: Int) {
         var firstIndex = index
         var secondIndex = index
@@ -892,7 +892,7 @@ class FieldsController {
     
     private var index = 0
     
-    //MARK: - setEditableSelectedLineLengthMarker
+    // MARK: - setEditableSelectedLineLengthMarker
     func setEditableSelectedFieldLengthMarker(index: Int) {
         for marker in selectedFieldLengthMarkers {
             marker.isDraggable = false
@@ -933,7 +933,7 @@ class FieldsController {
         
         self.index = index
     }
-    //MARK: - setEdgeLength
+    // MARK: - setEdgeLength
     func setEdgeLength(lengthMarkerIndex: Int, edgeLength: Double) -> GMSMarker? {
         
         if index != 0 && index != selectedFieldMarkers.count-1 {
@@ -981,4 +981,3 @@ class FieldsController {
         }
     }
 }
-

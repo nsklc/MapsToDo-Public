@@ -18,40 +18,40 @@ class EmailLoginViewController: UIViewController, UINavigationControllerDelegate
     @IBOutlet weak var passwordLabel: UILabel!
     @IBOutlet weak var logInButton: UIButton!
     @IBOutlet weak var infoLabel: UILabel!
-    @IBOutlet weak var PasswordForgottenButton: UIButton!
+    @IBOutlet weak var passwordForgottenButton: UIButton!
     @IBOutlet weak var errorLabel: UILabel!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = UIColor(hexString: K.colors.thirdColor)
+        view.backgroundColor = UIColor(hexString: K.Colors.thirdColor)
         setAutoLayout()
         
         eMailTextfield.delegate = self
         passwordTextfield.delegate = self
         
     }
-    //MARK: - logInButtonTapped
+    // MARK: - logInButtonTapped
     @IBAction func logInButtonTapped(_ sender: UIButton?) {
         if let email = eMailTextfield.text, let password = passwordTextfield.text, !email.isEmpty, !password.isEmpty {
-            Auth.auth().signIn(withEmail: email, password: password) { [self] authResult, error in
-                if let e = error {
-                    //print(e)
-                    if let errCode = AuthErrorCode(rawValue: error!._code) {
+            Auth.auth().signIn(withEmail: email, password: password) { [self] _, error in
+                if let error = error {
+                    // print(e)
+                    if let errCode = AuthErrorCode(rawValue: error._code) {
                         switch errCode {
                         case .userNotFound:
-                            Auth.auth().createUser(withEmail: email, password: password) { [self] authResult, error in
-                                if let e = error {
+                            Auth.auth().createUser(withEmail: email, password: password) { [self] _, error in
+                                if let error = error {
                                     
-                                    if let errCode = AuthErrorCode(rawValue: error!._code) {
+                                    if let errCode = AuthErrorCode(rawValue: error._code) {
                                         switch errCode {
                                             case .weakPassword:
                                             errorLabel.isHidden = false
                                                 errorLabel.text = NSLocalizedString("Password must contain 6 or more characters.", comment: "")
-                                            print(e.localizedDescription)
+                                            print(error.localizedDescription)
                                             default:
                                                 errorLabel.isHidden = false
-                                                errorLabel.text = e.localizedDescription
+                                                errorLabel.text = error.localizedDescription
                                         }
                                     }
                                 } else {
@@ -69,11 +69,11 @@ class EmailLoginViewController: UIViewController, UINavigationControllerDelegate
                             errorLabel.text = NSLocalizedString("Wrong password. Try again or click 'Forgot password' to get an email to reset your password.", comment: "")
                         default:
                             errorLabel.isHidden = false
-                            errorLabel.text = e.localizedDescription
+                            errorLabel.text = error.localizedDescription
                         }
                     }
                 } else {
-                    //self.performSegue(withIdentifier: K.segueIdentifiers.loginToMapView, sender: self)
+                    // self.performSegue(withIdentifier: K.segueIdentifiers.loginToMapView, sender: self)
                     navigationController?.popToRootViewController(animated: true)
                 }
                 /*if let authResult = authResult {
@@ -88,16 +88,17 @@ class EmailLoginViewController: UIViewController, UINavigationControllerDelegate
             errorLabel.text = NSLocalizedString("You must enter an email address and password.", comment: "")
         }
     }
-    //MARK: - PasswordForgottenButtonTapped
+    // MARK: - PasswordForgottenButtonTapped
+    // swiftlint:disable identifier_name
     @IBAction func PasswordForgottenButtonTapped(_ sender: UIButton) {
-        AuthAlertsHelper.passwordForgottenAlert(on: self) { [weak self] text, isHidden in
+        AuthAlertsHelper.passwordForgottenAlert(on: self) { [weak self] text, _ in
             guard let self = self else { return }
             self.errorLabel.isHidden = false
             self.errorLabel.text = text
         }
     }
-    
-    //MARK: - textFieldShouldReturn
+    // swiftlint:enable identifier_name
+    // MARK: - textFieldShouldReturn
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == eMailTextfield {
             eMailTextfield.resignFirstResponder()
@@ -132,7 +133,7 @@ class EmailLoginViewController: UIViewController, UINavigationControllerDelegate
         return updatedText.count <= 30
     }
     
-    //MARK: - setAutoLayout
+    // MARK: - setAutoLayout
     func setAutoLayout() {
         eMailTextfield.translatesAutoresizingMaskIntoConstraints = false
         eMailTextfield.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.8).isActive = true
@@ -150,12 +151,12 @@ class EmailLoginViewController: UIViewController, UINavigationControllerDelegate
         emailLabel.centerYAnchor.constraint(equalTo: eMailTextfield.topAnchor, constant: 0).isActive = true
         emailLabel.clipsToBounds = true
         emailLabel.layer.cornerRadius = emailLabel.bounds.height*0.3
-        //displayNameLabel.layer.borderWidth = 1
+        // displayNameLabel.layer.borderWidth = 1
         emailLabel.text = NSLocalizedString("Email", comment: "")
         emailLabel.backgroundColor = view.backgroundColor
         emailLabel.textAlignment = .center
         
-        emailLabel.minimumScaleFactor = 0.1    //you need
+        emailLabel.minimumScaleFactor = 0.1    // you need
         emailLabel.adjustsFontSizeToFitWidth = true
         emailLabel.lineBreakMode = .byClipping
         emailLabel.numberOfLines = 0
@@ -178,30 +179,30 @@ class EmailLoginViewController: UIViewController, UINavigationControllerDelegate
         passwordLabel.centerYAnchor.constraint(equalTo: passwordTextfield.topAnchor, constant: 0).isActive = true
         passwordLabel.clipsToBounds = true
         passwordLabel.layer.cornerRadius = passwordLabel.bounds.height*0.3
-        //displayNameLabel.layer.borderWidth = 1
+        // displayNameLabel.layer.borderWidth = 1
         passwordLabel.text = NSLocalizedString("Password", comment: "")
         passwordLabel.backgroundColor = view.backgroundColor
         passwordLabel.textAlignment = .center
         
-        passwordLabel.minimumScaleFactor = 0.1    //you need
+        passwordLabel.minimumScaleFactor = 0.1    // you need
         passwordLabel.adjustsFontSizeToFitWidth = true
         passwordLabel.lineBreakMode = .byClipping
         passwordLabel.numberOfLines = 0
         
         self.view.bringSubviewToFront(passwordLabel)
         
-        PasswordForgottenButton.translatesAutoresizingMaskIntoConstraints = false
-        PasswordForgottenButton.widthAnchor.constraint(equalTo: passwordLabel.widthAnchor, multiplier: 1.2).isActive = true
-        PasswordForgottenButton.heightAnchor.constraint(equalTo: passwordLabel.heightAnchor, multiplier: 1.2).isActive = true
-        PasswordForgottenButton.rightAnchor.constraint(equalTo: passwordTextfield.rightAnchor, constant: 0).isActive = true
-        PasswordForgottenButton.topAnchor.constraint(equalTo: passwordTextfield.bottomAnchor, constant: 10).isActive = true
+        passwordForgottenButton.translatesAutoresizingMaskIntoConstraints = false
+        passwordForgottenButton.widthAnchor.constraint(equalTo: passwordLabel.widthAnchor, multiplier: 1.2).isActive = true
+        passwordForgottenButton.heightAnchor.constraint(equalTo: passwordLabel.heightAnchor, multiplier: 1.2).isActive = true
+        passwordForgottenButton.rightAnchor.constraint(equalTo: passwordTextfield.rightAnchor, constant: 0).isActive = true
+        passwordForgottenButton.topAnchor.constraint(equalTo: passwordTextfield.bottomAnchor, constant: 10).isActive = true
         
-        PasswordForgottenButton.clipsToBounds = true
-        PasswordForgottenButton.backgroundColor = UIColor.clear
-        PasswordForgottenButton.tintColor = UIColor.flatBlue()
-        PasswordForgottenButton.layer.cornerRadius = logInButton.bounds.height*0.5
+        passwordForgottenButton.clipsToBounds = true
+        passwordForgottenButton.backgroundColor = UIColor.clear
+        passwordForgottenButton.tintColor = UIColor.flatBlue()
+        passwordForgottenButton.layer.cornerRadius = logInButton.bounds.height*0.5
         
-        PasswordForgottenButton.setTitle(NSLocalizedString("Forgot password?", comment: ""), for: .normal)
+        passwordForgottenButton.setTitle(NSLocalizedString("Forgot password?", comment: ""), for: .normal)
         
         logInButton.translatesAutoresizingMaskIntoConstraints = false
         logInButton.widthAnchor.constraint(equalTo: view.widthAnchor, multiplier: 0.3).isActive = true
@@ -212,7 +213,7 @@ class EmailLoginViewController: UIViewController, UINavigationControllerDelegate
         logInButton.clipsToBounds = true
         logInButton.layer.cornerRadius = logInButton.bounds.height*0.3
         
-        logInButton.backgroundColor = UIColor(hexString: K.colors.primaryColor)
+        logInButton.backgroundColor = UIColor(hexString: K.Colors.primaryColor)
         logInButton.setTitleColor(UIColor.flatGreen(), for: .normal)
         logInButton.setTitle(NSLocalizedString("Log in", comment: ""), for: .normal)
         
@@ -246,4 +247,3 @@ class EmailLoginViewController: UIViewController, UINavigationControllerDelegate
         errorLabel.isHidden = true
     }
 }
-

@@ -15,7 +15,7 @@ import GoogleMobileAds
 
 class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
-    let realm = try! Realm()
+    let realm: Realm! = try? Realm()
     
     @IBOutlet weak var infoStackView: UIStackView!
     @IBOutlet weak var titleLabel: UILabel!
@@ -35,12 +35,12 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
     
     @IBOutlet weak var shareBarButton: UIBarButtonItem!
     
-    enum type {
+    enum pageType {
         case fieldInfoPage
         case lineInfoPage
         case placeInfoPage
     }
-    var infoPageType = type.fieldInfoPage
+    var infoPageType = pageType.fieldInfoPage
     
     var images = [UIImage]()
     
@@ -100,10 +100,10 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
         super.viewDidLoad()
         // Get userDefaults in the realm
         
-        timer = Timer.scheduledTimer(timeInterval: K.freeAccountLimitations.infoPageTimer, target: self, selector: #selector(fireTimer), userInfo: nil, repeats: false)
+        timer = Timer.scheduledTimer(timeInterval: K.FreeAccountLimitations.infoPageTimer, target: self, selector: #selector(fireTimer), userInfo: nil, repeats: false)
         
         imagePicker.delegate = self
-        imagePicker.sourceType = .camera //. photoLibrary
+        imagePicker.sourceType = .camera // . photoLibrary
         
         imagePicker.allowsEditing = true
         
@@ -126,16 +126,16 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
                                }
         )
     }
-    //MARK: - viewWillAppear
+    // MARK: - viewWillAppear
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        if images.count != 0 {
+        if !images.isEmpty {
             imageView.image = images.last
         } else {
-            imageView.image = UIImage(named: K.imagesFromXCAssets.appLogo)
+            imageView.image = UIImage(named: K.ImagesFromXCAssets.appLogo)
         }
     }
-    //MARK: - loadImages
+    // MARK: - loadImages
     func loadImages(photoIDs: List<String>) {
         
         if !images.isEmpty {
@@ -164,29 +164,29 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
         }
     }
     
-    //MARK: - cameraButtonTapped
+    // MARK: - cameraButtonTapped
     @IBAction func cameraButtonTapped(_ sender: UIBarButtonItem) {
         
         if userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
-            //if let imageCount = images.count {
+            // if let imageCount = images.count {
                 
-                if images.count >= K.freeAccountLimitations.photoLimit {
+                if images.count >= K.FreeAccountLimitations.photoLimit {
                     AlertsHelper.addingExtraPhotoAlert(on: self)
                     return
                 }
-            //}
+            // }
         }
         
         present(imagePicker, animated: true, completion: nil)
     }
-    //MARK: - imagePickerController
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+    // MARK: - imagePickerController
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]) {
         
         if let userPickedImage = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             
-            //imageView.image = userPickedImage
+            // imageView.image = userPickedImage
             
-            //images.append(userPickedImage)
+            // images.append(userPickedImage)
             
             if let id = saveImage(image: userPickedImage) {
                 if let image = getSavedImage(named: id) {
@@ -233,14 +233,14 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
         imagePicker.dismiss(animated: true, completion: nil)
         imageCollectionView.reloadData()
     }
-    //MARK: - deleteButtonTapped
+    // MARK: - deleteButtonTapped
     @IBAction func deleteButtonTapped(_ sender: UIButton) {
         
         AlertsHelper.deleteAlert(on: self,
                                  with: .image,
                                  overlayTitle: nil) { [weak self] in
             guard let self = self else { return }
-            if self.images.count != 0 {
+            if !self.images.isEmpty {
                 if let id = self.imageView.image?.accessibilityIdentifier {
                     if self.deleteImage(id: id) {
                         print("image deleted")
@@ -265,10 +265,10 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
                             print("Saving photo in field, \(error)")
                         }
                         
-                        if self.images.count != 0 {
+                        if !self.images.isEmpty {
                             self.imageView.image = self.images[0]
                         } else {
-                            self.imageView.image = UIImage(systemName: K.imagesFromXCAssets.appLogo)
+                            self.imageView.image = UIImage(systemName: K.ImagesFromXCAssets.appLogo)
                         }
                     } else {
                         AlertsHelper.savingPhotoAlert(on: self)
@@ -276,13 +276,13 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
                     self.imageCollectionView.reloadData()
                 }
             } else {
-                self.imageView.image = UIImage(named: K.imagesFromXCAssets.appLogo)
+                self.imageView.image = UIImage(named: K.ImagesFromXCAssets.appLogo)
                 AlertsHelper.thereIsNoPhotoAlert(on: self)
                 print("no image to delete")
             }
         }
     }
-    //MARK: - saveImage
+    // MARK: - saveImage
     func saveImage(image: UIImage) -> String? {
         guard let data = image.jpegData(compressionQuality: 1) else {
             return nil
@@ -304,17 +304,16 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
             uploadImageToFirebase(data: data, imageID: imageID)
         }
         
-        
         return imageID
     }
-    //MARK: - getSavedImage
+    // MARK: - getSavedImage
     func getSavedImage(named: String) -> UIImage? {
         if let dir = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false) {
             return UIImage(contentsOfFile: URL(fileURLWithPath: dir.absoluteString).appendingPathComponent(named).path)
         }
         return nil
     }
-    //MARK: - deleteImage
+    // MARK: - deleteImage
     func deleteImage(id: String) -> Bool {
         guard let directory = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false) as NSURL else {
             return false
@@ -324,7 +323,7 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
             try fileManager.removeItem(at: directory.appendingPathComponent("\(id).png")!)
             let imageURL = directory.appendingPathComponent("\(id).png")!
             if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
-                deleteImageFromFirebase(imageURL: imageURL,imageID: id)
+                deleteImageFromFirebase(imageURL: imageURL, imageID: id)
             }
             return true
         } catch {
@@ -333,16 +332,16 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
         }
         
     }
-    //MARK: - viewDidAppear
+    // MARK: - viewDidAppear
     override func viewDidAppear(_ animated: Bool) {
-        //let handle = Auth.auth().addStateDidChangeListener { (auth, user) in
-        //print(auth.currentUser?.displayName)
-        //}
+        // let handle = Auth.auth().addStateDidChangeListener { (auth, user) in
+        // print(auth.currentUser?.displayName)
+        // }
     }
     
-    //MARK: - Firebase Storage
+    // MARK: - Firebase Storage
     
-    //MARK: - getImageReferences
+    // MARK: - getImageReferences
     func getImageReferences() -> [StorageReference] {
         print("getImageReferences")
         var imageReferences = [StorageReference]()
@@ -364,17 +363,17 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
                     // The items under storageReference.
                     print("item: \(item.name)")
                     imageReferences.append(item)
-                    //item.name
+                    // item.name
                 }
             }
         }
         return imageReferences
     }
-    //MARK: - uploadImageToFirebase
+    // MARK: - uploadImageToFirebase
     func uploadImageToFirebase(data: Data, imageID: String) {
         print(imageID)
         if user != nil, let bossID = userDefaults?.first?.bossID {
-            storage.child("\(bossID)/\(selectedOverlayID)/\(imageID).png").putData(data, metadata: nil) { (storageMetadata, error) in
+            storage.child("\(bossID)/\(selectedOverlayID)/\(imageID).png").putData(data, metadata: nil) { (_, error) in
                 guard error == nil else {
                     print("Failed to upload \(String(describing: error?.localizedDescription))")
                     return
@@ -382,15 +381,15 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
             }
         }
     }
-    //MARK: - downloadImageFromFirebase
-    func downloadImageFromFirebase(imageURL: URL,imageID: String) {
+    // MARK: - downloadImageFromFirebase
+    func downloadImageFromFirebase(imageURL: URL, imageID: String) {
         
         if let bossID = userDefaults?.first?.bossID {
             // Create a reference to the file you want to download
             let islandRef = storage.child("\(bossID)/\(selectedOverlayID)/\(imageID).png")
             
             // Download to the local filesystem
-            let downloadTask = islandRef.write(toFile: imageURL) { url, error in
+            let downloadTask = islandRef.write(toFile: imageURL) { _, error in
                 if let error = error {
                     // Uh-oh, an error occurred!
                     print(error)
@@ -399,7 +398,7 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
                 }
             }
             
-            downloadTask.observe(.success) { [self] snapshot in
+            downloadTask.observe(.success) { [self] _ in
                 // Download completed successfully
                 print("Download completed successfully")
                 if let image = getSavedImage(named: imageID) {
@@ -411,8 +410,8 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
         }
         
     }
-    //MARK: - deleteImageFromFirebase
-    func deleteImageFromFirebase(imageURL: URL,imageID: String) {
+    // MARK: - deleteImageFromFirebase
+    func deleteImageFromFirebase(imageURL: URL, imageID: String) {
         
         if let bossID = userDefaults?.first?.bossID {
             // Create a reference to the file you want to download
@@ -431,7 +430,7 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
             
         }
     }
-    //MARK: - shareBarButtonTapped
+    // MARK: - shareBarButtonTapped
     @IBAction func shareBarButtonTapped(_ sender: UIBarButtonItem) {
         print("shareBarButtonTapped")
         if let image = imageView.image {
@@ -439,22 +438,22 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
         }
         
     }
-    //MARK: - presentShareSheet
+    // MARK: - presentShareSheet
     func presentShareSheet(image: UIImage) {
         
         let shareSheetVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
         
         if UIDevice.current.userInterfaceIdiom == .pad {
             if let popoverController = shareSheetVC.popoverPresentationController {
-                popoverController.sourceView = self.view //to set the source of your alert
+                popoverController.sourceView = self.view // to set the source of your alert
                 popoverController.sourceRect = CGRect(x: self.view.bounds.midX, y: self.view.bounds.midY, width: 0, height: 0)
-                popoverController.permittedArrowDirections = [] //to hide the arrow of any particular direction
+                popoverController.permittedArrowDirections = [] // to hide the arrow of any particular direction
             }
         }
         present(shareSheetVC, animated: true)
     }
     
-    //MARK: - addSubViewsConstraints
+    // MARK: - addSubViewsConstraints
     func setSubViewsConstraints() {
         
         if infoPageType == .fieldInfoPage {
@@ -478,14 +477,17 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
             let area = Measurement(value: selectedField!.area, unit: UnitArea.squareMeters)
             let circumference = Measurement(value: selectedField!.circumference, unit: UnitLength.meters)
             
-            let content = UnitsHelper.app.getUnitForField(isShowAllUnitsSelected: false, isMeasureSystemMetric: userDefaults!.first!.isMeasureSystemMetric, area: area, circumference: circumference, distanceUnit: userDefaults!.first!.distanceUnit, areaUnit: userDefaults!.first!.areaUnit)
+            let content = UnitsHelper.app.getUnitForField(isShowAllUnitsSelected: false,
+                                                          isMeasureSystemMetric: userDefaults!.first!.isMeasureSystemMetric,
+                                                          area: area, circumference: circumference,
+                                                          distanceUnit: userDefaults!.first!.distanceUnit,
+                                                          areaUnit: userDefaults!.first!.areaUnit)
             
             let splitContentLines = content.split(separator: "\n")
             let line = splitContentLines[0]
             let line1 = splitContentLines[1]
             rightAreaLabel.text = String(line.split(separator: "=")[1].trimmingCharacters(in: .whitespaces))
             rightCircumferenceLabel.text = String(line1.split(separator: "=")[1].trimmingCharacters(in: .whitespaces))
-            
             
         } else if infoPageType == .lineInfoPage {
             titleLabel.text = NSLocalizedString("Title", comment: "")
@@ -496,7 +498,9 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
             
             let length = Measurement(value: selectedLine!.length, unit: UnitLength.meters)
             
-            let content = UnitsHelper.app.getUnitForLine(isShowAllUnitsSelected: false, isMeasureSystemMetric: userDefaults!.first!.isMeasureSystemMetric, length: length, distanceUnit: userDefaults!.first!.distanceUnit)
+            let content = UnitsHelper.app.getUnitForLine(isShowAllUnitsSelected: false,
+                                                         isMeasureSystemMetric: userDefaults!.first!.isMeasureSystemMetric,
+                                                         length: length, distanceUnit: userDefaults!.first!.distanceUnit)
             
             rightAreaLabel.text = String(content.split(separator: "=")[1].trimmingCharacters(in: .whitespaces))
             
@@ -515,28 +519,28 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
         infoStackView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -5).isActive = true
         infoStackView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 5).isActive = true
         infoStackView.heightAnchor.constraint(greaterThanOrEqualToConstant: 100).isActive = true
-        //infoStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+        // infoStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         infoStackView.bottomAnchor.constraint(equalTo: imageView.safeAreaLayoutGuide.topAnchor, constant: -10).isActive = true
         
-        view.backgroundColor = UIColor(hexString: K.colors.thirdColor)
-        imageView.backgroundColor = UIColor(hexString: K.colors.primaryColor)
-        imageView.image = UIImage(named: K.imagesFromXCAssets.picture)
+        view.backgroundColor = UIColor(hexString: K.Colors.thirdColor)
+        imageView.backgroundColor = UIColor(hexString: K.Colors.primaryColor)
+        imageView.image = UIImage(named: K.ImagesFromXCAssets.picture)
         
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -5).isActive = true
         imageView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 5).isActive = true
         imageView.topAnchor.constraint(equalTo: infoStackView.bottomAnchor, constant: 10).isActive = true
         imageView.centerYAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerYAnchor).isActive = true
-        //imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, constant: -100).isActive = true
+        // imageView.heightAnchor.constraint(equalTo: imageView.widthAnchor, constant: -100).isActive = true
         imageView.layer.borderWidth = 0.25
         imageView.layer.borderColor = UIColor.systemBlue.cgColor
         
-        deleteButton.backgroundColor = UIColor(hexString: K.colors.thirdColor)
-        deleteButton.tintColor = UIColor(hexString: K.colors.fifthColor)
+        deleteButton.backgroundColor = UIColor(hexString: K.Colors.thirdColor)
+        deleteButton.tintColor = UIColor(hexString: K.Colors.fifthColor)
         deleteButton.translatesAutoresizingMaskIntoConstraints = false
         deleteButton.leftAnchor.constraint(equalTo: imageView.leftAnchor, constant: 0).isActive = true
         deleteButton.centerYAnchor.constraint(equalTo: imageView.centerYAnchor, constant: 0).isActive = true
-        //deleteButton.heightAnchor.constraint(equalTo: imageView.heightAnchor, constant: ).isActive = true
+        // deleteButton.heightAnchor.constraint(equalTo: imageView.heightAnchor, constant: ).isActive = true
         deleteButton.widthAnchor.constraint(equalTo: deleteButton.heightAnchor).isActive = true
         deleteButton.layer.borderWidth = 0.25
         deleteButton.layer.borderColor = UIColor.systemBlue.cgColor
@@ -548,13 +552,13 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
         imageCollectionView.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 10).isActive = true
         imageCollectionView.heightAnchor.constraint(equalToConstant: 100).isActive = true
         
-        imageCollectionView.backgroundColor = UIColor(hexString: K.colors.primaryColor)
+        imageCollectionView.backgroundColor = UIColor(hexString: K.Colors.primaryColor)
         imageCollectionView.tintColor = UIColor.flatWhite()
         
         imageCollectionView.layer.borderWidth = 0.25
         imageCollectionView.layer.borderColor = UIColor.systemBlue.cgColor
     }
-    //MARK: - viewWillDisappear
+    // MARK: - viewWillDisappear
     override func viewWillDisappear(_ animated: Bool) {
         if showAd {
             if interstitial != nil {
@@ -564,7 +568,7 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
             }
         }
     }
-    //MARK: - viewDidDisappear
+    // MARK: - viewDidDisappear
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         
@@ -572,38 +576,38 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
     }
 }
 
-//MARK: - UICollectionViewDataSource
+// MARK: - UICollectionViewDataSource
 extension InfoViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return images.count // How many cells to display
+        images.count // How many cells to display
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let myCell = collectionView.dequeueReusableCell(withReuseIdentifier: "MyCell", for: indexPath)
         myCell.backgroundView = UIImageView(image: images[indexPath.row])
         myCell.layer.cornerRadius = 5
-        //print(indexPath[1])
+        // print(indexPath[1])
         return myCell
     }
 }
 
-//MARK: - UICollectionViewDelegate
+// MARK: - UICollectionViewDelegate
 extension InfoViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        //print("User tapped on item \(indexPath.row)")
+        // print("User tapped on item \(indexPath.row)")
         imageView.image = images[indexPath.row]
     }
 }
 
-//MARK: - UICollectionViewDelegateFlowLayout
+// MARK: - UICollectionViewDelegateFlowLayout
 extension InfoViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         let bounds = collectionView.bounds
         return CGSize(width: bounds.height, height: bounds.height)
     }
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumInteritemSpacingForSectionAt section: Int) -> CGFloat {
-        return CGFloat(collectionView.bounds.height/7)
+        CGFloat(collectionView.bounds.height/7)
     }
     /*func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
      return CGFloat(collectionView.bounds.height/7)

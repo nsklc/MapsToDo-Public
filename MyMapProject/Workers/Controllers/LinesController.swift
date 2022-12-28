@@ -13,7 +13,7 @@ import Firebase
 import FirebaseFirestore
 
 class LinesController {
-    let realm = try! Realm()
+    let realm: Realm! = try? Realm()
     
     var userDefaults: Results<UserDefaults>?
     
@@ -31,9 +31,9 @@ class LinesController {
             for position in selectedLine.polylineMarkersPositions {
                 let marker = GMSMarker()
                 marker.isDraggable = true
-                marker.icon = UIImage(systemName: K.systemImages.dotCircle)?.imageScaled(to: CGSize(width: 30, height: 30))
-                //marker.iconView =  UIImageView(image: UIImage(systemName: "dot.circle"))
-                //marker.iconView?.tintColor = UIColor.flatBlackDark()
+                marker.icon = UIImage(systemName: K.SystemImages.dotCircle)?.imageScaled(to: CGSize(width: 30, height: 30))
+                // marker.iconView =  UIImageView(image: UIImage(systemName: "dot.circle"))
+                // marker.iconView?.tintColor = UIColor.flatBlackDark()
                 marker.groundAnchor = .init(x: 0.5, y: 0.5)
                 marker.position = CLLocationCoordinate2D(latitude: position.latitude, longitude: position.longitude)
                 selectedLineMarkers.append(marker)
@@ -48,11 +48,11 @@ class LinesController {
     let user = Auth.auth().currentUser
     
     private lazy var updateTime = Date()
-    //MARK: - loadLines
+    // MARK: - loadLines
     func loadLines() {
         lines = realm.objects(Line.self)
     }
-    //MARK: - init
+    // MARK: - init
     init(mapView: GMSMapView) {
         userDefaults = realm.objects(UserDefaults.self)
         listenLineDocuments(mapView: mapView)
@@ -77,7 +77,7 @@ class LinesController {
             polyline.map = mapView
         }
     }
-    //MARK: - addLine
+    // MARK: - addLine
     func addLine(title: String, color: String, initialMarkers: [GMSMarker], mapView: GMSMapView, isGeodesic: Bool, id: String?) {
         let line = Line()
         if let id = id {
@@ -120,11 +120,11 @@ class LinesController {
         polylines[polylines.count-1].map = mapView
         loadLines()
     }
-    //MARK: - checkTitleAvailable
+    // MARK: - checkTitleAvailable
     func checkTitleAvailable(title: String) -> String {
         var isValidName = true
         var errorMessage = "Line needs a title."
-        if title.count == 0 {
+        if title.isEmpty {
             isValidName = false
             errorMessage = "Line needs a title."
         }
@@ -140,25 +140,25 @@ class LinesController {
             return errorMessage
         }
     }
-    //MARK: - changePolylinesTappableBoolean
+    // MARK: - changePolylinesTappableBoolean
     func changePolylinesTappableBoolean(to tapable: Bool) {
         for polyline in polylines {
             polyline.isTappable = tapable
         }
     }
-    //MARK: - setColor
-    func setColor(color: String, line: Line, mapView: GMSMapView){
+    // MARK: - setColor
+    func setColor(color: String, line: Line, mapView: GMSMapView) {
         selectedPolyline.map = nil
         updatedColor = color
         selectedPolyline.strokeColor = UIColor(hexString: color)!
         selectedPolyline.map = mapView
     }
-    //MARK: - setSelectedLineLength
+    // MARK: - setSelectedLineLength
     func setSelectedLineLength (length: Double) {
         updatedLength = length
     }
     
-    //MARK: - saveLineToDB
+    // MARK: - saveLineToDB
     func saveLineToDB(line: Line) {
         do {
             try realm.write({
@@ -177,7 +177,7 @@ class LinesController {
         }
         saveLineToCloud(line: selectedLine)
     }
-    //MARK: - deleteSelectedLineFromDB
+    // MARK: - deleteSelectedLineFromDB
     func deleteSelectedLineFromDB(line: Line) {
         if let polyline = polylines.first(where: {$0.title == line.id}) {
             do {
@@ -193,15 +193,14 @@ class LinesController {
             }
         }
         
-        
-        if line == selectedLine && selectedLineMarkers.count != 0 {
+        if line == selectedLine && !selectedLineMarkers.isEmpty {
             for marker in selectedLineMarkers {
                 marker.map = nil
             }
             setHideSelectedLineLengthMarkers(mapView: nil, remove: true)
         }
     }
-    //MARK: - changeTitle +
+    // MARK: - changeTitle +
     func changeTitle(for line: Line, title: String) {
         do {
             try self.realm.write({
@@ -213,45 +212,45 @@ class LinesController {
         changeTitleAtCloud(for: line, title: title)
     }
     
-    //MARK: - FIREBASE
+    // MARK: - FIREBASE
     
-    //MARK: - saveLineToCloud
+    // MARK: - saveLineToCloud
     func saveLineToCloud(line: Line) {
         if let user = user {
-            var positions = [[String : Any]]()
+            var positions = [[String: Any]]()
             
             for position in line.polylineMarkersPositions {
                 positions.append(position.dictionaryWithValues(forKeys: ["latitude", "longitude"]))
             }
             
-            var photos = [[String : Any]]()
+            var photos = [[String: Any]]()
             
             for photo in line.photos {
-                photos.append([photo:""])
+                photos.append([photo: ""])
             }
             
             self.db.collection(userDefaults!.first!.bossID).document("Lines").collection("Lines").document(line.id).setData(["updatedBy": user.uid, line.id: line.dictionaryWithValues(forKeys: ["title", "color", "length"]), "positions": positions, "photos": photos], merge: true)
-            self.db.collection(user.uid).document("Lines").setData([line.id : self.updateTime], merge: true)
+            self.db.collection(user.uid).document("Lines").setData([line.id: self.updateTime], merge: true)
         }
     }
     
-    //MARK: - changeTitle
+    // MARK: - changeTitle
     func changeTitleAtCloud(for line: Line, title: String) {
         if let user = user {
             self.db.collection(userDefaults!.first!.bossID).document("Lines").collection("Lines").document(line.id).setData(["updatedBy": user.uid, line.id: line.dictionaryWithValues(forKeys: ["title"])], merge: true)
-            self.db.collection(user.uid).document("Lines").setData([line.id : self.updateTime], merge: true)
+            self.db.collection(user.uid).document("Lines").setData([line.id: self.updateTime], merge: true)
         }
     }
     
-    //MARK: - deleteLineFromCloud
+    // MARK: - deleteLineFromCloud
     func deleteLineFromCloud(line: Line) {
         if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
             self.db.collection(userDefaults!.first!.bossID).document("Lines").collection("Lines").document(line.id).delete()
-            self.db.collection(userDefaults!.first!.bossID).document("Lines").updateData([line.id : FieldValue.delete()])
+            self.db.collection(userDefaults!.first!.bossID).document("Lines").updateData([line.id: FieldValue.delete()])
         }
     }
     
-    //MARK: - listenLineDocuments
+    // MARK: - listenLineDocuments
     func listenLineDocuments(mapView: GMSMapView) {
         if let user = user {
             self.db.collection(userDefaults!.first!.bossID).document("Lines").collection("Lines").addSnapshotListener { [self] querySnapshot, error in
@@ -260,19 +259,19 @@ class LinesController {
                     return
                 }
                 snapshot.documentChanges.forEach { diff in
-                    //MARK: - added
-                    if (diff.type == .added) {
-                        //print("New line: \(diff.document.data())")
-                        //print(diff.document.documentID)
+                    // MARK: - added
+                    if diff.type == .added {
+                        // print("New line: \(diff.document.data())")
+                        // print(diff.document.documentID)
                         if realm.object(ofType: Line.self, forPrimaryKey: diff.document.documentID) != nil {
                             
                         } else {
-                            //if diff.document.data()["updatedBy"] as? String != user.uid {
+                            // if diff.document.data()["updatedBy"] as? String != user.uid {
                             let line = Line()
                             line.id = diff.document.documentID
-                            //print(diff.document.data())
-                            if let lineData = diff.document.data()[diff.document.documentID] as? [String:Any] {
-                                if let title = lineData["title"] as? String, let color = lineData["color"] as? String,let positions = diff.document.data()["positions"] as? [[String:Any]] {
+                            // print(diff.document.data())
+                            if let lineData = diff.document.data()[diff.document.documentID] as? [String: Any] {
+                                if let title = lineData["title"] as? String, let color = lineData["color"] as? String, let positions = diff.document.data()["positions"] as? [[String: Any]] {
                                     line.title = title
                                     line.color = color
                                     
@@ -290,17 +289,17 @@ class LinesController {
                             }
                         }
                     }
-                    //MARK: - modified
-                    if (diff.type == .modified) {
-                        //print("Modified line: \(diff.document.data())")
+                    // MARK: - modified
+                    if diff.type == .modified {
+                        // print("Modified line: \(diff.document.data())")
                         if let specificLine = realm.object(ofType: Line.self, forPrimaryKey: diff.document.documentID) {
-                            if selectedLine == specificLine && selectedLineMarkers.count != 0 {
+                            if selectedLine == specificLine && !selectedLineMarkers.isEmpty {
                                 let nc = NotificationCenter.default
                                 nc.post(name: Notification.Name("EndEditing"), object: nil)
                             }
                             
                             if diff.document.data()["updatedBy"] as? String != user.uid {
-                                if let lineData = diff.document.data()[diff.document.documentID] as? [String:Any] {
+                                if let lineData = diff.document.data()[diff.document.documentID] as? [String: Any] {
                                     if let title = lineData["title"] as? String, let color = lineData["color"] as? String, let length = lineData["length"] as? Double {
                                         do {
                                             try realm.write({
@@ -322,7 +321,7 @@ class LinesController {
                                         }
                                     }
                                 }
-                                if let positions = diff.document.data()["positions"] as? [[String:Double]] {
+                                if let positions = diff.document.data()["positions"] as? [[String: Double]] {
                                     do {
                                         try realm.write({
                                             specificLine.polylineMarkersPositions.removeAll()
@@ -346,15 +345,15 @@ class LinesController {
                             }
                         }
                     }
-                    //MARK: - removed
-                    if (diff.type == .removed) {
-                        //print("Removed line: \(diff.document.data())")
+                    // MARK: - removed
+                    if diff.type == .removed {
+                        // print("Removed line: \(diff.document.data())")
                         
                         if let specificLine = realm.object(ofType: Line.self, forPrimaryKey: diff.document.documentID) {
                             if selectedLine != specificLine {
                                 deleteSelectedLineFromDB(line: specificLine)
                             } else {
-                                if selectedLineMarkers.count == 0 {
+                                if selectedLineMarkers.isEmpty {
                                     deleteSelectedLineFromDB(line: specificLine)
                                 } else {
                                     let nc = NotificationCenter.default
@@ -370,7 +369,7 @@ class LinesController {
         }
     }
     
-    //MARK: - updatePolyline
+    // MARK: - updatePolyline
     func updatePolyline(line: Line, polyline: GMSPolyline, mapView: GMSMapView) {
         let path = GMSMutablePath()
         for position in line.polylineMarkersPositions {
@@ -379,14 +378,14 @@ class LinesController {
         polyline.title = line.id
         polyline.strokeColor = UIColor(hexString: line.color)!
         polyline.strokeWidth = 5
-        //newPolyline.isTappable = true
+        // newPolyline.isTappable = true
         polyline.path = path
         polyline.map = mapView
     }
     
-    //MARK: - LENGTH MARKERS
+    // MARK: - LENGTH MARKERS
     
-    //MARK: - arrangeSelectedLineLengthMarker
+    // MARK: - arrangeSelectedLineLengthMarker
     func arrangeSelectedLineLengthMarker(i: Int, inside: Bool, add: Bool, mapView: GMSMapView, isMetric: Bool, distanceUnit: Int) {
         
         if inside {
@@ -427,7 +426,7 @@ class LinesController {
                 tempMarker.isTappable = false
                 tempMarker.title = "lengthMarker"
                 tempMarker.iconView = UIImage.makeIconView(iconSize: 50, length: tempLength, isMetric: isMetric, distanceUnit: distanceUnit, isTappable: tempMarker.isTappable)
-                if add && (i != 0){
+                if add && (i != 0) {
                     selectedLineLengthMarkers.append(tempMarker)
                     tempMarker.map = mapView
                 } else if add && (i == 0) {
@@ -455,7 +454,7 @@ class LinesController {
         }
     }
     
-    //MARK: - setSelectedLineLengthMarkers
+    // MARK: - setSelectedLineLengthMarkers
     func setSelectedLineLengthMarkers(isMetric: Bool, distanceUnit: Int) {
         for i in 0...selectedLineMarkers.count-2 {
             let tempMarker = GMSMarker(position: GMSUnproject( GMSMapPointInterpolate(GMSProject((selectedLineMarkers[i].position)), GMSProject((selectedLineMarkers[i+1].position)), 0.5)))
@@ -467,7 +466,7 @@ class LinesController {
             selectedLineLengthMarkers.append(tempMarker)
         }
     }
-    //MARK: - setHideSelectedLineLengthMarkers
+    // MARK: - setHideSelectedLineLengthMarkers
     func setHideSelectedLineLengthMarkers(mapView: GMSMapView?, remove: Bool) {
         for marker in selectedLineLengthMarkers {
             marker.map = mapView
@@ -476,7 +475,7 @@ class LinesController {
             selectedLineLengthMarkers.removeAll()
         }
     }
-    //MARK: - deleteSelectedLineLengthMarker
+    // MARK: - deleteSelectedLineLengthMarker
     func deleteSelectedLineLengthMarker(index: Int, isMetric: Bool, distanceUnit: Int) {
         if index == 0 {
             selectedLineLengthMarkers.removeFirst().map = nil
@@ -498,7 +497,7 @@ class LinesController {
     
     private var index = 0
     
-    //MARK: - setEditableSelectedLineLengthMarker
+    // MARK: - setEditableSelectedLineLengthMarker
     func setEditableSelectedLineLengthMarker(index: Int) {
         for marker in selectedLineLengthMarkers {
             marker.isDraggable = false
@@ -535,7 +534,7 @@ class LinesController {
         }
         self.index = index
     }
-    //MARK: - setEdgeLength
+    // MARK: - setEdgeLength
     func setEdgeLength(lengthMarkerIndex: Int, edgeLength: Double) -> GMSMarker? {
         if lengthMarkerIndex == index && index != selectedLineMarkers.count-1 {
             let oldLength = GMSGeometryDistance(selectedLineMarkers[index].position, selectedLineMarkers[index + 1].position)

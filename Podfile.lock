@@ -426,6 +426,7 @@ PODS:
   - Realm/Headers (10.7.4)
   - RealmSwift (10.7.4):
     - Realm (= 10.7.4)
+  - SwiftLint (0.50.3)
   - SwipeCellKit (2.7.1)
 
 DEPENDENCIES:
@@ -441,6 +442,7 @@ DEPENDENCIES:
   - GoogleSignIn
   - Purchases
   - RealmSwift
+  - SwiftLint
   - SwipeCellKit
 
 SPEC REPOS:
@@ -477,6 +479,7 @@ SPEC REPOS:
     - PurchasesCoreSwift
     - Realm
     - RealmSwift
+    - SwiftLint
     - SwipeCellKit
 
 EXTERNAL SOURCES:
@@ -523,8 +526,9 @@ SPEC CHECKSUMS:
   PurchasesCoreSwift: cae29de1aeda5d13caf68d69c847ddb01e224ab1
   Realm: f08ce1a85649a41303ecfe1cbd914c62e9e6d710
   RealmSwift: 60ec49d165f23d040ab48811d8dd177e09baf4d3
+  SwiftLint: 77f7cb2b9bb81ab4a12fcc86448ba3f11afa50c6
   SwipeCellKit: 3972254a826da74609926daf59b08d6c72e619ea
 
-PODFILE CHECKSUM: 615431575823b2a1410b4aa1010ebc94d92f1fd0
+PODFILE CHECKSUM: 82a5266125a4912f7417286a00a70b5131be0db2
 
 COCOAPODS: 1.11.2

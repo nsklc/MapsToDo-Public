@@ -18,7 +18,7 @@ class ImportExportAlertsHelper: BaseAlertHelper {
         
         let alert = UIAlertController(title: NSLocalizedString("Export File", comment: ""), message: NSLocalizedString("Exporting file task is completed. Now you can share the file.", comment: ""), preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
-        alert.addAction(UIAlertAction(title: NSLocalizedString("Share", comment: ""), style: .default, handler: { (action) in
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Share", comment: ""), style: .default, handler: { (_) in
             ImportExportAlertsHelper.presentShareSheet(on: vc)
         }))
         DispatchQueue.main.async {

@@ -20,14 +20,14 @@ protocol MapViewModelProtocol: AnyObject {
     func saveMapType(with mapType: String)
     func getMyLocation() -> CLLocation?
     func createNewMarker(_ mapView: GMSMapView, didTapAt coordinate: CLLocationCoordinate2D) -> GMSMarker
-    func findClosestMarkers(newMarker: GMSMarker, markers: [GMSMarker]) -> (Int,Int)
+    func findClosestMarkers(newMarker: GMSMarker, markers: [GMSMarker]) -> (Int, Int)
 }
 
 class MapViewModel: NSObject, MapViewModelProtocol {
     
     weak var viewController: MapViewControllerProtocol?
     
-    let realm = try! Realm()
+    let realm: Realm! = try? Realm()
     
     var userDefaults: UserDefaults!
     private let locationManager = CLLocationManager()
@@ -69,7 +69,6 @@ class MapViewModel: NSObject, MapViewModelProtocol {
                                    customMapStyle: userDefaults.customMapStyle,
                                    isBatterySaveModeActive: userDefaults.isBatterySaveModeActive)
         
-        
         if let userID = user?.uid {
             do {
                 try realm.write({
@@ -83,7 +82,7 @@ class MapViewModel: NSObject, MapViewModelProtocol {
     }
     
     func getMyLocation() -> CLLocation? {
-        return locationManager.location
+        locationManager.location
     }
     
     func saveCameraPosition(latitude: Double, longitude: Double, zoom: Float) {
@@ -110,18 +109,18 @@ class MapViewModel: NSObject, MapViewModelProtocol {
         }
     }
     
-    //Marker adding helpers
+    // Marker adding helpers
     func createNewMarker(_ mapView: GMSMapView, didTapAt coordinate: CLLocationCoordinate2D) -> GMSMarker {
         let newMarker = GMSMarker()
         newMarker.map = mapView
         newMarker.isDraggable = true
-        newMarker.icon = UIImage(systemName: K.systemImages.dotCircle)?.imageScaled(to: CGSize(width: 30, height: 30))
+        newMarker.icon = UIImage(systemName: K.SystemImages.dotCircle)?.imageScaled(to: CGSize(width: 30, height: 30))
         newMarker.groundAnchor = .init(x: 0.5, y: 0.5)
         newMarker.position = CLLocationCoordinate2D(latitude: coordinate.latitude, longitude: coordinate.longitude)
         return newMarker
     }
     
-    func findClosestMarkers(newMarker: GMSMarker, markers: [GMSMarker]) -> (Int,Int) {
+    func findClosestMarkers(newMarker: GMSMarker, markers: [GMSMarker]) -> (Int, Int) {
         var closestMarkerIndex = 0
         var secondClosestMarkerIndex = 0
         var closestDistance = Double.greatestFiniteMagnitude
@@ -144,7 +143,7 @@ class MapViewModel: NSObject, MapViewModelProtocol {
     fileprivate func createUserDefaults() {
         let userDefaults = UserDefaults()
         userDefaults.title = ""
-        userDefaults.mapType = K.mapTypes.satellite
+        userDefaults.mapType = K.MapTypes.satellite
         userDefaults.cameraPosition = CameraPosition()
         if let latitude = locationManager.location?.coordinate.latitude, let longitude = locationManager.location?.coordinate.longitude {
             userDefaults.cameraPosition?.latitude = latitude
@@ -168,11 +167,9 @@ class MapViewModel: NSObject, MapViewModelProtocol {
 }
 
 extension MapViewModel: CLLocationManagerDelegate {
-    //MARK: - Location Manager delegates
+    // MARK: - Location Manager delegates
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         locationManager.stopUpdatingLocation()
         viewController?.setMapViewLocationEnabled(isEnabled: true)
     }
 }
-
-

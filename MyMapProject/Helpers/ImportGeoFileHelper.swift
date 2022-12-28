@@ -43,8 +43,8 @@ class GeoJSON {
                 print(counter)
                 counter += 1
                 if let feature = feature as? GMUFeature {
-                    //print(feature.properties?.keys)
-                    //print(feature.properties?.values)
+                    // print(feature.properties?.keys)
+                    // print(feature.properties?.values)
                     
                     var title = "untitled"
                     var color = UIColor.flatBlueDark().hexValue()
@@ -58,11 +58,11 @@ class GeoJSON {
                     
                     if let color1 = feature.properties?["fill"] as? String {
                         color = color1
-                    } else if let color1 = feature.properties?["color"] as? String{
+                    } else if let color1 = feature.properties?["color"] as? String {
                         color = color1
-                    } else if let color1 = feature.properties?["fillColor"] as? String{
+                    } else if let color1 = feature.properties?["fillColor"] as? String {
                         color = color1
-                    } else if let color1 = feature.properties?["marker-color"] as? String{
+                    } else if let color1 = feature.properties?["marker-color"] as? String {
                         color = color1
                     }
                     
@@ -85,7 +85,7 @@ class GeoJSON {
                             markers.append(marker)
                         }
                         markers.removeDuplicates()
-                        if linesController.lines!.count < K.freeAccountLimitations.overlayLimit {
+                        if linesController.lines!.count < K.FreeAccountLimitations.overlayLimit {
                             if markers.count > 1 {
                                 
                                 linesController.addLine(title: title, color: color, initialMarkers: markers, mapView: mapView, isGeodesic: true, id: nil)
@@ -104,7 +104,7 @@ class GeoJSON {
                             }
                             markers.removeDuplicates()
                             
-                            if fieldsController.fields!.count < K.freeAccountLimitations.overlayLimit {
+                            if fieldsController.fields!.count < K.FreeAccountLimitations.overlayLimit {
                                 if markers.count > 2 {
                                     
                                     fieldsController.addField(title: title, groupTitle: group, color: color, initialMarkers: markers, id: nil, isGeodesic: true)
@@ -118,10 +118,9 @@ class GeoJSON {
                         
                         let marker = GMSMarker(position: place.coordinate)
                         
-                        if placesController.places!.count < K.freeAccountLimitations.overlayLimit {
+                        if placesController.places!.count < K.FreeAccountLimitations.overlayLimit {
                             placesController.addPlace(title: title, color: color, mapView: mapView, initialMarker: marker, id: nil, iconSize: nil)
                         }
-                        
                         
                     }
                 }

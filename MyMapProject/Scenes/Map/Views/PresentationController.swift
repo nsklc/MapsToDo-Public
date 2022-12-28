@@ -10,7 +10,7 @@ import UIKit
 
 class PresentationController: UIPresentationController {
     
-    //let blurEffectView: UIVisualEffectView!
+    // let blurEffectView: UIVisualEffectView!
     var tapGestureRecognizer: UITapGestureRecognizer = UITapGestureRecognizer()
     
     override init(presentedViewController: UIViewController, presenting presentingViewController: UIViewController?) {
@@ -31,16 +31,16 @@ class PresentationController: UIPresentationController {
         self.presentedViewController.transitionCoordinator?.animate(alongsideTransition: { [self] (UIViewControllerTransitionCoordinatorContext) in
             
             presentedView?.frame = frameOfPresentedViewInContainerView
-            //self.blurEffectView.alpha = 0.5
+            // self.blurEffectView.alpha = 0.5
             
-        }, completion: { (UIViewControllerTransitionCoordinatorContext) in })
+        }, completion: { (_) in })
     }
     
     override func dismissalTransitionWillBegin() {
-        self.presentedViewController.transitionCoordinator?.animate(alongsideTransition: { (UIViewControllerTransitionCoordinatorContext) in
-            //self.blurEffectView.alpha = 0
-        }, completion: { (UIViewControllerTransitionCoordinatorContext) in
-            //self.blurEffectView.removeFromSuperview()
+        self.presentedViewController.transitionCoordinator?.animate(alongsideTransition: { (_) in
+            // self.blurEffectView.alpha = 0
+        }, completion: { (_) in
+            // self.blurEffectView.removeFromSuperview()
         })
     }
     
@@ -52,11 +52,10 @@ class PresentationController: UIPresentationController {
     override func containerViewDidLayoutSubviews() {
         super.containerViewDidLayoutSubviews()
         presentedView?.frame = frameOfPresentedViewInContainerView
-        //blurEffectView.frame = containerView!.bounds
+        // blurEffectView.frame = containerView!.bounds
     }
     
-    
-    @objc func dismissController(){
+    @objc func dismissController() {
         self.presentedViewController.dismiss(animated: true, completion: nil)
     }
 }

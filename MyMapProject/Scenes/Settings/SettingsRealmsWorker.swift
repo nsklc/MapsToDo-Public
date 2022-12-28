@@ -14,7 +14,7 @@ import RealmSwift
 
 class SettingsRealmsWorker {
     
-    private let realm = try! Realm()
+    private let realm: Realm! = try? Realm()
     private var userDefaults: Results<UserDefaults>!
     
     init() {
@@ -22,7 +22,7 @@ class SettingsRealmsWorker {
         userDefaults = realm.objects(UserDefaults.self)
     }
     
-    //MARK: - getShowDistancesBetweenTwoCorners
+    // MARK: - getShowDistancesBetweenTwoCorners
     func getShowDistancesBetweenTwoCorners() -> Bool? {
         if let userDefaults = userDefaults.first {
             return userDefaults.showDistancesBetweenTwoCorners
@@ -30,7 +30,7 @@ class SettingsRealmsWorker {
         return nil
     }
     
-    //MARK: - setIsShowAllUnitsSelected
+    // MARK: - setIsShowAllUnitsSelected
     func setIsShowAllUnitsSelected(with isSwitchOn: Bool) {
         guard let userDefaults = userDefaults, let userDefaultsFirst = userDefaults.first else { return }
         do {
@@ -42,7 +42,7 @@ class SettingsRealmsWorker {
         }
     }
     
-    //MARK: - showAllSwitchValueChanged
+    // MARK: - showAllSwitchValueChanged
     func setShowAll(isSwitchOn: Bool) {
         guard let userDefaults = userDefaults, let userDefaultsFirst = userDefaults.first else { return }
         do {
@@ -54,7 +54,7 @@ class SettingsRealmsWorker {
         }
     }
     
-    //MARK: - setGeodesicCorrection
+    // MARK: - setGeodesicCorrection
     func setGeodesicCorrection(with isSwitchOn: Bool) {
         guard let userDefaults = userDefaults, let userDefaultsFirst = userDefaults.first else { return }
         do {
@@ -66,7 +66,7 @@ class SettingsRealmsWorker {
         }
     }
     
-    //MARK: - setBatterySaving
+    // MARK: - setBatterySaving
     func setBatterySaving(with isSwitchOn: Bool) {
         guard let userDefaults = userDefaults, let userDefaultsFirst = userDefaults.first else { return }
         do {
@@ -78,7 +78,7 @@ class SettingsRealmsWorker {
         }
     }
     
-    //MARK: - setLowDataSwitch
+    // MARK: - setLowDataSwitch
     func setLowDataSwitch(with isSwitchOn: Bool) {
         guard let userDefaults = userDefaults, let userDefaultsFirst = userDefaults.first else { return }
         do {

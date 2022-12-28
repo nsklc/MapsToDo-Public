@@ -24,7 +24,7 @@ class LineListViewController: SwipeTableViewController, UITextFieldDelegate {
         
         title = NSLocalizedString("Lines", comment: "")
         
-        tableView.backgroundView = UIImageView(image: UIImage(named: K.imagesFromXCAssets.line3))
+        tableView.backgroundView = UIImageView(image: UIImage(named: K.ImagesFromXCAssets.line3))
         
         tableView.backgroundView?.alpha = 0.3
         
@@ -48,7 +48,7 @@ class LineListViewController: SwipeTableViewController, UITextFieldDelegate {
         
         linesController.selectedLine = lines[indexPath.row]
         
-        let deleteAction = SwipeAction(style: .destructive, title: NSLocalizedString("Delete", comment: "")) { [self] action, indexPath in
+        let deleteAction = SwipeAction(style: .destructive, title: NSLocalizedString("Delete", comment: "")) { [self] _, _ in
             
             AlertsHelper.deleteAlert(on: self,
                                      with: .line,
@@ -65,18 +65,18 @@ class LineListViewController: SwipeTableViewController, UITextFieldDelegate {
         }
         
         // customize the action appearance
-        //deleteAction.image = UIImage(named: "delete-icon")
-        deleteAction.image = UIImage(systemName: K.systemImages.trashFill)
+        // deleteAction.image = UIImage(named: "delete-icon")
+        deleteAction.image = UIImage(systemName: K.SystemImages.trashFill)
         
-        let findInTheMap = SwipeAction(style: .default, title: NSLocalizedString("Location", comment: "")) { action, indexPath in
+        let findInTheMap = SwipeAction(style: .default, title: NSLocalizedString("Location", comment: "")) { _, _ in
             self.goBackToMapView()
         }
 
         // customize the action appearance
-        findInTheMap.image = UIImage(systemName: K.systemImages.locationFill)
+        findInTheMap.image = UIImage(systemName: K.SystemImages.locationFill)
         findInTheMap.backgroundColor = #colorLiteral(red: 0.03921568627, green: 0.5176470588, blue: 1, alpha: 1)
         
-        let changeTitle = SwipeAction(style: .default, title: NSLocalizedString("Title", comment: "")) { action, indexPath in
+        let changeTitle = SwipeAction(style: .default, title: NSLocalizedString("Title", comment: "")) { _, indexPath in
             guard let linesController = self.linesController,
                     let lines = linesController.lines else { return }
             AlertsHelper.changeTitleAlert(on: self,
@@ -88,7 +88,7 @@ class LineListViewController: SwipeTableViewController, UITextFieldDelegate {
         }
 
         // customize the action appearance
-        changeTitle.image = UIImage(systemName: K.systemImages.rectangleAndPencilAndEllipsisrtl)
+        changeTitle.image = UIImage(systemName: K.SystemImages.rectangleAndPencilAndEllipsisrtl)
         if lines[indexPath.row].color != UIColor.flatYellow().hexValue() {
             changeTitle.backgroundColor = UIColor.flatYellow()
         } else {
@@ -99,26 +99,26 @@ class LineListViewController: SwipeTableViewController, UITextFieldDelegate {
     }
     
     func goBackToMapView() {
-        performSegue(withIdentifier: K.segueIdentifiers.lineListToMapView, sender: self)
+        performSegue(withIdentifier: K.SegueIdentifiers.lineListToMapView, sender: self)
     }
     
     @objc func back(sender: UIBarButtonItem) {
         _ = navigationController?.popViewController(animated: true)
-        //performSegue(withIdentifier: "lineListToMapView", sender: self)
+        // performSegue(withIdentifier: "lineListToMapView", sender: self)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == K.segueIdentifiers.goToItems {
-            let destinationVC = segue.destination as! ToDoListViewController
+        if segue.identifier == K.SegueIdentifiers.goToItems {
+            let destinationVC = segue.destination as? ToDoListViewController
             
             if let indexPath = tableView.indexPathForSelectedRow {
-                destinationVC.selectedLine = linesController?.lines?[indexPath.row]
+                destinationVC?.selectedLine = linesController?.lines?[indexPath.row]
             }
-        } else if segue.identifier == K.segueIdentifiers.lineListToMapView {
+        } else if segue.identifier == K.SegueIdentifiers.lineListToMapView {
             
-            let destinationVC = segue.destination as! MapViewController
+            let destinationVC = segue.destination as? MapViewController
             if let cameraPositionPath = cameraPositionPath {
-                destinationVC.cameraPositionPath = cameraPositionPath
+                destinationVC?.cameraPositionPath = cameraPositionPath
             }
             
         }
@@ -147,10 +147,10 @@ class LineListViewController: SwipeTableViewController, UITextFieldDelegate {
         return updatedText.count <= 20
     }
     
-    //MARK: - TableView DataSource Methods
+    // MARK: - TableView DataSource Methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return linesController?.lines!.count ?? 1
+        linesController?.lines!.count ?? 1
        }
 
     /*override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -164,13 +164,13 @@ class LineListViewController: SwipeTableViewController, UITextFieldDelegate {
         
             let cell = super.tableView(tableView, cellForRowAt: indexPath)
           
-        if let line = linesController?.lines![indexPath.row]{
+        if let line = linesController?.lines![indexPath.row] {
         
-            //cell.textLabel!.text = line.title
+            // cell.textLabel!.text = line.title
         
             guard let lineColor =  UIColor(hexString: line.color) else {fatalError()}
             
-            //cell.backgroundColor = lineColor
+            // cell.backgroundColor = lineColor
         
             let length = Measurement(value: line.length, unit: UnitLength.meters)
             
@@ -203,7 +203,7 @@ class LineListViewController: SwipeTableViewController, UITextFieldDelegate {
                     break
                 }
             }
-            //cell.textLabel?.textColor = ContrastColorOf(lineColor, returnFlat: true)
+            // cell.textLabel?.textColor = ContrastColorOf(lineColor, returnFlat: true)
             
             cell.detailTextLabel?.textColor = UIColor.flatBlack()
             
@@ -226,9 +226,9 @@ class LineListViewController: SwipeTableViewController, UITextFieldDelegate {
             return cell
        }
     
-    //MARK: - Table Delegate Methods
+    // MARK: - Table Delegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        performSegue(withIdentifier: K.segueIdentifiers.goToItems, sender: self)
+        performSegue(withIdentifier: K.SegueIdentifiers.goToItems, sender: self)
     }
 }

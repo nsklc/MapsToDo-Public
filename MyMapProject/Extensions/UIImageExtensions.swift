@@ -17,9 +17,9 @@ extension UIImage {
         return img
     }
     
-    static func makeIconView(iconSize: Int, length : Double, isMetric: Bool, distanceUnit: Int, isTappable: Bool) -> UIImageView {
+    static func makeIconView(iconSize: Int, length: Double, isMetric: Bool, distanceUnit: Int, isTappable: Bool) -> UIImageView {
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: iconSize, height: iconSize/2))
-        label.backgroundColor = UIColor(hexString: K.colors.primaryColor)
+        label.backgroundColor = UIColor(hexString: K.Colors.primaryColor)
         let lengthWithUnit = Measurement.init(value: length, unit: UnitLength.meters)
         
         let formatter = MeasurementFormatter()
@@ -29,24 +29,24 @@ extension UIImage {
         if isMetric {
             switch distanceUnit {
             case 0:
-                label.text = formatter.string(from:lengthWithUnit.converted(to: UnitLength.centimeters))
+                label.text = formatter.string(from: lengthWithUnit.converted(to: UnitLength.centimeters))
             case 1:
-                label.text = formatter.string(from:lengthWithUnit.converted(to: UnitLength.meters))
+                label.text = formatter.string(from: lengthWithUnit.converted(to: UnitLength.meters))
             case 2:
-                label.text = formatter.string(from:lengthWithUnit.converted(to: UnitLength.kilometers))
+                label.text = formatter.string(from: lengthWithUnit.converted(to: UnitLength.kilometers))
             default:
                 break
             }
         } else {
             switch distanceUnit {
             case 0:
-                label.text = formatter.string(from:lengthWithUnit.converted(to: UnitLength.inches))
+                label.text = formatter.string(from: lengthWithUnit.converted(to: UnitLength.inches))
             case 1:
-                label.text = formatter.string(from:lengthWithUnit.converted(to: UnitLength.feet))
+                label.text = formatter.string(from: lengthWithUnit.converted(to: UnitLength.feet))
             case 2:
-                label.text = formatter.string(from:lengthWithUnit.converted(to: UnitLength.yards))
+                label.text = formatter.string(from: lengthWithUnit.converted(to: UnitLength.yards))
             case 3:
-                label.text = formatter.string(from:lengthWithUnit.converted(to: UnitLength.miles))
+                label.text = formatter.string(from: lengthWithUnit.converted(to: UnitLength.miles))
             default:
                 break
             }
@@ -66,7 +66,7 @@ extension UIImage {
     }
     static func makeIconView(iconSize: Int, lat: Double, lon: Double) -> UIImageView {
         let label = UILabel(frame: CGRect(x: 0, y: 0, width: iconSize, height: iconSize/2))
-        label.backgroundColor = UIColor(hexString: K.colors.primaryColor)
+        label.backgroundColor = UIColor(hexString: K.Colors.primaryColor)
         label.text = "Lat: \(String(format: "%.4f", lat)) Lon: \(String(format: "%.4f", lon))"
         label.sizeToFit()
         label.textColor = UIColor.flatBlack()

@@ -17,7 +17,7 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
     var cameraPositionPath: GMSPath?
     var selectedGroup: Group?
     var isMetric: Bool?
-    var groupsCollectionView:UICollectionView?
+    var groupsCollectionView: UICollectionView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -25,7 +25,7 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
         fieldsController.loadFieldsAndGroups()
         self.tableView.reloadData()
         
-        tableView.backgroundView = UIImageView(image: UIImage(named: K.imagesFromXCAssets.picture7))
+        tableView.backgroundView = UIImageView(image: UIImage(named: K.ImagesFromXCAssets.picture7))
         tableView.backgroundView?.alpha = 0.3
         
     }
@@ -37,7 +37,7 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
     func hideFilterGroupCollection(hide: Bool) {
         groupsCollectionView?.isHidden = hide
     }
-    //MARK: - viewWillAppear
+    // MARK: - viewWillAppear
     override func viewWillAppear(_ animated: Bool) {
         
         let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
@@ -73,16 +73,15 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
         return options
     }
     
-    //MARK: - editActionsForRowAt
+    // MARK: - editActionsForRowAt
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
         guard orientation == .right, let fieldsController = fieldsController else { return nil }
-        
         
         if let polygon = self.fieldsController.polygons.first(where: {$0.title == fieldsController.fields![indexPath.row].id}) {
             cameraPositionPath = polygon.path
         }
         
-        let deleteAction = SwipeAction(style: .destructive, title: NSLocalizedString("Delete", comment: "")) { [self] action, indexPath in
+        let deleteAction = SwipeAction(style: .destructive, title: NSLocalizedString("Delete", comment: "")) { [self] _, indexPath in
             // handle action by updating model with deletion
             
             deleteField(field: (fieldsController.fields![indexPath.row]))
@@ -90,21 +89,21 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
         }
         
         // customize the action appearance
-        deleteAction.image = UIImage(systemName: K.systemImages.trashFill)
+        deleteAction.image = UIImage(systemName: K.SystemImages.trashFill)
         
-        let findInTheMap = SwipeAction(style: .default, title: NSLocalizedString("Location", comment: "") ) { action, indexPath in
+        let findInTheMap = SwipeAction(style: .default, title: NSLocalizedString("Location", comment: "") ) { _, _ in
             // handle action by updating model with go to map
             
-            //_ = self.navigationController?.popViewController(animated: true)
+            // _ = self.navigationController?.popViewController(animated: true)
             self.goBackToMapView()
             
         }
         
         // customize the action appearance
-        findInTheMap.image = UIImage(systemName: K.systemImages.locationFill)
+        findInTheMap.image = UIImage(systemName: K.SystemImages.locationFill)
         findInTheMap.backgroundColor = #colorLiteral(red: 0.03921568627, green: 0.5176470588, blue: 1, alpha: 1)
         
-        let changeTitle = SwipeAction(style: .default, title: NSLocalizedString("Title", comment: "")) { action, indexPath in
+        let changeTitle = SwipeAction(style: .default, title: NSLocalizedString("Title", comment: "")) { _, indexPath in
             guard let fieldsControllerFields = fieldsController.fields else { return }
             AlertsHelper.changeTitleAlert(on: self,
                                           title: fieldsControllerFields[indexPath.row].title,
@@ -116,15 +115,14 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
         }
         
         // customize the action appearance
-        changeTitle.image = UIImage(systemName: K.systemImages.rectangleAndPencilAndEllipsisrtl)
+        changeTitle.image = UIImage(systemName: K.SystemImages.rectangleAndPencilAndEllipsisrtl)
         if fieldsController.fields![indexPath.row].color != UIColor.flatYellow().hexValue() {
             changeTitle.backgroundColor = UIColor.flatYellow()
         } else {
             changeTitle.backgroundColor = UIColor.flatBlue()
         }
         
-        
-        let changeGroup = SwipeAction(style: .default, title: NSLocalizedString("Group", comment: "")) { action, indexPath in
+        let changeGroup = SwipeAction(style: .default, title: NSLocalizedString("Group", comment: "")) { _, indexPath in
             
             guard let fieldsController = self.fieldsController,
                   let fields = fieldsController.fields else { return }
@@ -141,11 +139,11 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
                            let polygon = self.fieldsController.polygons.first(where: {$0.title == field.id}) {
                             fieldsController.changeFieldGroup(field: field, oldGroup: oldGroup, newGroup: newGroup, polygon: polygon)
                             fieldsController.changeFieldGroupAtCloud(field: field, newGroup: newGroup)
-                            fieldsController.setColor(color: newGroup.color, field: field)
+                            fieldsController.setColor(colorHex: newGroup.color, field: field)
                             fieldsController.saveColor(field: field, color: newGroup.color)
                         }
                     } else {
-                        if groupTitle.count != 0 {
+                        if groupTitle.isEmpty {
                             if let oldGroup = field.parentGroup.first,
                                 let polygon = self.fieldsController.polygons.first(where: {$0.title == field.id}) {
                                 let newGroup = Group()
@@ -168,7 +166,7 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
         }
         
         // customize the action appearance
-        changeGroup.image = UIImage(systemName: K.systemImages.rectangleAndPencilAndEllipsisrtl)
+        changeGroup.image = UIImage(systemName: K.SystemImages.rectangleAndPencilAndEllipsisrtl)
         if let fields = fieldsController.fields, fields[indexPath.row].color != UIColor.flatLime().hexValue() {
             changeGroup.backgroundColor = UIColor.flatLime()
         } else {
@@ -177,7 +175,7 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
         
         return [deleteAction, findInTheMap, changeTitle, changeGroup]
     }
-    //MARK: - deleteField
+    // MARK: - deleteField
     func deleteField(field: Field) {
         fieldsController.selectedField = field
         AlertsHelper.deleteAlert(on: self,
@@ -214,20 +212,20 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
         return updatedText.count <= 20
     }
     
-    //MARK: - goBackToMapView
+    // MARK: - goBackToMapView
     func goBackToMapView() {
-        performSegue(withIdentifier: K.segueIdentifiers.backToMapView, sender: self)
+        performSegue(withIdentifier: K.SegueIdentifiers.backToMapView, sender: self)
     }
-    //MARK: - prepare
+    // MARK: - prepare
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == K.segueIdentifiers.goToItems {
-            let destinationVC = segue.destination as! ToDoListViewController
+        if segue.identifier == K.SegueIdentifiers.goToItems {
+            let destinationVC = segue.destination as? ToDoListViewController
             
             if let indexPath = tableView.indexPathForSelectedRow {
-                destinationVC.selectedGroup = fieldsController.fields?[indexPath.row].parentGroup.first
-                destinationVC.selectedField = fieldsController.fields?[indexPath.row]
+                destinationVC?.selectedGroup = fieldsController.fields?[indexPath.row].parentGroup.first
+                destinationVC?.selectedField = fieldsController.fields?[indexPath.row]
             }
-        } else if segue.identifier == K.segueIdentifiers.backToMapView {
+        } else if segue.identifier == K.SegueIdentifiers.backToMapView {
             
             let destinationVC = segue.destination as? MapViewController
             if let cameraPositionPath = cameraPositionPath {
@@ -236,18 +234,18 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
             
         }
     }
-    //MARK: - TableView DataSource Methods
+    // MARK: - TableView DataSource Methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return fieldsController.fields?.count ?? 1
+        fieldsController.fields?.count ?? 1
     }
     
-    //MARK: - cellForRowAt
+    // MARK: - cellForRowAt
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
-        if let field = fieldsController.fields?[indexPath.row]{
+        if let field = fieldsController.fields?[indexPath.row] {
             
             cell.textLabel!.text = field.title
             
@@ -267,24 +265,24 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
             cell.addSubview(label)
             label.heightAnchor.constraint(equalTo: cell.heightAnchor, constant: 0).isActive = true
             label.widthAnchor.constraint(equalTo: cell.widthAnchor, multiplier: 0.4).isActive = true
-            //label.centerXAnchor.constraint(equalTo: cell.centerXAnchor, constant: 0).isActive = true
+            // label.centerXAnchor.constraint(equalTo: cell.centerXAnchor, constant: 0).isActive = true
             label.rightAnchor.constraint(equalTo: cell.rightAnchor, constant: 0).isActive = true
         }
         cell.backgroundColor = UIColor.clear
-        //cell.contentView.alpha = 0.5
+        // cell.contentView.alpha = 0.5
         return cell
     }
     
-    //MARK: - Table Delegate Methods
+    // MARK: - Table Delegate Methods
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        performSegue(withIdentifier: K.segueIdentifiers.goToItems, sender: self)
+        performSegue(withIdentifier: K.SegueIdentifiers.goToItems, sender: self)
     }
     
 }
 
 extension FieldListViewController: UINavigationControllerDelegate, UICollectionViewDataSource, UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return (fieldsController.groups?.count ?? 0 ) + 1
+        (fieldsController.groups?.count ?? 0 ) + 1
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -295,7 +293,7 @@ extension FieldListViewController: UINavigationControllerDelegate, UICollectionV
         if let groups = fieldsController.groups, indexPath.row != groups.count {
             myCell.backgroundColor = UIColor(hexString: (fieldsController.groups![indexPath.row].color))
             
-            title.textColor = ContrastColorOf( UIColor(hexString: (fieldsController.groups![indexPath.row].color))! , returnFlat: true)
+            title.textColor = ContrastColorOf( UIColor(hexString: (fieldsController.groups![indexPath.row].color))!, returnFlat: true)
             
             title.text = fieldsController.groups![indexPath.row].title
         } else {

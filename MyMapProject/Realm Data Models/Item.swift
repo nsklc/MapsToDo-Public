@@ -20,6 +20,6 @@ class Item: Object {
     @objc dynamic var parentID = ""
     
     override static func primaryKey() -> String? {
-        return "id"
+        "id"
     }
 }

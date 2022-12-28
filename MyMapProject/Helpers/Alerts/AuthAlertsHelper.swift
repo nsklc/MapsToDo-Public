@@ -20,7 +20,9 @@ class AuthAlertsHelper: BaseAlertHelper {
     }
     
     static func changePasswordAlert(on vc: UIViewController, changePasswordAction: @escaping () -> Void, sendEmailAction: @escaping () -> Void) {
-        let ac = UIAlertController(title: NSLocalizedString("Change Password", comment: ""), message: NSLocalizedString("If you select 'send email', a password forgot mail will be sent", comment: ""), preferredStyle: .alert)
+        let ac = UIAlertController(title: NSLocalizedString("Change Password", comment: ""),
+                                   message: NSLocalizedString("If you select 'send email', a password forgot mail will be sent", comment: ""),
+                                   preferredStyle: .alert)
         let changePasswordAction = UIAlertAction(title: NSLocalizedString("Enter Password", comment: ""), style: .default) {_ in
             changePasswordAction()
         }
@@ -49,7 +51,6 @@ class AuthAlertsHelper: BaseAlertHelper {
         textFields[0].isSecureTextEntry = true
         textFields[1].isSecureTextEntry = true
         textFields[2].isSecureTextEntry = true
-        
 
         let submitAction = UIAlertAction(title: NSLocalizedString("Submit", comment: ""), style: .default) { [unowned ac] _ in
             if let password = ac.textFields![0].text,
@@ -57,7 +58,7 @@ class AuthAlertsHelper: BaseAlertHelper {
                let newPassword1 = ac.textFields![2].text {
                 submitAction(password, newPassword, newPassword1)
             }
-          }
+        }
         let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .destructive)
         ac.addAction(cancelAction)
         ac.addAction(submitAction)

@@ -13,12 +13,12 @@ import Firebase
 import FirebaseFirestore
 
 class PlacesController {
-    let realm = try! Realm()
+    let realm: Realm! = try? Realm()
     
     var userDefaults: Results<UserDefaults>?
     
     var places: Results<Place>?
-    //var groundOverlays = [GMSGroundOverlay]()
+    // var groundOverlays = [GMSGroundOverlay]()
     
     var placeMarkers = [GMSMarker]()
     
@@ -27,7 +27,7 @@ class PlacesController {
     lazy var updatedColor = ""
     lazy var updatedIconSize: Float = 0.003
     var selectedPlace = Place() {
-        didSet{
+        didSet {
             if let marker = placeMarkers.first(where: {$0.title == selectedPlace.id}) {
                 selectedPlaceMarker = marker
             }
@@ -39,11 +39,11 @@ class PlacesController {
     let db = Firestore.firestore()
     let user = Auth.auth().currentUser
     
-    //MARK: - loadPlaces
+    // MARK: - loadPlaces
     func loadPlaces() {
         places = realm.objects(Place.self)
     }
-    //MARK: - init
+    // MARK: - init
     init(mapView: GMSMapView) {
         userDefaults = realm.objects(UserDefaults.self)
         listenPlaceDocuments(mapView: mapView)
@@ -56,7 +56,7 @@ class PlacesController {
                                         
                     let newPlaceMarker = GMSMarker(position: CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
                     newPlaceMarker.title = place.id
-                    //newPlaceMarker.icon = newPlaceMarker.icon?.withTintColor(UIColor(hexString: place.color) ?? UIColor.flatBlueDark() , renderingMode: .automatic)
+                    // newPlaceMarker.icon = newPlaceMarker.icon?.withTintColor(UIColor(hexString: place.color) ?? UIColor.flatBlueDark() , renderingMode: .automatic)
                     newPlaceMarker.icon = makeIconView(title: "", color: place.color)
                     newPlaceMarker.isTappable = true
                     
@@ -66,7 +66,7 @@ class PlacesController {
             }
         }
     }
-    //MARK: - addPlace
+    // MARK: - addPlace
     func addPlace(title: String, color: String, mapView: GMSMapView, initialMarker: GMSMarker, id: String?, iconSize: Float?) {
         let place = Place()
         if let id = id {
@@ -102,7 +102,7 @@ class PlacesController {
         }
         loadPlaces()
     }
-    //MARK: - checkTitleAvailable
+    // MARK: - checkTitleAvailable
     func checkTitleAvailable(title: String) -> String {
         var isValidName = true
         var errorMessage = "Place needs a title."
@@ -122,20 +122,20 @@ class PlacesController {
             return errorMessage
         }
     }
-    //MARK: - changeGroundOverlayTappableBoolean
+    // MARK: - changeGroundOverlayTappableBoolean
     func changeGroundOverlayTappableBoolean(to tapable: Bool) {
         for marker in placeMarkers {
             marker.isTappable = tapable
         }
     }
-    //MARK: - setColor
-    func setColor(color: String, place: Place, mapView: GMSMapView){
+    // MARK: - setColor
+    func setColor(color: String, place: Place, mapView: GMSMapView) {
         selectedPlaceMarker.map = nil
         updatedColor = color
         selectedPlaceMarker.icon = makeIconView(title: "", color: color)
         selectedPlaceMarker.map = mapView
     }
-    //MARK: - makeIconView
+    // MARK: - makeIconView
     func makeIconView(title: String, color: String) -> UIImage {
         /*let label = UILabel(frame: CGRect(x: 0, y: 0, width: 500, height: 500))
         label.text = title
@@ -174,21 +174,21 @@ class PlacesController {
         
         let size: CGSize = tempmarker.icon?.size ?? CGSize(width: 100, height: 100)
         
-        //let bottomImage = UIImage(systemName: "building.2.fill")!.imageScaled(to: size).withTintColor(UIColor(hexString: color) ?? UIColor.flatMint())
+        // let bottomImage = UIImage(systemName: "building.2.fill")!.imageScaled(to: size).withTintColor(UIColor(hexString: color) ?? UIColor.flatMint())
         let bottomImage = UIImage(systemName: "pin.fill")!.imageScaled(to: size).withTintColor(UIColor(hexString: color) ?? UIColor.flatMint())
         
         return bottomImage.imageScaled(to: CGSize(width: 35, height: 35))
     }
-    //MARK: - increaseIconSize
+    // MARK: - increaseIconSize
     func increaseIconSize(place: Place, mapView: GMSMapView) {
        
     }
-    //MARK: - decreaseIconSize
+    // MARK: - decreaseIconSize
     func decreaseIconSize(place: Place, mapView: GMSMapView) {
      
     }
     
-    //MARK: - savePlaceToDB
+    // MARK: - savePlaceToDB
     func savePlaceToDB(place: Place, placeMarker: GMSMarker) {
         updateTime = Date()
         if let marker = placeMarkers.first(where: {$0.title == place.id}) {
@@ -211,7 +211,7 @@ class PlacesController {
         }
         savePlaceToCloud(place: place)
     }
-    //MARK: - changeTitle
+    // MARK: - changeTitle
     func changeTitle(for place: Place, title: String) {
         do {
             try self.realm.write({
@@ -222,7 +222,7 @@ class PlacesController {
         }
         changeTitleAtCloud(for: place, title: title)
     }
-    //MARK: - Delete Place From DB
+    // MARK: - Delete Place From DB
     func deletePlaceFromDB(place: Place) {
         if let placeMarker = placeMarkers.first(where: {$0.title == place.id}) {
             do {
@@ -239,15 +239,15 @@ class PlacesController {
         }
     }
     
-    //MARK: - FIREBASE
+    // MARK: - FIREBASE
     
-    //MARK: - savePlaceToCloud
+    // MARK: - savePlaceToCloud
     func savePlaceToCloud(place: Place) {
         if let user = user {
-            var photos = [[String : Any]]()
+            var photos = [[String: Any]]()
             
             for photo in place.photos {
-                photos.append([photo:""])
+                photos.append([photo: ""])
             }
             
             self.db.collection(userDefaults!.first!.bossID).document("Places").collection("Places").document(place.id).setData(["updatedBy": user.uid, place.id: place.dictionaryWithValues(forKeys: ["title", "color", "iconSize"]), "position": place.markerPosition!.dictionaryWithValues(forKeys: ["latitude", "longitude"]), "photos": photos], merge: true) { error in
@@ -255,24 +255,24 @@ class PlacesController {
                     print(error.localizedDescription)
                 }
             }
-            self.db.collection(user.uid).document("Places").setData([place.id : self.updateTime], merge: true)
+            self.db.collection(user.uid).document("Places").setData([place.id: self.updateTime], merge: true)
         }
     }
-    //MARK: - changeTitleAtCloud
+    // MARK: - changeTitleAtCloud
     func changeTitleAtCloud(for place: Place, title: String) {
         if let user = user {
             self.db.collection(userDefaults!.first!.bossID).document("Places").collection("Places").document(place.id).setData(["updatedBy": user.uid, place.id: place.dictionaryWithValues(forKeys: ["title"])], merge: true)
-            self.db.collection(user.uid).document("Places").setData([place.id : self.updateTime], merge: true)
+            self.db.collection(user.uid).document("Places").setData([place.id: self.updateTime], merge: true)
         }
     }
-    //MARK: - deletePlaceFromCloud
+    // MARK: - deletePlaceFromCloud
     func deletePlaceFromCloud(place: Place) {
         if user != nil {
             self.db.collection(userDefaults!.first!.bossID).document("Places").collection("Places").document(place.id).delete()
-            self.db.collection(userDefaults!.first!.bossID).document("Places").updateData([place.id : FieldValue.delete()])
+            self.db.collection(userDefaults!.first!.bossID).document("Places").updateData([place.id: FieldValue.delete()])
         }
     }
-    //MARK: - listenPlaceDocuments
+    // MARK: - listenPlaceDocuments
     func listenPlaceDocuments(mapView: GMSMapView) {
         if let user = user {
             self.db.collection(userDefaults!.first!.bossID).document("Places").collection("Places").addSnapshotListener { [self] querySnapshot, error in
@@ -281,16 +281,16 @@ class PlacesController {
                     return
                 }
                 snapshot.documentChanges.forEach { diff in
-                    //MARK: - added
-                    if (diff.type == .added) {
-                        //print("New place: \(diff.document.data())")
-                        //print(diff.document.documentID)
+                    // MARK: - added
+                    if diff.type == .added {
+                        // print("New place: \(diff.document.data())")
+                        // print(diff.document.documentID)
                         if realm.object(ofType: Place.self, forPrimaryKey: diff.document.documentID) != nil {
                         } else {
-                            //if diff.document.data()["updatedBy"] as? String != user.uid {
+                            // if diff.document.data()["updatedBy"] as? String != user.uid {
                                 
-                                //print(diff.document.data())
-                                if let placeData = diff.document.data()[diff.document.documentID] as? [String:Any], let position = diff.document.data()["position"] as? [String:Any] {
+                                // print(diff.document.data())
+                                if let placeData = diff.document.data()[diff.document.documentID] as? [String: Any], let position = diff.document.data()["position"] as? [String: Any] {
                                     
                                     if let title = placeData["title"] as? String, let color = placeData["color"] as? String, let iconSize = placeData["iconSize"] as? Float {
                                         if let lat = position["latitude"] as? Double, let lon = position["longitude"] as? Double {
@@ -299,20 +299,20 @@ class PlacesController {
                                         }
                                     }
                                 }
-                            //}
+                            // }
                         }
                     }
-                    //MARK: - modified
-                    if (diff.type == .modified) {
-                        //print("Modified place: \(diff.document.data())")
+                    // MARK: - modified
+                    if diff.type == .modified {
+                        // print("Modified place: \(diff.document.data())")
                         if let specificPlace = realm.object(ofType: Place.self, forPrimaryKey: diff.document.documentID) {
                             if selectedPlace == specificPlace {
                                 let nc = NotificationCenter.default
                                 nc.post(name: Notification.Name("EndEditing"), object: nil)
                             }
                             if diff.document.data()["updatedBy"] as? String != user.uid {
-                                if let placeData = diff.document.data()[diff.document.documentID] as? [String:Any] {
-                                    if let title = placeData["title"] as? String, let color = placeData["color"] as? String, let iconSize = placeData["iconSize"] as? Float, let position = diff.document.data()["position"] as? [String:Any] {
+                                if let placeData = diff.document.data()[diff.document.documentID] as? [String: Any] {
+                                    if let title = placeData["title"] as? String, let color = placeData["color"] as? String, let iconSize = placeData["iconSize"] as? Float, let position = diff.document.data()["position"] as? [String: Any] {
                                         if let lat = position["latitude"] as? Double, let lon = position["longitude"] as? Double {
                                             do {
                                                 try realm.write({
@@ -347,9 +347,9 @@ class PlacesController {
                             }
                         }
                     }
-                    //MARK: - removed
-                    if (diff.type == .removed) {
-                        //print("Removed place: \(diff.document.data())")
+                    // MARK: - removed
+                    if diff.type == .removed {
+                        // print("Removed place: \(diff.document.data())")
                         if let specificPlace = realm.object(ofType: Place.self, forPrimaryKey: diff.document.documentID) {
                             if selectedPlace != specificPlace {
                                 deletePlaceFromDB(place: specificPlace)

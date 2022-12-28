@@ -13,7 +13,7 @@
 import UIKit
 
 @objc protocol SettingsRoutingLogic {
-    //func routeToSomewhere(segue: UIStoryboardSegue?)
+    // func routeToSomewhere(segue: UIStoryboardSegue?)
 }
 
 protocol SettingsDataPassing {
@@ -26,7 +26,7 @@ class SettingsRouter: NSObject, SettingsRoutingLogic, SettingsDataPassing {
 
 // MARK: Routing (navigating to other screens)
 
-//func routeToSomewhere(segue: UIStoryboardSegue?) {
+// func routeToSomewhere(segue: UIStoryboardSegue?) {
 //    if let segue = segue {
 //        let destinationVC = segue.destination as! SomewhereViewController
 //        var destinationDS = destinationVC.router!.dataStore!
@@ -38,13 +38,13 @@ class SettingsRouter: NSObject, SettingsRoutingLogic, SettingsDataPassing {
 //        passDataToSomewhere(source: dataStore!, destination: &destinationDS)
 //        navigateToSomewhere(source: viewController!, destination: destinationVC)
 //    }
-//}
+// }
 
 // MARK: Navigation to other screen
 
-//func navigateToSomewhere(source: SettingsViewController, destination: SomewhereViewController) {
+// func navigateToSomewhere(source: SettingsViewController, destination: SomewhereViewController) {
 //    source.show(destination, sender: nil)
-//}
+// }
 
 // MARK: Passing data to other screen
 

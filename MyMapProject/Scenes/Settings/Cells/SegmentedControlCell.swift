@@ -31,8 +31,8 @@ class SegmentedControlCell: UITableViewCell {
         self.contentView.isUserInteractionEnabled = false
         self.selectionStyle = .none
         self.backgroundColor = UIColor.clear
-        UISegmentedControl.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.flatWhite()], for: .selected)
-        UISegmentedControl.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor:UIColor.systemBlue], for: .normal)
+        UISegmentedControl.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.flatWhite()], for: .selected)
+        UISegmentedControl.appearance().setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.systemBlue], for: .normal)
     }
     
     func addLabel(with labelText: String) {
@@ -51,9 +51,9 @@ class SegmentedControlCell: UITableViewCell {
     
     func addSegmentedControl() {
         
-        segmentedControl.backgroundColor = UIColor(hexString: K.colors.primaryColor)
+        segmentedControl.backgroundColor = UIColor(hexString: K.Colors.primaryColor)
         segmentedControl.selectedSegmentTintColor = UIColor.systemBlue
-        segmentedControl.tintColor = UIColor(hexString: K.colors.thirdColor)
+        segmentedControl.tintColor = UIColor(hexString: K.Colors.thirdColor)
         
         segmentedControl.apportionsSegmentWidthsByContent = true
         segmentedControl.translatesAutoresizingMaskIntoConstraints = false

@@ -19,25 +19,23 @@ class PlaceListViewController: SwipeTableViewController, UINavigationControllerD
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
         placesController!.loadPlaces()
         tableView.reloadData()
         
         title = NSLocalizedString("Places", comment: "")
         
-        tableView.backgroundView = UIImageView(image: UIImage(named: K.imagesFromXCAssets.place8))
+        tableView.backgroundView = UIImageView(image: UIImage(named: K.ImagesFromXCAssets.place8))
         tableView.backgroundView?.alpha = 0.3
         
         tableView.separatorStyle = .singleLine
         
     }
-    //MARK: - viewWillAppear
+    // MARK: - viewWillAppear
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
     }
     
-    
-    //MARK: - editActionsForRowAt
+    // MARK: - editActionsForRowAt
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
         guard orientation == .right,
               let placesController = placesController,
@@ -45,9 +43,7 @@ class PlaceListViewController: SwipeTableViewController, UINavigationControllerD
         
         placesController.selectedPlace = places[indexPath.row]
         
-        
-        
-        let deleteAction = SwipeAction(style: .destructive, title: NSLocalizedString("Delete", comment: "")) { [self] action, indexPath in
+        let deleteAction = SwipeAction(style: .destructive, title: NSLocalizedString("Delete", comment: "")) { [self] _, _ in
             AlertsHelper.deleteAlert(on: self,
                                      with: .place,
                                      overlayTitle: placesController.selectedPlace.title) { [weak self] in
@@ -63,17 +59,17 @@ class PlaceListViewController: SwipeTableViewController, UINavigationControllerD
         path.add(CLLocationCoordinate2D(latitude: (self.placesController!.places?[indexPath.row].markerPosition?.latitude)!, longitude: (self.placesController!.places?[indexPath.row].markerPosition?.longitude)!))
         cameraPositionPath = path
         
-        deleteAction.image = UIImage(systemName: K.systemImages.trashFill)
+        deleteAction.image = UIImage(systemName: K.SystemImages.trashFill)
         
-        let findInTheMap = SwipeAction(style: .default, title: NSLocalizedString("Location", comment: "")) { action, indexPath in
+        let findInTheMap = SwipeAction(style: .default, title: NSLocalizedString("Location", comment: "")) { _, _ in
             self.goBackToMapView()
         }
         
         // customize the action appearance
-        findInTheMap.image = UIImage(systemName: K.systemImages.locationFill)
+        findInTheMap.image = UIImage(systemName: K.SystemImages.locationFill)
         findInTheMap.backgroundColor = #colorLiteral(red: 0.03921568627, green: 0.5176470588, blue: 1, alpha: 1)
         
-        let changeTitle = SwipeAction(style: .default, title: NSLocalizedString("Title", comment: "")) { action, indexPath in
+        let changeTitle = SwipeAction(style: .default, title: NSLocalizedString("Title", comment: "")) { _, indexPath in
             
             guard let placesController = self.placesController,
                   let places = placesController.places else { return }
@@ -86,7 +82,7 @@ class PlaceListViewController: SwipeTableViewController, UINavigationControllerD
         }
         
         // customize the action appearance
-        changeTitle.image = UIImage(systemName: K.systemImages.rectangleAndPencilAndEllipsisrtl)
+        changeTitle.image = UIImage(systemName: K.SystemImages.rectangleAndPencilAndEllipsisrtl)
         if places[indexPath.row].color != UIColor.flatYellow().hexValue() {
             changeTitle.backgroundColor = UIColor.flatYellow()
         } else {
@@ -96,24 +92,24 @@ class PlaceListViewController: SwipeTableViewController, UINavigationControllerD
         return [deleteAction, findInTheMap, changeTitle]
         
     }
-    //MARK: - goBackToMapView
+    // MARK: - goBackToMapView
     func goBackToMapView() {
-        performSegue(withIdentifier: K.segueIdentifiers.placeListToMapView, sender: self)
+        performSegue(withIdentifier: K.SegueIdentifiers.placeListToMapView, sender: self)
     }
-    //MARK: - back
+    // MARK: - back
     @objc func back(sender: UIBarButtonItem) {
         _ = navigationController?.popViewController(animated: true)
-        //performSegue(withIdentifier: "placeListToMapView", sender: self)
+        // performSegue(withIdentifier: "placeListToMapView", sender: self)
     }
-    //MARK: - prepare
+    // MARK: - prepare
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == K.segueIdentifiers.goToItems {
+        if segue.identifier == K.SegueIdentifiers.goToItems {
             let destinationVC = segue.destination as! ToDoListViewController
             
             if let indexPath = tableView.indexPathForSelectedRow {
                 destinationVC.selectedPlace = placesController?.places?[indexPath.row]
             }
-        } else if segue.identifier == K.segueIdentifiers.placeListToMapView {
+        } else if segue.identifier == K.SegueIdentifiers.placeListToMapView {
             
             let destinationVC = segue.destination as! MapViewController
             
@@ -147,10 +143,10 @@ class PlaceListViewController: SwipeTableViewController, UINavigationControllerD
         return updatedText.count <= 20
     }
     
-    //MARK: - TableView DataSource Methods
+    // MARK: - TableView DataSource Methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return placesController!.places?.count ?? 1
+        placesController!.places?.count ?? 1
     }
     
     // Provide a cell object for each row.
@@ -158,15 +154,15 @@ class PlaceListViewController: SwipeTableViewController, UINavigationControllerD
         
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
-        if let place = placesController!.places?[indexPath.row]{
+        if let place = placesController!.places?[indexPath.row] {
             
-            //cell.textLabel!.text = place.title
+            // cell.textLabel!.text = place.title
             
             guard let placeColor =  UIColor(hexString: place.color) else {fatalError()}
             
-            //cell.backgroundColor = placeColor
+            // cell.backgroundColor = placeColor
             
-            //cell.textLabel?.textColor = ContrastColorOf(placeColor, returnFlat: true)
+            // cell.textLabel?.textColor = ContrastColorOf(placeColor, returnFlat: true)
             
             cell.backgroundColor = UIColor.clear
             
@@ -184,15 +180,13 @@ class PlaceListViewController: SwipeTableViewController, UINavigationControllerD
             label.leftAnchor.constraint(equalTo: cell.leftAnchor, constant: 0).isActive = true
         }
         
-        
         return cell
     }
     
-    //MARK: - Table Delegate Methods
+    // MARK: - Table Delegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        performSegue(withIdentifier: K.segueIdentifiers.goToItems, sender: self)
+        performSegue(withIdentifier: K.SegueIdentifiers.goToItems, sender: self)
     }
     
 }
-

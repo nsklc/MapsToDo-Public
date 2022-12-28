@@ -79,7 +79,6 @@ struct GeoJsonTemplates {
         }
     }
     
-    
     private func makeFieldsGeoJSONString(field: Field) -> String {
         var coordinates = ""
         field.polygonMarkersPositions.forEach { (position) in
@@ -106,7 +105,7 @@ struct GeoJsonTemplates {
                                    }
                         """
         
-        //print(json)
+        // print(json)
         return json
         
     }

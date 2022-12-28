@@ -1,0 +1,31 @@
+enabled_rules:
+  - trailing_whitespace
+  - unused_declaration
+  - todo
+  - force_unwrapping
+  - force_cast
+  - line_length
+  - implicit_return
+  - file_length
+  - final_class
+  - closure_end_indentation
+  - legacy_constructor
+  - legacy_multiple_statement_if_conditions
+  - implicit_getter
+  - trailing_semicolon
+  - empty_count
+  - cyclomatic_complexity
+  - vertical_whitespace
+  - unused_closure_parameter
+trailing_whitespace:
+  max_lines: 2
+line_length:
+  warning: 120
+trailing_whitespace:
+  max_lines: 2
+disabled_rules:
+  - trailing_whitespace
+excluded:
+  - Carthage
+  - Pods
+  - Vendor

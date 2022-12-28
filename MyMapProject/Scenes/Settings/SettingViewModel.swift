@@ -23,7 +23,7 @@ class SettingsViewModel: SettingsViewModelProtocol {
     
     weak var viewController: SettingsViewControllerProtocol?
     
-    let realm = try! Realm()
+    let realm: Realm! = try? Realm()
     
     private var userDefaults: Results<UserDefaults>?
     private var handle: AuthStateDidChangeListenerHandle?
@@ -51,7 +51,7 @@ class SettingsViewModel: SettingsViewModelProtocol {
     
     func getIsShowDistance() {
         if let userDefaults = userDefaults, let userDefaultsFirst = userDefaults.first {
-            viewController?.setIsShowDistance(IsShowDistance: userDefaultsFirst.showDistancesBetweenTwoCorners)
+            viewController?.setIsShowDistance(isShowDistance: userDefaultsFirst.showDistancesBetweenTwoCorners)
         }
     }
     
@@ -121,7 +121,7 @@ class SettingsViewModel: SettingsViewModelProtocol {
         }
     }
     
-    func switchStateDidChange(_ settingsOption: SettingsOptions, value: Bool){
+    func switchStateDidChange(_ settingsOption: SettingsOptions, value: Bool) {
         do {
             try realm.write({
                 switch settingsOption {

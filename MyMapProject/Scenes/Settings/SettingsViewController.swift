@@ -12,7 +12,7 @@ import Firebase
 
 protocol SettingsViewControllerProtocol: AnyObject {
     func setIsMeasureSystemMetric(isMeasureSystemMetric: Bool)
-    func setIsShowDistance(IsShowDistance: Bool)
+    func setIsShowDistance(isShowDistance: Bool)
     func setDistanceUnit(distanceUnit: Int)
     func setIsShowAllUnitsSelected(isShowAllUnitsSelected: Bool)
     func setAreaUnit(areaUnit: Int)
@@ -43,7 +43,7 @@ final class SettingsViewController: UITableViewController {
         
         tableView.rowHeight = 80
         title = NSLocalizedString("Settings", comment: "")
-        view.backgroundColor = UIColor(hexString: K.colors.thirdColor)
+        view.backgroundColor = UIColor(hexString: K.Colors.thirdColor)
         
         addMeasurementUnitsCell()
         addShowDistanceBetweenCornersCell()
@@ -62,7 +62,7 @@ final class SettingsViewController: UITableViewController {
         let cell = UITableViewCell()
         cell.contentView.isUserInteractionEnabled = false
         cell.selectionStyle = .none
-        cell.backgroundColor = UIColor(hexString: K.colors.primaryColor)
+        cell.backgroundColor = UIColor(hexString: K.Colors.primaryColor)
         cellList.append(cell)
     }
     
@@ -125,7 +125,7 @@ final class SettingsViewController: UITableViewController {
         cellList.append(cell)
     }
     
-    //MARK: - heightForRowAt
+    // MARK: - heightForRowAt
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         if indexPath.row == 5 || indexPath.row == 7 {
             return 10 // the height you want
@@ -133,15 +133,14 @@ final class SettingsViewController: UITableViewController {
             return 80
         }
     }
-    //MARK: - segmentedControlValueChanged
+    // MARK: - segmentedControlValueChanged
     @objc func segmentedControlValueChanged(_ segment: UISegmentedControl!) {
         
         switch segment {
         case unitsSegmentedControl:
             if segment.selectedSegmentIndex == 0 {
                 viewModel?.setIsMeasureSystemMetric(true)
-            }
-            else {
+            } else {
                 viewModel?.setIsMeasureSystemMetric(false)
             }
             
@@ -203,38 +202,38 @@ final class SettingsViewController: UITableViewController {
         }
     }
     
-    @objc func showDistanceSwitchStateDidChange(_ sender:UISwitch!){
+    @objc func showDistanceSwitchStateDidChange(_ sender: UISwitch!) {
         viewModel?.switchStateDidChange(.showDistance, value: sender.isOn)
     }
     
-    @objc func showAllSwitchStateDidChange(_ sender:UISwitch!){
+    @objc func showAllSwitchStateDidChange(_ sender: UISwitch!) {
         viewModel?.switchStateDidChange(.showAll, value: sender.isOn)
     }
     
-    @objc func geodesicSwitchStateDidChange(_ sender:UISwitch!){
+    @objc func geodesicSwitchStateDidChange(_ sender: UISwitch!) {
         viewModel?.switchStateDidChange(.geodesic, value: sender.isOn)
     }
     
-    @objc func batterySwitchStateDidChange(_ sender:UISwitch!){
+    @objc func batterySwitchStateDidChange(_ sender: UISwitch!) {
         viewModel?.switchStateDidChange(.battery, value: sender.isOn)
     }
     
-    @objc func dataSwitchStateDidChange(_ sender:UISwitch!){
+    @objc func dataSwitchStateDidChange(_ sender: UISwitch!) {
         viewModel?.switchStateDidChange(.data, value: sender.isOn)
     }
 
-    //MARK: - cellForRowAt
+    // MARK: - cellForRowAt
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        return cellList[indexPath.row]
+        cellList[indexPath.row]
     }
-    //MARK: - numberOfRowsInSection
+    // MARK: - numberOfRowsInSection
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return cellList.count
+        cellList.count
     }
-    //MARK: - didSelectRowAt
+    // MARK: - didSelectRowAt
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //print(indexPath.row)
+        // print(indexPath.row)
     }
 
 }
@@ -252,8 +251,8 @@ extension SettingsViewController: SettingsViewControllerProtocol {
         }
     }
     
-    func setIsShowDistance(IsShowDistance: Bool) {
-        showDistanceSwitchUI.setOn(IsShowDistance, animated: false)
+    func setIsShowDistance(isShowDistance: Bool) {
+        showDistanceSwitchUI.setOn(isShowDistance, animated: false)
     }
     
     func setDistanceUnit(distanceUnit: Int) {

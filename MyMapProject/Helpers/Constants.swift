@@ -11,14 +11,14 @@ import Foundation
 struct K {
     static let appName = "Maps To Do"
     
-    struct errorMessages {
+    struct ErrorMessages {
         static let deletingCornerErrorMessage = NSLocalizedString("You need to select a corner and then tap the “x” button.", comment: "")
         static let tooFewCornerCountForFieldErrorMessage = NSLocalizedString(" Field cannot contain 2 or less corners.", comment: "")
         static let tooFewCornerCountForLineErrorMessage = NSLocalizedString(" Line must contain 1 or more markers.", comment: "")
         static let navigationControllerDoesNotExistErrorMessage = NSLocalizedString("Navigation controller does not exist.", comment: "")
     }
     
-    struct imagesFromXCAssets {
+    struct ImagesFromXCAssets {
         static let picture = "picture"
         static let picture1 = "picture1"
         static let picture2 = "picture2"
@@ -33,7 +33,7 @@ struct K {
         static let appleIcon = "appleIcon"
         static let mailIcon = "mailIcon"
         
-        struct mapImages {
+        struct MapImages {
             static let retroMap = "retroMap"
             static let aubergineMap = "aubergineMap"
             static let darkMap = "darkMap"
@@ -47,14 +47,14 @@ struct K {
     
     static let deleteGroupWithAllFields = NSLocalizedString("All fields in this group will be deleted.", comment: "")
     
-    struct mapTypes {
+    struct MapTypes {
         static let normal = "normal"
         static let satellite = "satellite"
         static let terrain = "terrain"
         static let custom = "custom"
     }
     
-    struct systemImages {
+    struct SystemImages {
         static let minusCircleFill = "minus.circle.fill"
         static let plusCircleFill = "plus.circle.fill"
         static let dotCircle = "dot.circle"
@@ -73,7 +73,7 @@ struct K {
         static let docRichtextFillHe = "doc.richtext.fill.he"
     }
     
-    struct segueIdentifiers {
+    struct SegueIdentifiers {
         static let goToItemsFromMapView = "goToItemsFromMapView"
         static let infoView = "infoView"
         static let goToGroups = "goToGroups"
@@ -96,7 +96,7 @@ struct K {
         static let mapViewToPremiumView = "mapViewToPremiumView"
     }
     
-    struct colors {
+    struct Colors {
         static let primaryColor = "F5F5F5"
         static let secondaryColor = "007AFF"
         static let thirdColor = "EBEBEB"
@@ -126,14 +126,14 @@ struct K {
         static let professional = "ProfessionalMapServicesSubscriptionGroup"
     }
     
-    struct freeAccountLimitations {
+    struct FreeAccountLimitations {
         static let overlayLimit = 10
         static let todoItemLimit = 10
         static let photoLimit = 5
         
         static var toolBarTimer = 120.0
         static var infoPageTimer = 120.0
-        static var toDoPageTimer = 120.0//30.0
+        static var toDoPageTimer = 120.0// 30.0
         
     }
 }

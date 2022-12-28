@@ -20,16 +20,15 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate, UITe
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var changePasswordButton: UIButton!
     @IBOutlet weak var signOutButton: UIButton!
-    
         
-    let realm = try! Realm()
+    let realm: Realm! = try? Realm()
     
     private var userDefaults: Results<UserDefaults>?
     var fieldsController: FieldsController?
     var linesController: LinesController?
     var placesController: PlacesController?
     
-    private let db = Firestore.firestore()
+    private let firestoreDB = Firestore.firestore()
     
     private var handle: AuthStateDidChangeListenerHandle?
     private let user = Auth.auth().currentUser
@@ -38,11 +37,11 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate, UITe
         super.viewDidLoad()
         userDefaults = realm.objects(UserDefaults.self)
         
-        view.backgroundColor = UIColor(hexString: K.colors.thirdColor)
+        view.backgroundColor = UIColor(hexString: K.Colors.thirdColor)
         
         self.displayNameTextField.delegate = self
         
-        handle = Auth.auth().addStateDidChangeListener { [self] (auth, user) in
+        handle = Auth.auth().addStateDidChangeListener { [self] (_, user) in
             if let userID = user?.uid {
                 if userDefaults?.first?.accountType == "deActiveMember" || userDefaults?.first?.accountType == "premium" {
                     do {
@@ -58,16 +57,16 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate, UITe
             if let userName = user?.displayName {
                 if !userName.isEmpty {
                     displayNameTextField.text = userName
-                }else {
+                } else {
                     displayNameTextField.placeholder = NSLocalizedString("Enter a display name.", comment: "")
                 }
             }
-            if let url = user?.photoURL{
+            if let url = user?.photoURL {
                 userImageView.downloaded(from: url)
             } else {
                 userImageView.image = UIImage(systemName: "\( user?.displayName?.first?.lowercased() ?? "a").square.fill")
-                userImageView.tintColor = UIColor(hexString: K.colors.primaryColor) ?? UIColor.flatTeal()
-                userImageView.backgroundColor = UIColor(hexString: K.colors.fifthColor) ?? UIColor.flatTeal()
+                userImageView.tintColor = UIColor(hexString: K.Colors.primaryColor) ?? UIColor.flatTeal()
+                userImageView.backgroundColor = UIColor(hexString: K.Colors.fifthColor) ?? UIColor.flatTeal()
             }
             if let email = user?.email {
                 emailTextField.text = email
@@ -82,8 +81,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate, UITe
         Auth.auth().removeStateDidChangeListener(handle!)
     }
     
-    
-    //MARK: - textFieldShouldReturn
+    // MARK: - textFieldShouldReturn
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == displayNameTextField {
             textField.resignFirstResponder()
@@ -120,7 +118,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate, UITe
         return updatedText.count <= 20
     }
     
-    //MARK: - changePasswordButtonTapped
+    // MARK: - changePasswordButtonTapped
     @IBAction func changePasswordButtonTapped(_ sender: UIButton) {
         AuthAlertsHelper.changePasswordAlert(on: self) {
             AuthAlertsHelper.enterPasswordAlert(on: self) { [weak self] password, newPassword, newPassword1 in
@@ -143,37 +141,37 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate, UITe
             }
         }
     }
-    //MARK: - reAuth
+    // MARK: - reAuth
     func reAuth(password: String) -> Bool {
         var isCurrentPasswordTrue = true
         let user = Auth.auth().currentUser
         var credential: AuthCredential
         credential = EmailAuthProvider.credential(withEmail: (user?.email)!, password: password)
         // Prompt the user to re-provide their sign-in credentials
-        user?.reauthenticate(with: credential) { (result, error)  in
+        user?.reauthenticate(with: credential) { (_, error)  in
             isCurrentPasswordTrue = AuthAlertsHelper.reAuthAlert(on: self, error: error)
         }
         return isCurrentPasswordTrue
     }
-    //MARK: - changePassword
+    // MARK: - changePassword
     func changePassword(newPassword: String) {
         Auth.auth().currentUser?.updatePassword(to: newPassword) { (error) in
             AuthAlertsHelper.passwordChangedAlert(on: self, error: error)
         }
     }
     
-    //MARK: - signOutButtonTapped
+    // MARK: - signOutButtonTapped
     @IBAction func signOutButtonTapped(_ sender: UIButton) {
         let firebaseAuth = Auth.auth()
         do {
             try firebaseAuth.signOut()
             navigationController?.popToRootViewController(animated: true)
         } catch let signOutError as NSError {
-          print ("Error signing out: %@", signOutError)
+          print("Error signing out: %@", signOutError)
         }
         navigationController?.popToRootViewController(animated: true)
     }
-    //MARK: - deleteDB
+    // MARK: - deleteDB
     func deleteDB() {
         placesController?.placeMarkers.forEach({ (marker) in
             marker.map = nil
@@ -200,7 +198,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate, UITe
         }
     }
     
-    //MARK: - setAutoLayout()
+    // MARK: - setAutoLayout()
     func setAutoLayout() {
         
         userImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -219,7 +217,6 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate, UITe
         userImageView.layer.cornerRadius = userImageView.bounds.height*0.3
         userImageView.layer.borderWidth = 1
         
-        
         displayNameTextField.translatesAutoresizingMaskIntoConstraints = false
         displayNameTextField.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.6).isActive = true
         displayNameTextField.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05).isActive = true
@@ -237,12 +234,12 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate, UITe
         displayNameLabel.centerYAnchor.constraint(equalTo: displayNameTextField.safeAreaLayoutGuide.topAnchor, constant: 0).isActive = true
         displayNameLabel.clipsToBounds = true
         displayNameLabel.layer.cornerRadius = displayNameLabel.bounds.height*0.3
-        //displayNameLabel.layer.borderWidth = 1
+        // displayNameLabel.layer.borderWidth = 1
         displayNameLabel.text = NSLocalizedString("Display Name", comment: "")
         displayNameLabel.backgroundColor = view.backgroundColor
         displayNameLabel.textAlignment = .center
         
-        displayNameLabel.minimumScaleFactor = 0.1    //you need
+        displayNameLabel.minimumScaleFactor = 0.1    // you need
         displayNameLabel.adjustsFontSizeToFitWidth = true
         displayNameLabel.lineBreakMode = .byClipping
         displayNameLabel.numberOfLines = 0
@@ -267,12 +264,12 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate, UITe
         emailLabel.centerYAnchor.constraint(equalTo: emailTextField.topAnchor, constant: 0).isActive = true
         emailLabel.clipsToBounds = true
         emailLabel.layer.cornerRadius = displayNameLabel.bounds.height*0.3
-        //displayNameLabel.layer.borderWidth = 1
+        // displayNameLabel.layer.borderWidth = 1
         emailLabel.text = NSLocalizedString("E-Mail", comment: "")
         emailLabel.backgroundColor = view.backgroundColor
         emailLabel.textAlignment = .center
  
-        emailLabel.minimumScaleFactor = 0.1    //you need
+        emailLabel.minimumScaleFactor = 0.1    // you need
         emailLabel.adjustsFontSizeToFitWidth = true
         emailLabel.lineBreakMode = .byClipping
         emailLabel.numberOfLines = 0
@@ -286,7 +283,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate, UITe
         changePasswordButton.bottomAnchor.constraint(equalTo: signOutButton.safeAreaLayoutGuide.topAnchor, constant: -20).isActive = true
         changePasswordButton.clipsToBounds = true
         changePasswordButton.layer.cornerRadius = emailTextField.bounds.height*0.3
-        //changePasswordButton.layer.borderWidth = 1
+        // changePasswordButton.layer.borderWidth = 1
         changePasswordButton.setTitle(NSLocalizedString("Change Password", comment: ""), for: .normal)
         changePasswordButton.backgroundColor = UIColor.flatGreenDark()
         changePasswordButton.setTitleColor(UIColor.flatWhite(), for: .normal)
@@ -299,7 +296,7 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate, UITe
         signOutButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -50).isActive = true
         signOutButton.clipsToBounds = true
         signOutButton.layer.cornerRadius = emailTextField.bounds.height*0.3
-        //signOutButton.layer.borderWidth = 1
+        // signOutButton.layer.borderWidth = 1
         signOutButton.setTitle(NSLocalizedString("Sign Out", comment: ""), for: .normal)
         signOutButton.backgroundColor = UIColor.flatRedDark()
         signOutButton.setTitleColor(UIColor.flatWhite(), for: .normal)

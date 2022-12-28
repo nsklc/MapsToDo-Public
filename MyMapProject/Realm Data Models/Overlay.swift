@@ -8,7 +8,6 @@
 
 import Foundation
 
-import Foundation
 import RealmSwift
 import GoogleMaps
 
@@ -19,6 +18,6 @@ class Overlay: Object {
     let items = List<Item>()
     
     override static func primaryKey() -> String? {
-        return "id"
+        "id"
     }
 }

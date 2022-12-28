@@ -28,9 +28,12 @@ class ToDoListViewController: SwipeTableViewController, ToDoListViewControllerPr
     var viewModel: ToDoListViewModelProtocol = ToDoListViewModel()
     let addButton = UIButton.init(type: .system)
     var itemType = TodoItemType.fieldsItem
-    var status = [NSLocalizedString("Waiting To Run", comment: ""), NSLocalizedString("In Progress", comment: ""), NSLocalizedString("Completed", comment: ""), NSLocalizedString("Canceled", comment: "")]
+    var status = [NSLocalizedString("Waiting To Run", comment: ""),
+                  NSLocalizedString("In Progress", comment: ""),
+                  NSLocalizedString("Completed", comment: ""),
+                  NSLocalizedString("Canceled", comment: "")]
     
-    //MARK: - selectedGroup
+    // MARK: - selectedGroup
     var selectedGroup: Group? {
         didSet {
             viewModel.viewController = self
@@ -44,7 +47,7 @@ class ToDoListViewController: SwipeTableViewController, ToDoListViewControllerPr
             infoButton.image = UIImage()
         }
     }
-    //MARK: - selectedField
+    // MARK: - selectedField
     var selectedField: Field? {
         didSet {
             viewModel.viewController = self
@@ -59,10 +62,10 @@ class ToDoListViewController: SwipeTableViewController, ToDoListViewControllerPr
                 viewModel.loadItemsWithField(selectedField: selectedField)
             }
             infoButton.isEnabled = true
-            infoButton.image = UIImage(systemName: K.systemImages.infoCircleFill)
+            infoButton.image = UIImage(systemName: K.SystemImages.infoCircleFill)
         }
     }
-    //MARK: - selectedLine
+    // MARK: - selectedLine
     var selectedLine: Line? {
         didSet {
             viewModel.viewController = self
@@ -73,10 +76,10 @@ class ToDoListViewController: SwipeTableViewController, ToDoListViewControllerPr
                 viewModel.loadItemsWithLine(selectedLine: selectedLine)
             }
             infoButton.isEnabled = true
-            infoButton.image = UIImage(systemName: K.systemImages.infoCircleFill)
+            infoButton.image = UIImage(systemName: K.SystemImages.infoCircleFill)
         }
     }
-    //MARK: - selectedPlace
+    // MARK: - selectedPlace
     var selectedPlace: Place? {
         didSet {
             viewModel.viewController = self
@@ -87,24 +90,24 @@ class ToDoListViewController: SwipeTableViewController, ToDoListViewControllerPr
                 viewModel.loadItemsWithPlace(selectedPlace: selectedPlace)
             }
             infoButton.isEnabled = true
-            infoButton.image = UIImage(systemName: K.systemImages.infoCircleFill)
+            infoButton.image = UIImage(systemName: K.SystemImages.infoCircleFill)
         }
     }
     
-    //MARK: - viewDidLoad
+    // MARK: - viewDidLoad
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
     }
-    //MARK: - setupUI
+    // MARK: - setupUI
     func setupUI() {
-        addButton.setImage(UIImage(systemName: K.systemImages.plus), for: .normal)
-        addButton.tintColor = UIColor(hexString: K.colors.secondaryColor)
-        addButton.backgroundColor = UIColor(hexString: K.colors.thirdColor)
+        addButton.setImage(UIImage(systemName: K.SystemImages.plus), for: .normal)
+        addButton.tintColor = UIColor(hexString: K.Colors.secondaryColor)
+        addButton.backgroundColor = UIColor(hexString: K.Colors.thirdColor)
         addButton.layer.borderWidth = 0.25
         addButton.layer.borderColor = UIColor.systemBlue.cgColor
         self.view.addSubview(addButton)
-        //set constrains
+        // set constrains
         addButton.translatesAutoresizingMaskIntoConstraints = false
         addButton.contentHorizontalAlignment = .left
         addButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
@@ -113,11 +116,11 @@ class ToDoListViewController: SwipeTableViewController, ToDoListViewControllerPr
         addButton.heightAnchor.constraint(equalToConstant: 100).isActive = true
         addButton.layer.cornerRadius = 32.5
         addButton.clipsToBounds = true
-        addButton.addTarget(self, action: #selector(showAddItemAlert) ,
+        addButton.addTarget(self, action: #selector(showAddItemAlert),
                             for: .touchUpInside)
         
         tableView.separatorStyle = .singleLine
-        tableView.backgroundView = UIImageView(image: UIImage(named: K.imagesFromXCAssets.picture7))
+        tableView.backgroundView = UIImageView(image: UIImage(named: K.ImagesFromXCAssets.picture7))
         tableView.backgroundView?.alpha = 0.3
         
         if let selectedGroup = selectedGroup {
@@ -132,22 +135,22 @@ class ToDoListViewController: SwipeTableViewController, ToDoListViewControllerPr
                 fatalError("Navigation controller does not exist.")
             }
             if let navBarColor = UIColor(hexString: colorHex) {
-                navBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor : ContrastColorOf(navBarColor, returnFlat: true)]
+                navBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor: ContrastColorOf(navBarColor, returnFlat: true)]
             }
         }
     }
-    //MARK: - viewDidAppear
+    // MARK: - viewDidAppear
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
         NotificationCenter.default.addObserver(self, selector: #selector(addShowed), name: NSNotification.Name("addShowed"), object: nil)
     }
-    //MARK: - myAction
+    // MARK: - myAction
     @objc func addShowed() {
         print("addShowed")
         AlertsHelper.adsAlert(on: self)
     }
     
-    //MARK: - myAction
+    // MARK: - myAction
     @objc func showAddItemAlert() {
         
         if viewModel.checkIsToDoItemsCountAtLimit() {
@@ -157,7 +160,7 @@ class ToDoListViewController: SwipeTableViewController, ToDoListViewControllerPr
         
         AlertsHelper.addNewItemAlert(on: self,
                                      itemType: self.itemType) { [weak self] title in
-            guard let self = self else{ return }
+            guard let self = self else { return }
             if title.isEmpty {
                 AlertsHelper.errorAlert(on: self,
                                         with: NSLocalizedString("Item needs a title.", comment: ""),
@@ -190,13 +193,9 @@ class ToDoListViewController: SwipeTableViewController, ToDoListViewControllerPr
         }
     }
     
-    
-    
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
         
-        
-        
-        let deleteAction = SwipeAction(style: .destructive, title: NSLocalizedString("Delete", comment: "")) { action, indexPath in
+        let deleteAction = SwipeAction(style: .destructive, title: NSLocalizedString("Delete", comment: "")) { _, indexPath in
             
             AlertsHelper.deleteAlert(on: self,
                                      with: .item,
@@ -212,12 +211,12 @@ class ToDoListViewController: SwipeTableViewController, ToDoListViewControllerPr
         return [deleteAction]
     }
     
-    //MARK: - numberOfRowsInSection
+    // MARK: - numberOfRowsInSection
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel.getToDoItemsCount(itemType: itemType)
+        viewModel.getToDoItemsCount(itemType: itemType)
     }
     
-    //MARK: - cellForRowAt
+    // MARK: - cellForRowAt
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
@@ -288,57 +287,57 @@ class ToDoListViewController: SwipeTableViewController, ToDoListViewControllerPr
         return cell
     }
     
-    //MARK: - TableView Delegate Methods
+    // MARK: - TableView Delegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        performSegue(withIdentifier: K.segueIdentifiers.goToItemsForm, sender: self)
+        performSegue(withIdentifier: K.SegueIdentifiers.goToItemsForm, sender: self)
     }
-    //MARK: - infoButtonTapped
+    // MARK: - infoButtonTapped
     @IBAction func infoButtonTapped(_ sender: UIBarButtonItem) {
-        performSegue(withIdentifier: K.segueIdentifiers.goToInfoViewController, sender: self)
+        performSegue(withIdentifier: K.SegueIdentifiers.goToInfoViewController, sender: self)
         
     }
-    //MARK: - prepare
+    // MARK: - prepare
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == K.segueIdentifiers.goToItemsForm{
-            let destinationVC = segue.destination as! ToDoFormViewController
+        if segue.identifier == K.SegueIdentifiers.goToItemsForm {
+            let destinationVC = segue.destination as? ToDoFormViewController
             
             if let indexPath = tableView.indexPathForSelectedRow {
-                destinationVC.selectedItem = viewModel.getItem(for: itemType, with: indexPath.row)
+                destinationVC?.selectedItem = viewModel.getItem(for: itemType, with: indexPath.row)
             }
-        } else if segue.identifier == K.segueIdentifiers.goToInfoViewController {
-            let destinationVC = segue.destination as! InfoViewController
+        } else if segue.identifier == K.SegueIdentifiers.goToInfoViewController {
+            let destinationVC = segue.destination as? InfoViewController
             switch itemType {
             case .fieldsItem:
-                destinationVC.selectedField = selectedField
+                destinationVC?.selectedField = selectedField
             case .linesItem:
-                destinationVC.selectedLine = selectedLine
+                destinationVC?.selectedLine = selectedLine
             case .placesItem:
-                destinationVC.selectedPlace = selectedPlace
+                destinationVC?.selectedPlace = selectedPlace
             default:
                 break
             }
         }
     }
-    //MARK: - reloadTableViewData
+    // MARK: - reloadTableViewData
     func reloadTableViewData() {
         self.tableView.reloadData()
     }
-    //MARK: - deleteItem
+    // MARK: - deleteItem
     override func deleteItem(at indexPath: IndexPath) {}
 }
 
-//MARK: - UISearchBarDelegate
+// MARK: - UISearchBarDelegate
 
 extension ToDoListViewController: UISearchBarDelegate {
-    //MARK: - searchBarSearchButtonClicked
+    // MARK: - searchBarSearchButtonClicked
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         if let text = searchBar.text {
             viewModel.filterToDoItems(filterText: text)
         }
         searchBar.resignFirstResponder()
     }
-    //MARK: - searchBar
+    // MARK: - searchBar
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         switch itemType {
         case .groupsItem:
@@ -362,7 +361,7 @@ extension ToDoListViewController: UISearchBarDelegate {
 }
 
 extension ToDoListViewController: UITextFieldDelegate {
-    //MARK: - textFieldShouldReturn
+    // MARK: - textFieldShouldReturn
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true

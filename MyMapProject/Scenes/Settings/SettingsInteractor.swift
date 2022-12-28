@@ -23,13 +23,13 @@ protocol SettingsBusinessLogic {
 }
 
 protocol SettingsDataStore {
-    //var name: String { get set }
+    // var name: String { get set }
 }
 
 class SettingsInteractor: SettingsBusinessLogic, SettingsDataStore {
     var presenter: SettingsPresentationLogic?
     var worker: SettingsRealmsWorker?
-    //var name: String = ""
+    // var name: String = ""
 
     // MARK: Do something (and send response to SettingsPresenter)
 

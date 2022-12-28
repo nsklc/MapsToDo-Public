@@ -22,6 +22,7 @@ pod 'Firebase/Firestore'
 pod 'Firebase/Storage'
 
 pod 'Google-Maps-iOS-Utils'
+pod 'SwiftLint'
 
 post_install do |pi|
     pi.pods_project.targets.each do |t|

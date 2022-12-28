@@ -13,10 +13,10 @@ import Firebase
 
 class SubscriptionsHelper {
     static var app: SubscriptionsHelper = {
-        return SubscriptionsHelper()
+        SubscriptionsHelper()
     }()
     
-    private let realm = try! Realm()
+    private let realm: Realm! = try? Realm()
     
     private var userDefaults: Results<UserDefaults>?
     
@@ -28,24 +28,24 @@ class SubscriptionsHelper {
         userDefaults = realm.objects(UserDefaults.self)
     }
     
-    //MARK: - checkUserSubscription
-    @objc func checkUserSubscription(){
+    // MARK: - checkUserSubscription
+    @objc func checkUserSubscription() {
         Purchases.shared.purchaserInfo { [self] (purchaserInfo, error) in
             
             if let purchaserInfo = purchaserInfo {
                 if purchaserInfo.entitlements.active.isEmpty {
                     if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
-                        //print("user need to be deActive member or active member.")
+                        // print("user need to be deActive member or active member.")
                         
                         let nc = NotificationCenter.default
                         nc.post(name: Notification.Name("deleteDB"), object: nil)
                         
-                        //Sign out the user
+                        // Sign out the user
                         let firebaseAuth = Auth.auth()
                         do {
                             try firebaseAuth.signOut()
                         } catch let signOutError as NSError {
-                          print ("Error signing out: %@", signOutError)
+                          print("Error signing out: %@", signOutError)
                         }
                         
                         do {
@@ -61,7 +61,7 @@ class SubscriptionsHelper {
                     if userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
                         
                         if purchaserInfo.entitlements[K.Entitlements.professional]?.isActive == true {
-                            //print("user need to be professional member")
+                            // print("user need to be professional member")
                             do {
                                 try realm.write({
                                     userDefaults?.first?.accountType = K.invites.accountTypes.proAccount
@@ -71,7 +71,7 @@ class SubscriptionsHelper {
                             }
                         }
                         
-                        //save all overlays to the firebase 
+                        // save all overlays to the firebase 
                         
                     }
                 }

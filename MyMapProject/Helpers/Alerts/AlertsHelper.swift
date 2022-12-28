@@ -14,7 +14,7 @@ class AlertsHelper: BaseAlertHelper {
     static func showLimitReachedAlert(on vc: UIViewController, title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel, handler: nil))
-        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default, handler: { (action) in
+        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .default, handler: { (_) in
             vc.navigationController?.popToRootViewController(animated: true)
             nc.post(name: Notification.Name("openPremiumViewController"), object: nil)
         }))
@@ -24,35 +24,51 @@ class AlertsHelper: BaseAlertHelper {
     }
     
     static func addingExtraFieldAlert(on vc: UIViewController) {
-        showLimitReachedAlert(on: vc, title: NSLocalizedString("Oops!", comment: ""), message: NSLocalizedString("You have reached the free account field adding limit. To subscribe and get rid of this error, press OK.", comment: ""))
+        showLimitReachedAlert(on: vc,
+                              title: NSLocalizedString("Oops!", comment: ""),
+                              message: NSLocalizedString("You have reached the free account field adding limit. To subscribe and get rid of this error, press OK.", comment: ""))
     }
     
     static func addingExtraLineAlert(on vc: UIViewController) {
-        showLimitReachedAlert(on: vc, title: NSLocalizedString("Oops!", comment: ""), message: NSLocalizedString("You have reached the free account line adding limit. To subscribe and get rid of this error, press OK.", comment: ""))
+        showLimitReachedAlert(on: vc,
+                              title: NSLocalizedString("Oops!", comment: ""),
+                              message: NSLocalizedString("You have reached the free account line adding limit. To subscribe and get rid of this error, press OK.", comment: ""))
     }
     
     static func addingExtraPlaceAlert(on vc: UIViewController) {
-        showLimitReachedAlert(on: vc, title: NSLocalizedString("Oops!", comment: ""), message: NSLocalizedString("You have reached the free account place adding limit. To subscribe and get rid of this error, press OK.", comment: ""))
+        showLimitReachedAlert(on: vc,
+                              title: NSLocalizedString("Oops!", comment: ""),
+                              message: NSLocalizedString("You have reached the free account place adding limit. To subscribe and get rid of this error, press OK.", comment: ""))
     }
     
     static func addingExtraToDoItemAlert(on vc: UIViewController) {
-        showLimitReachedAlert(on: vc, title: NSLocalizedString("Oops!", comment: ""), message: NSLocalizedString("You have reached the free account item adding limit. To subscribe and get rid of this error, press OK.", comment: ""))
+        showLimitReachedAlert(on: vc,
+                              title: NSLocalizedString("Oops!", comment: ""),
+                              message: NSLocalizedString("You have reached the free account item adding limit. To subscribe and get rid of this error, press OK.", comment: ""))
     }
     
     static func addingExtraPhotoAlert(on vc: UIViewController) {
-        showLimitReachedAlert(on: vc, title: NSLocalizedString("Oops!", comment: ""), message: NSLocalizedString("You have reached the free account photo limit. To subscribe and get rid of this error, press OK.", comment: ""))
+        showLimitReachedAlert(on: vc,
+                              title: NSLocalizedString("Oops!", comment: ""),
+                              message: NSLocalizedString("You have reached the free account photo limit. To subscribe and get rid of this error, press OK.", comment: ""))
     }
     
     static func savingPhotoAlert(on vc: UIViewController) {
-        showLimitReachedAlert(on: vc, title: NSLocalizedString("Oops!", comment: ""), message: NSLocalizedString("An error happend while deleting the image.", comment: ""))
+        showLimitReachedAlert(on: vc,
+                              title: NSLocalizedString("Oops!", comment: ""),
+                              message: NSLocalizedString("An error happend while deleting the image.", comment: ""))
     }
     
     static func thereIsNoPhotoAlert(on vc: UIViewController) {
-        showLimitReachedAlert(on: vc, title: NSLocalizedString("Oops!", comment: "There is no image to delete"), message: NSLocalizedString("", comment: ""))
+        showLimitReachedAlert(on: vc,
+                              title: NSLocalizedString("Oops!", comment: "There is no image to delete"),
+                              message: NSLocalizedString("", comment: ""))
     }
     
     static func adsAlert(on vc: UIViewController) {
-        showBasicAlertWithAction(on: vc, with: NSLocalizedString("Bored with ads?", comment: ""), message: NSLocalizedString("Get Maps To Do Pro account, get rid of ads and limitations.", comment: "")) {
+        showBasicAlertWithAction(on: vc,
+                                 with: NSLocalizedString("Bored with ads?", comment: ""),
+                                 message: NSLocalizedString("Get Maps To Do Pro account, get rid of ads and limitations.", comment: "")) {
             
             vc.navigationController?.popToRootViewController(animated: true)
             nc.post(name: Notification.Name("openPremiumViewController"), object: nil)
@@ -62,7 +78,9 @@ class AlertsHelper: BaseAlertHelper {
     
     static func didTapMarkerAlert(on vc: UIViewController, placeholderTitle: String, unitLength: UnitLength, okAction: @escaping (_ length: Double, _ unitLength: UnitLength) -> Void) {
         
-        let ac = UIAlertController(title: NSLocalizedString("Enter Length", comment: ""), message: NSLocalizedString("The selected point will stay fixed and the edge will be extended.", comment: ""), preferredStyle: .alert)
+        let ac = UIAlertController(title: NSLocalizedString("Enter Length", comment: ""),
+                                   message: NSLocalizedString("The selected point will stay fixed and the edge will be extended.", comment: ""),
+                                   preferredStyle: .alert)
         ac.addTextField()
         guard let textFields = ac.textFields else { return }
         textFields[0].keyboardType = .decimalPad
@@ -118,7 +136,7 @@ class AlertsHelper: BaseAlertHelper {
         lonTextField.leftViewRect(forBounds: CGRect(x: lonTextField.bounds.midX, y: lonTextField.bounds.midY, width: 0, height: 0))
         
         alert.addAction(UIAlertAction(title: "Cancel", style: .destructive, handler: nil))
-        alert.addAction(UIAlertAction(title: NSLocalizedString("Submit", comment: ""), style: .default, handler: { (uiAlertAction) in
+        alert.addAction(UIAlertAction(title: NSLocalizedString("Submit", comment: ""), style: .default, handler: { (_) in
             if let latText = latTextField.text, let lonText = lonTextField.text {
                 if let latitude = Double(latText), let longitude = Double(lonText) {
                     okAction(CLLocationCoordinate2D(latitude: latitude, longitude: longitude))
@@ -156,8 +174,9 @@ class AlertsHelper: BaseAlertHelper {
         vc.present(alert, animated: true, completion: nil)
     }
     
-    static func overlayActionSheet(on vc: UIViewController, overlayTitle: String, editOverlayAction: @escaping (() -> Void), editItemsAction: @escaping () -> Void, infoPageAction: @escaping () -> Void) {
-        let alert = UIAlertController(title: String(format: NSLocalizedString("For %@", comment: ""), overlayTitle) , message: "", preferredStyle: .actionSheet)
+    static func overlayActionSheet(on vc: UIViewController, overlayTitle: String, editOverlayAction: @escaping (() -> Void),
+                                   editItemsAction: @escaping () -> Void, infoPageAction: @escaping () -> Void) {
+        let alert = UIAlertController(title: String(format: NSLocalizedString("For %@", comment: ""), overlayTitle), message: "", preferredStyle: .actionSheet)
         
         let titleAttributes = [NSAttributedString.Key.font: UIFont(name: "HelveticaNeue-Bold", size: 25)!, NSAttributedString.Key.foregroundColor: UIColor.black]
         let titleString = NSAttributedString(string: String(format: NSLocalizedString("For %@", comment: ""), overlayTitle), attributes: titleAttributes)
@@ -181,9 +200,9 @@ class AlertsHelper: BaseAlertHelper {
             alert.addAction(UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .destructive, handler: nil))
             
             if let popoverController = alert.popoverPresentationController {
-                popoverController.sourceView = vc.view //to set the source of your alert
+                popoverController.sourceView = vc.view // to set the source of your alert
                 popoverController.sourceRect = CGRect(x: vc.view.bounds.midX, y: vc.view.bounds.midY, width: 0, height: 0)
-                popoverController.permittedArrowDirections = [] //to hide the arrow of any particular direction
+                popoverController.permittedArrowDirections = [] // to hide the arrow of any particular direction
             }
         }
         vc.present(alert, animated: true, completion: nil)
@@ -194,11 +213,11 @@ class AlertsHelper: BaseAlertHelper {
         
         let alert = UIAlertController(title: String(format: NSLocalizedString("Change %@'s Title", comment: ""), title), message: "", preferredStyle: .alert)
         
-        let action = UIAlertAction(title: NSLocalizedString("Change", comment: ""), style: .default) { (action) in
+        let action = UIAlertAction(title: NSLocalizedString("Change", comment: ""), style: .default) { (_) in
             if let newTitle = textField.text {
                 var isValidName = true
                 var errorMessage = ""
-                if newTitle.count == 0 {
+                if newTitle.isEmpty {
                     isValidName = false
                     switch overlayType {
                     case .field:
@@ -221,8 +240,8 @@ class AlertsHelper: BaseAlertHelper {
                 } else {
                     let alert = UIAlertController(title: errorMessage, message: "", preferredStyle: .alert)
                     
-                    let editItemsAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .cancel) { (action) in
-                        //self.arrowButton.isHidden = false
+                    let editItemsAction = UIAlertAction(title: NSLocalizedString("OK", comment: ""), style: .cancel) { (_) in
+                        // self.arrowButton.isHidden = false
                     }
                     
                     alert.addAction(editItemsAction)
@@ -232,7 +251,7 @@ class AlertsHelper: BaseAlertHelper {
             }
         }
         
-        let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { (action) in
+        let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { (_) in
         }
         
         alert.addTextField { (alertTextField) in
@@ -265,7 +284,7 @@ class AlertsHelper: BaseAlertHelper {
             }
         }
         
-        let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { (action) in
+        let cancelAction = UIAlertAction(title: NSLocalizedString("Cancel", comment: ""), style: .cancel) { (_) in
         }
         
         alert.addTextField { (alertTextField) in
@@ -280,7 +299,7 @@ class AlertsHelper: BaseAlertHelper {
         vc.present(alert, animated: true, completion: nil)
     }
     
-    //MARK: - ToDoAlerts
+    // MARK: - ToDoAlerts
     
     static func addNewItemAlert(on vc: UIViewController, itemType: TodoItemType, addItemAction: @escaping (_ title: String) -> Void, forAllGroupAction: @escaping (_ title: String) -> Void) {
         var textField = UITextField()
@@ -299,7 +318,7 @@ class AlertsHelper: BaseAlertHelper {
             actionTitle = NSLocalizedString("Add Place Item", comment: "")
         }
         
-        let action = UIAlertAction(title: actionTitle, style: .default) { (action) in
+        let action = UIAlertAction(title: actionTitle, style: .default) { (_) in
             if let title = textField.text {
                 addItemAction(title)
             }

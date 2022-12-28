@@ -12,7 +12,7 @@ import RealmSwift
 
 class FieldPolygon: GMSPolygon {
     
-    private let realm = try! Realm()
+    private let realm: Realm! = try? Realm()
     var field: Field?
     
     func setColor(with color: UIColor) {

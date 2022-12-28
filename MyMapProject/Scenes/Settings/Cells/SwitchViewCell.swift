@@ -59,12 +59,11 @@ class SwitchViewCell: UITableViewCell {
         switchView.clipsToBounds = true
         switchView.backgroundColor = UIColor.clear
         
-        
         self.addSubview(switchUI)
         switchUI.translatesAutoresizingMaskIntoConstraints = false
         switchUI.centerXAnchor.constraint(equalTo: switchView.centerXAnchor).isActive = true
         switchUI.centerYAnchor.constraint(equalTo: switchView.centerYAnchor).isActive = true
         
-        switchUI.onTintColor = UIColor(hexString: K.colors.secondaryColor)
+        switchUI.onTintColor = UIColor(hexString: K.Colors.secondaryColor)
     }
 }

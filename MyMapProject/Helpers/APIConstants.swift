@@ -6,10 +6,6 @@
 //  Copyright © 2022 Enes Kılıç. All rights reserved.
 //
 
-// APP ID: ca-app-pub-6786543394132232~6747928879
-// Banner Unit ID: ca-app-pub-6786543394132232/6736320580
-// Interstitial Unit ID: ca-app-pub-6786543394132232/7625055959
-
 import Foundation
 
 class APIConstants {

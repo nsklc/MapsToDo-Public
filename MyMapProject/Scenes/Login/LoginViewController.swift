@@ -24,25 +24,25 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, GID
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = UIColor(hexString: K.colors.thirdColor)
+        view.backgroundColor = UIColor(hexString: K.Colors.thirdColor)
         self.setLoginPage()
         GIDSignIn.sharedInstance()?.delegate = self
         
     }
-    //MARK: - setLoginPage
+    // MARK: - setLoginPage
     func setLoginPage() {
         let signInWithAppleButton = ASAuthorizationAppleIDButton()
         signInWithAppleButton.addTarget(self, action: #selector(handleAppleIdRequest), for: .touchUpInside)
         view.addSubview(signInWithAppleButton)
         
-        setButtonConstraints(button: signInWithGoogleButton, icon: K.imagesFromXCAssets.googleIcon)
+        setButtonConstraints(button: signInWithGoogleButton, icon: K.ImagesFromXCAssets.googleIcon)
         signInWithAppleButton.translatesAutoresizingMaskIntoConstraints = false
         signInWithAppleButton.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.6).isActive = true
         signInWithAppleButton.heightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.heightAnchor, multiplier: 0.05).isActive = true
         signInWithAppleButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor, constant: 0).isActive = true
         signInWithAppleButton.clipsToBounds = true
         signInWithAppleButton.layer.cornerRadius = signInWithAppleButton.bounds.height*0.5
-        setButtonConstraints(button: loginWithEmailButton, icon: K.imagesFromXCAssets.mailIcon)
+        setButtonConstraints(button: loginWithEmailButton, icon: K.ImagesFromXCAssets.mailIcon)
         
         loginWithEmailButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -50).isActive = true
         
@@ -54,12 +54,12 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, GID
         loginWithEmailButton.setTitle(NSLocalizedString("Sign in with Email", comment: ""), for: .normal)
     }
     
-    //MARK: - setButtonConstraints
-    func setButtonConstraints(button: UIButton,icon: String) {
+    // MARK: - setButtonConstraints
+    func setButtonConstraints(button: UIButton, icon: String) {
         
         appIconImageView.translatesAutoresizingMaskIntoConstraints = false
-        //appIconImageView.widthAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.4).isActive = true
-        //appIconImageView.heightAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.4).isActive = true
+        // appIconImageView.widthAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.4).isActive = true
+        // appIconImageView.heightAnchor.constraint(greaterThanOrEqualTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.4).isActive = true
         
         appIconImageView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
         
@@ -78,8 +78,8 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, GID
         
         appIconImageView.clipsToBounds = true
         appIconImageView.layer.cornerRadius = appIconImageView.bounds.height*0.1
-        //appIconImageView.layer.borderWidth = 1
-        appIconImageView.image = UIImage(named: K.imagesFromXCAssets.appLogo)
+        // appIconImageView.layer.borderWidth = 1
+        appIconImageView.image = UIImage(named: K.ImagesFromXCAssets.appLogo)
         
         button.translatesAutoresizingMaskIntoConstraints = false
         button.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.6).isActive = true
@@ -89,7 +89,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, GID
         let image = UIImageView(image: UIImage(named: icon))
         image.tintColor = UIColor.flatBlue()
         image.backgroundColor = UIColor.flatWhiteDark()
-        //image.backgroundColor = UIColor.flatRed()
+        // image.backgroundColor = UIColor.flatRed()
         button.addSubview(image)
         image.translatesAutoresizingMaskIntoConstraints = false
         image.leftAnchor.constraint(equalTo: button.leftAnchor).isActive = true
@@ -103,17 +103,17 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, GID
         button.backgroundColor = UIColor.flatWhiteDark()
         button.setTitleColor(UIColor.flatBlack(), for: .normal)
     }
-    //MARK: - loginWithEmailButtonTapped
+    // MARK: - loginWithEmailButtonTapped
     @IBAction func loginWithEmailButtonTapped(_ sender: UIButton) {
         performSegue(withIdentifier: "showEmailLoginViewController", sender: self)
     }
-    //MARK: - SignInWithGoogleButtonTapped
+    // MARK: - SignInWithGoogleButtonTapped
     @IBAction func SignInWithGoogleButtonTapped(_ sender: UIButton) {
         GIDSignIn.sharedInstance()?.presentingViewController = self
         GIDSignIn.sharedInstance().signIn()
         
     }
-    //MARK: - didSignInFor
+    // MARK: - didSignInFor
     func sign(_ signIn: GIDSignIn!, didSignInFor user: GIDGoogleUser!, withError error: Error?) {
         // ...
         if let error = error {
@@ -127,7 +127,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, GID
                                                        accessToken: authentication.accessToken)
         // ...
         
-        Auth.auth().signIn(with: credential) { (authResult, error) in
+        Auth.auth().signIn(with: credential) { (_, error) in
             if let error = error {
                 print(error)
                 // ...
@@ -139,7 +139,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, GID
         }
         
     }
-    //MARK: - SignInWithAppleButtonTapped
+    // MARK: - SignInWithAppleButtonTapped
     @objc func handleAppleIdRequest() {
         let nonce = randomNonceString()
         currentNonce = nonce
@@ -153,12 +153,12 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, GID
         authorizationController.presentationContextProvider = self
         authorizationController.performRequests()
     }
-    //MARK: - sha256
+    // MARK: - sha256
     private func sha256(_ input: String) -> String {
         let inputData = Data(input.utf8)
         let hashedData = SHA256.hash(data: inputData)
         let hashString = hashedData.compactMap {
-            return String(format: "%02x", $0)
+            String(format: "%02x", $0)
         }.joined()
         
         return hashString
@@ -166,7 +166,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, GID
     // Adapted from https://auth0.com/docs/api-auth/tutorials/nonce#generate-a-cryptographically-random-nonce
     private func randomNonceString(length: Int = 32) -> String {
         precondition(length > 0)
-        let charset: Array<Character> =
+        let charset: [Character] =
             Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
         var result = ""
         var remainingLength = length
@@ -196,8 +196,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, GID
         return result
     }
     
-    
-    //MARK: - authorizationController
+    // MARK: - authorizationController
     func authorizationController(controller: ASAuthorizationController, didCompleteWithAuthorization authorization: ASAuthorization) {
         if let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential {
             guard let nonce = currentNonce else {
@@ -216,7 +215,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, GID
                                                       idToken: idTokenString,
                                                       rawNonce: nonce)
             // Sign in with Firebase.
-            Auth.auth().signIn(with: credential) { (authResult, error) in
+            Auth.auth().signIn(with: credential) { (_, error) in
                 if let error = error {
                     // Error. If error.code == .MissingOrInvalidNonce, make sure
                     // you're sending the SHA256-hashed nonce as a hex string with
@@ -225,27 +224,27 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, GID
                     return
                 } else {
                     // User is signed in to Firebase with Apple.
-                    //print("User is signed in to Firebase with Apple.")
+                    // print("User is signed in to Firebase with Apple.")
                     
                     self.navigationController?.popToRootViewController(animated: true)
                 }
             }
         }
     }
-    //MARK: - authorizationController
+    // MARK: - authorizationController
     func authorizationController(controller: ASAuthorizationController, didCompleteWithError error: Error) {
         // Handle error.
         print("Sign in with Apple errored: \(error)")
     }
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        return ASPresentationAnchor()
+        ASPresentationAnchor()
     }
     
-    //MARK: - viewWillAppear
+    // MARK: - viewWillAppear
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
     }
-    //MARK: - viewWillDisappear
+    // MARK: - viewWillDisappear
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
     }

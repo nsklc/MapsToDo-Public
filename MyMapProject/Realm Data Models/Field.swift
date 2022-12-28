@@ -17,7 +17,6 @@ class Field: Overlay {
     @objc dynamic var lastUpdateTime: Date = Date()
     var polygonMarkersPositions = List<Position>()
     
-    
     var parentGroup = LinkingObjects(fromType: Group.self, property: "fields")
 }
 
@@ -26,4 +25,3 @@ class Position: Object {
     @objc dynamic var longitude: Double = 0
     
 }
-

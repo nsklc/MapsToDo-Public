@@ -18,7 +18,7 @@ class PremiumViewController: UIViewController {
     
     private let user = Auth.auth().currentUser
     
-    let realm = try! Realm()
+    let realm: Realm! = try? Realm()
     
     private var userDefaults: Results<UserDefaults>?
     
@@ -29,10 +29,9 @@ class PremiumViewController: UIViewController {
     @IBOutlet weak var contentLabel: UILabel!
     @IBOutlet weak var buyButton: UIButton!
     
-    
     let color = ["6EB5A5", "F9F4DB", "E7D6AC", "A13842"]
     let textColors⁣⁣⁣⁣⁣⁣⁣⁣ = ["F9F4DB", "A13842", "A13842", "F9F4DB"]
-    //Sandbox tester password: nt_x6dDmtQfUSbz
+    // Sandbox tester password: nt_x6dDmtQfUSbz
     
     private var packages = [Purchases.Package]()
     
@@ -50,7 +49,7 @@ class PremiumViewController: UIViewController {
         setAutoLayout()
     }
     
-    //MARK: - buyProButtonTapped
+    // MARK: - buyProButtonTapped
     @IBAction func buyProButtonTapped(_ sender: UIButton) {
         guard let professionalMapServicesYearlyPackage = packages.first(where: {$0.product.productIdentifier == professionalMapServicesYearlyProductID}) else {
             return
@@ -59,10 +58,10 @@ class PremiumViewController: UIViewController {
         subscribe(to: professionalMapServicesYearlyPackage)
     }
     
-    //MARK: - restoreButtonTapped
+    // MARK: - restoreButtonTapped
     @IBAction func restoreButtonTapped(_ sender: UIBarButtonItem) {
-        Purchases.shared.restoreTransactions { [self] (purchaserInfo, error) in
-            //... check purchaserInfo to see if entitlement is now active
+        Purchases.shared.restoreTransactions { [self] (purchaserInfo, _) in
+            // ... check purchaserInfo to see if entitlement is now active
             if let purchaserInfo = purchaserInfo {
                 if !purchaserInfo.entitlements.active.isEmpty {
                     
@@ -80,18 +79,16 @@ class PremiumViewController: UIViewController {
         }
     }
     
-    
-    //MARK: - viewDidAppear
+    // MARK: - viewDidAppear
     override func viewDidAppear(_ animated: Bool) {
         
     }
-    //MARK: - viewWillDisappear
+    // MARK: - viewWillDisappear
     override func viewWillDisappear(_ animated: Bool) {
         
     }
-    
 
-    //MARK: - setAutoLayout
+    // MARK: - setAutoLayout
     func setAutoLayout() {
         
         mainStackView.translatesAutoresizingMaskIntoConstraints = false
@@ -105,18 +102,17 @@ class PremiumViewController: UIViewController {
         
         headerLabel.text = K.appName + " Professional"
         headerLabel.textColor = UIColor(hexString: textColors⁣⁣⁣⁣⁣⁣⁣⁣[3])
-        //headerLabel1.font = UIFont(name: "System", size: 30)
+        // headerLabel1.font = UIFont(name: "System", size: 30)
         headerLabel.font = UIFont.boldSystemFont(ofSize: 30)
         
         headerLabel.translatesAutoresizingMaskIntoConstraints = false
         headerLabel.topAnchor.constraint(equalTo: bottomView.safeAreaLayoutGuide.topAnchor, constant: 25).isActive = true
         headerLabel.centerXAnchor.constraint(equalTo: bottomView.safeAreaLayoutGuide.centerXAnchor).isActive = true
         
-        
         buyButton.setTitle(NSLocalizedString("Subscribe", comment: ""), for: .normal)
-        buyButton.setTitleColor(UIColor(hexString: K.colors.secondaryColor), for: .normal)
+        buyButton.setTitleColor(UIColor(hexString: K.Colors.secondaryColor), for: .normal)
         buyButton.titleLabel?.font = UIFont(name: "System", size: 30)
-        buyButton.backgroundColor = UIColor(hexString: K.colors.thirdColor)
+        buyButton.backgroundColor = UIColor(hexString: K.Colors.thirdColor)
         
         buyButton.translatesAutoresizingMaskIntoConstraints = false
         buyButton.bottomAnchor.constraint(equalTo: bottomView.safeAreaLayoutGuide.bottomAnchor, constant: -75).isActive = true
@@ -127,12 +123,11 @@ class PremiumViewController: UIViewController {
         buyButton.clipsToBounds = true
         buyButton.layer.cornerRadius = buyButton.bounds.height*0.3
         
-        
         contentLabel.textColor = UIColor(hexString: textColors⁣⁣⁣⁣⁣⁣⁣⁣[3])
         contentLabel.font = UIFont(name: "System", size: 25)
         contentLabel.numberOfLines = 0
         contentLabel.adjustsFontSizeToFitWidth = true
-        //contentLabel1.adjustsFontForContentSizeCategory = true
+        // contentLabel1.adjustsFontForContentSizeCategory = true
         
         contentLabel.text = NSLocalizedString("• Ad Free", comment: "")
         
@@ -146,12 +141,11 @@ class PremiumViewController: UIViewController {
             
         contentLabel.text! += NSLocalizedString( "\n\n• Collaboration With Your Team - Import and export files without limits to collaborate with your team.", comment: "")
         
-        
         contentLabel.translatesAutoresizingMaskIntoConstraints = false
         contentLabel.centerYAnchor.constraint(equalTo: bottomView.safeAreaLayoutGuide.centerYAnchor, constant: 0).isActive = true
         contentLabel.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 10).isActive = true
         contentLabel.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -10).isActive = true
-        //contentLabel1.topAnchor.constraint(lessThanOrEqualTo: headerLabel1.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
+        // contentLabel1.topAnchor.constraint(lessThanOrEqualTo: headerLabel1.safeAreaLayoutGuide.bottomAnchor, constant: 0).isActive = true
         contentLabel.bottomAnchor.constraint(lessThanOrEqualTo: buyButton.safeAreaLayoutGuide.topAnchor, constant: 10).isActive = true
         
     }
@@ -173,7 +167,7 @@ class PremiumViewController: UIViewController {
         let termsAndConditionsLabel = UITextView(frame: CGRect(x: 0, y: 0, width: 300, height: 100))
         termsAndConditionsLabel.isEditable = false
         
-        let buyButton2 = UIButton(primaryAction: UIAction(handler: { action in
+        let buyButton2 = UIButton(primaryAction: UIAction(handler: { _ in
             self.subscribe(to: professionalMapServicesPackage)
         }))
         
@@ -222,7 +216,6 @@ class PremiumViewController: UIViewController {
         
         termsAndConditionsLabel.isEditable = false
         
-        
         termsAndConditionsLabel.attributedText = attributedString
         termsAndConditionsLabel.textAlignment = .center
         
@@ -240,6 +233,14 @@ class PremiumViewController: UIViewController {
                 print(error.localizedDescription)
                 return
             } else if let offerings = offerings {
+<<<<<<< Updated upstream
+=======
+                // Display current offering with offerings.current
+                // offerings.all.keys.forEach { (key) in
+                    // print(key)
+                // }
+                
+>>>>>>> Stashed changes
                 offerings.current?.availablePackages.forEach({ package in
                     self.packages.append(package)
                 })
@@ -250,7 +251,7 @@ class PremiumViewController: UIViewController {
     }
     
     func subscribe(to package: Purchases.Package) {
-        Purchases.shared.purchasePackage(package) { [self] (transaction, purchaserInfo, error, userCancelled) in
+        Purchases.shared.purchasePackage(package) { [self] (_, purchaserInfo, error, _) in
             
             if let error = error {
                 print(error.localizedDescription)
@@ -285,5 +286,3 @@ extension PremiumViewController: UITextViewDelegate {
     }
     
 }
-
-

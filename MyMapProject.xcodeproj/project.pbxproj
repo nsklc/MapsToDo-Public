@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		ADF2F6A94C1A125CA47EED52 /* Pods_MyMapProject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 91062F31C87585E0B7AEC74B /* Pods_MyMapProject.framework */; };
+		B88BD104312E46D2D31CFBFD /* Pods_MyMapProject.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 40CC03CFA300EF4EB315902B /* Pods_MyMapProject.framework */; };
 		BC023EFD294AFAE9002FBCBD /* ExportTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC023EFC294AFAE9002FBCBD /* ExportTypes.swift */; };
 		BC540DFE2945AF6A0005DF3C /* UnitsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC540DFD2945AF6A0005DF3C /* UnitsHelper.swift */; };
 		BC7922CC29163CA700FD834C /* APIConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC7922CB29163CA700FD834C /* APIConstants.swift */; };
@@ -17,7 +17,6 @@
 		BCAC6ADE29544D1100B9F6AF /* BaseAlertsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAC6ADD29544D1100B9F6AF /* BaseAlertsHelper.swift */; };
 		BCAC6AE029544D2700B9F6AF /* AuthAlertsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAC6ADF29544D2700B9F6AF /* AuthAlertsHelper.swift */; };
 		BCAC6AE229544F4700B9F6AF /* ImportExportAlerts.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCAC6AE129544F4700B9F6AF /* ImportExportAlerts.swift */; };
-		BCBD14B829570CA600AF1E0B /* OverlaysController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCBD14B729570CA600AF1E0B /* OverlaysController.swift */; };
 		BCCB20BE291B7FE80068F196 /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCB20BD291B7FE80068F196 /* MapViewModel.swift */; };
 		BCCB20C0291CEF5D0068F196 /* FieldPolygon.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCB20BF291CEF5D0068F196 /* FieldPolygon.swift */; };
 		BCCB20C3291D13720068F196 /* UITextViewExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCB20C2291D13720068F196 /* UITextViewExtensions.swift */; };
@@ -28,6 +27,7 @@
 		BCCB20CD291D1AB20068F196 /* ArrayExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCB20CC291D1AB20068F196 /* ArrayExtensions.swift */; };
 		BCCB20D0291E1BC50068F196 /* ToDoListViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCB20CF291E1BC50068F196 /* ToDoListViewModel.swift */; };
 		BCCB20D2291F6FDF0068F196 /* Overlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCB20D1291F6FDF0068F196 /* Overlay.swift */; };
+		BCE9CFA929582801002BFEEE /* .swiftlint.yml in Resources */ = {isa = PBXBuildFile; fileRef = BCE9CFA829582801002BFEEE /* .swiftlint.yml */; };
 		C20F5AE5272BAAB30006AA35 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C20F5AE4272BAAB30006AA35 /* AppDelegate.swift */; };
 		C25598AC25BC46700000080D /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C25598AB25BC466F0000080D /* Constants.swift */; };
 		C25598BE25BC47190000080D /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = C25598B825BC47180000080D /* Item.swift */; };
@@ -56,6 +56,7 @@
 		C257E47926062B51007B5701 /* AuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C257E47826062B51007B5701 /* AuthViewController.swift */; };
 		C257E48226066904007B5701 /* SubscriptionsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C257E48126066904007B5701 /* SubscriptionsHelper.swift */; };
 		C263095525C0A06700919DBF /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C263095725C0A06700919DBF /* Main.storyboard */; };
+		C26390FF25E7E4C600B6D6F9 /* MembershipViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C26390FE25E7E4C600B6D6F9 /* MembershipViewController.swift */; };
 		C264751026198BF20021E88C /* PresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C264750F26198BF20021E88C /* PresentationController.swift */; };
 		C264751326198D230021E88C /* OverlayView.xib in Resources */ = {isa = PBXBuildFile; fileRef = C264751226198D230021E88C /* OverlayView.xib */; };
 		C264751A26198EBC0021E88C /* OverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C264751926198EBC0021E88C /* OverlayView.swift */; };
@@ -71,13 +72,13 @@
 		C298DFE526157DBA006669FE /* AlertsHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C298DFE426157DBA006669FE /* AlertsHelper.swift */; };
 		C299C48B260DEF3E007DF470 /* PremiumViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C299C48A260DEF3E007DF470 /* PremiumViewController.swift */; };
 		C2B4467824EFFEC600379EB1 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2B4467724EFFEC600379EB1 /* SceneDelegate.swift */; };
+		C2E1B80E2607A73E005900F0 /* AdMobHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2E1B80D2607A73E005900F0 /* AdMobHelper.swift */; };
 		C2F554A226219CEB00CBA457 /* CloudKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C2F554A126219CEB00CBA457 /* CloudKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		3D26FBD39712C2576173CC04 /* Pods-MyMapProject.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyMapProject.release.xcconfig"; path = "Target Support Files/Pods-MyMapProject/Pods-MyMapProject.release.xcconfig"; sourceTree = "<group>"; };
-		91062F31C87585E0B7AEC74B /* Pods_MyMapProject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MyMapProject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		9C32C092A966103C64F17F76 /* Pods-MyMapProject.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyMapProject.debug.xcconfig"; path = "Target Support Files/Pods-MyMapProject/Pods-MyMapProject.debug.xcconfig"; sourceTree = "<group>"; };
+		07AF6D64E456EA285C07C53E /* Pods-MyMapProject.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyMapProject.debug.xcconfig"; path = "Target Support Files/Pods-MyMapProject/Pods-MyMapProject.debug.xcconfig"; sourceTree = "<group>"; };
+		40CC03CFA300EF4EB315902B /* Pods_MyMapProject.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MyMapProject.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		BC023EFC294AFAE9002FBCBD /* ExportTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExportTypes.swift; sourceTree = "<group>"; };
 		BC540DFD2945AF6A0005DF3C /* UnitsHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UnitsHelper.swift; sourceTree = "<group>"; };
 		BC7922CB29163CA700FD834C /* APIConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIConstants.swift; sourceTree = "<group>"; };
@@ -87,7 +88,6 @@
 		BCAC6ADD29544D1100B9F6AF /* BaseAlertsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BaseAlertsHelper.swift; sourceTree = "<group>"; };
 		BCAC6ADF29544D2700B9F6AF /* AuthAlertsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthAlertsHelper.swift; sourceTree = "<group>"; };
 		BCAC6AE129544F4700B9F6AF /* ImportExportAlerts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImportExportAlerts.swift; sourceTree = "<group>"; };
-		BCBD14B729570CA600AF1E0B /* OverlaysController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlaysController.swift; sourceTree = "<group>"; };
 		BCCB20BD291B7FE80068F196 /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
 		BCCB20BF291CEF5D0068F196 /* FieldPolygon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldPolygon.swift; sourceTree = "<group>"; };
 		BCCB20C2291D13720068F196 /* UITextViewExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITextViewExtensions.swift; sourceTree = "<group>"; };
@@ -98,7 +98,9 @@
 		BCCB20CC291D1AB20068F196 /* ArrayExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayExtensions.swift; sourceTree = "<group>"; };
 		BCCB20CF291E1BC50068F196 /* ToDoListViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToDoListViewModel.swift; sourceTree = "<group>"; };
 		BCCB20D1291F6FDF0068F196 /* Overlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Overlay.swift; sourceTree = "<group>"; };
+		BCE9CFA829582801002BFEEE /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; path = .swiftlint.yml; sourceTree = "<group>"; };
 		C20F5AE4272BAAB30006AA35 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		C24E86BE25BC58000016FD3D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		C25598AB25BC466F0000080D /* Constants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		C25598B825BC47180000080D /* Item.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		C25598B925BC47180000080D /* Line.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Line.swift; sourceTree = "<group>"; };
@@ -125,9 +127,11 @@
 		C257E4732605BB63007B5701 /* LoginViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		C257E47826062B51007B5701 /* AuthViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthViewController.swift; sourceTree = "<group>"; };
 		C257E48126066904007B5701 /* SubscriptionsHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionsHelper.swift; sourceTree = "<group>"; };
+		C25EEDAF25C2B19400B62C12 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C263095625C0A06700919DBF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		C263095A25C0A0B800919DBF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
 		C263095E25C0A18D00919DBF /* tr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = tr; path = tr.lproj/Main.strings; sourceTree = "<group>"; };
+		C26390FE25E7E4C600B6D6F9 /* MembershipViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MembershipViewController.swift; sourceTree = "<group>"; };
 		C264750F26198BF20021E88C /* PresentationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PresentationController.swift; sourceTree = "<group>"; };
 		C264751226198D230021E88C /* OverlayView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = OverlayView.xib; sourceTree = "<group>"; };
 		C264751926198EBC0021E88C /* OverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverlayView.swift; sourceTree = "<group>"; };
@@ -146,8 +150,10 @@
 		C2B4467224EFFEC600379EB1 /* MyMapProject.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyMapProject.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		C2B4467724EFFEC600379EB1 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		C2B4468324EFFEC700379EB1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		C2E1B80D2607A73E005900F0 /* AdMobHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdMobHelper.swift; sourceTree = "<group>"; };
 		C2F0692F25D7EB0500B765DE /* MyMapProject.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MyMapProject.entitlements; sourceTree = "<group>"; };
 		C2F554A126219CEB00CBA457 /* CloudKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CloudKit.framework; path = System/Library/Frameworks/CloudKit.framework; sourceTree = SDKROOT; };
+		DE5193CCB2A0CFE82BE55B64 /* Pods-MyMapProject.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyMapProject.release.xcconfig"; path = "Target Support Files/Pods-MyMapProject/Pods-MyMapProject.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,7 +162,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C2F554A226219CEB00CBA457 /* CloudKit.framework in Frameworks */,
-				ADF2F6A94C1A125CA47EED52 /* Pods_MyMapProject.framework in Frameworks */,
+				B88BD104312E46D2D31CFBFD /* Pods_MyMapProject.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -168,7 +174,7 @@
 			children = (
 				C2F554A126219CEB00CBA457 /* CloudKit.framework */,
 				C27B909F25E0FE2500063CE3 /* StoreKit.framework */,
-				91062F31C87585E0B7AEC74B /* Pods_MyMapProject.framework */,
+				40CC03CFA300EF4EB315902B /* Pods_MyMapProject.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -176,8 +182,8 @@
 		A071E60461933242BC739C6E /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				9C32C092A966103C64F17F76 /* Pods-MyMapProject.debug.xcconfig */,
-				3D26FBD39712C2576173CC04 /* Pods-MyMapProject.release.xcconfig */,
+				07AF6D64E456EA285C07C53E /* Pods-MyMapProject.debug.xcconfig */,
+				DE5193CCB2A0CFE82BE55B64 /* Pods-MyMapProject.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -185,11 +191,9 @@
 		BC8A2A4528FEC144001D2130 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				BCBD14B729570CA600AF1E0B /* OverlaysController.swift */,
 				C25598C825BC47470000080D /* FieldsController.swift */,
 				C25598C725BC47460000080D /* LinesController.swift */,
 				C25598C625BC47460000080D /* PlacesController.swift */,
-				C248C8BF25D3DCDF005EC743 /* ItemsController.swift */,
 				BCCB20BF291CEF5D0068F196 /* FieldPolygon.swift */,
 			);
 			name = Controllers;
@@ -229,7 +233,7 @@
 			path = ToDoList;
 			sourceTree = "<group>";
 		};
-		C25598B725BC46F10000080D /* Realm Data Model */ = {
+		C25598B725BC46F10000080D /* Realm Data Models */ = {
 			isa = PBXGroup;
 			children = (
 				BCCB20D1291F6FDF0068F196 /* Overlay.swift */,
@@ -240,7 +244,7 @@
 				C25598BD25BC47190000080D /* Place.swift */,
 				C25598BB25BC47190000080D /* UserDefaults.swift */,
 			);
-			path = "Realm Data Model";
+			path = "Realm Data Models";
 			sourceTree = "<group>";
 		};
 		C257E47B26065B7D007B5701 /* Helpers */ = {
@@ -254,7 +258,6 @@
 				C288A787261DCB4100969BFE /* ImportGeoFileHelper.swift */,
 				C28E2C3C262C538500C33FBB /* GeoJsonTemplates.swift */,
 				BC7922CB29163CA700FD834C /* APIConstants.swift */,
-				C25598AB25BC466F0000080D /* Constants.swift */,
 				BC023EFC294AFAE9002FBCBD /* ExportTypes.swift */,
 				BCAC6ADA2953BA5400B9F6AF /* DataTypes.swift */,
 			);
@@ -277,6 +280,9 @@
 				C2B4467724EFFEC600379EB1 /* SceneDelegate.swift */,
 				C2F0692F25D7EB0500B765DE /* MyMapProject.entitlements */,
 				C29045C425C85B67005E1D2B /* Localizable.strings */,
+				C24E86BE25BC58000016FD3D /* GoogleService-Info.plist */,
+				C25598AB25BC466F0000080D /* Constants.swift */,
+				C25EEDAF25C2B19400B62C12 /* Assets.xcassets */,
 				C255990825BC4A450000080D /* Assets.xcassets */,
 			);
 			path = "Supporting Files";
@@ -294,6 +300,7 @@
 				C2827B2F272D454700926D5D /* Info */,
 				C2827B32272D45BA00926D5D /* Auth */,
 				C2827B31272D45B100926D5D /* Login */,
+				C2827B30272D457700926D5D /* Team */,
 			);
 			path = Scenes;
 			sourceTree = "<group>";
@@ -314,6 +321,16 @@
 				C25598F225BC49DB0000080D /* InfoViewController.swift */,
 			);
 			path = Info;
+			sourceTree = "<group>";
+		};
+		C2827B30272D457700926D5D /* Team */ = {
+			isa = PBXGroup;
+			children = (
+				C27B90A225E1244300063CE3 /* TeamViewController.swift */,
+				C26390FE25E7E4C600B6D6F9 /* MembershipViewController.swift */,
+				C2838C7425EE56C900F6E3CE /* PermissionsViewController.swift */,
+			);
+			path = Team;
 			sourceTree = "<group>";
 		};
 		C2827B31272D45B100926D5D /* Login */ = {
@@ -394,6 +411,7 @@
 		C2B4466924EFFEC600379EB1 = {
 			isa = PBXGroup;
 			children = (
+				BCE9CFA829582801002BFEEE /* .swiftlint.yml */,
 				C2B4467424EFFEC600379EB1 /* MyMapProject */,
 				C2B4467324EFFEC600379EB1 /* Products */,
 				A071E60461933242BC739C6E /* Pods */,
@@ -416,7 +434,7 @@
 				C2B4468324EFFEC700379EB1 /* Info.plist */,
 				C2827B2D272D41EC00926D5D /* Scenes */,
 				C257E47B26065B7D007B5701 /* Helpers */,
-				C25598B725BC46F10000080D /* Realm Data Model */,
+				C25598B725BC46F10000080D /* Realm Data Models */,
 				BC8A2A4528FEC144001D2130 /* Controllers */,
 				BCCB20C1291D13590068F196 /* Extensions */,
 				C2678506250204E70094A9EA /* Views */,
@@ -432,13 +450,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = C2B4468624EFFEC700379EB1 /* Build configuration list for PBXNativeTarget "MyMapProject" */;
 			buildPhases = (
-				6FFF7DCA21F303E108945AFB /* [CP] Check Pods Manifest.lock */,
+				E51A7F3E08890645442DA654 /* [CP] Check Pods Manifest.lock */,
 				C2B4466E24EFFEC600379EB1 /* Sources */,
 				C2B4466F24EFFEC600379EB1 /* Frameworks */,
 				C2B4467024EFFEC600379EB1 /* Resources */,
 				C28172A12637D09E0014E5A0 /* ShellScript */,
-				505E87FA7B411FFAA70B64CB /* [CP] Embed Pods Frameworks */,
-				4FAFE02485518620ABDA99AB /* [CP] Copy Pods Resources */,
+				172FC522720BD60F69BB02AA /* [CP] Embed Pods Frameworks */,
+				14074CCF5B782ADDA06308A0 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -491,15 +509,17 @@
 				C263095525C0A06700919DBF /* Main.storyboard in Resources */,
 				C26DAB72262379BD004A6CD9 /* InfoPlist.strings in Resources */,
 				C29045C625C85B67005E1D2B /* Localizable.strings in Resources */,
+				BCE9CFA929582801002BFEEE /* .swiftlint.yml in Resources */,
 				C264751326198D230021E88C /* OverlayView.xib in Resources */,
 				C255990C25BC4A450000080D /* Assets.xcassets in Resources */,
+				C24E86BF25BC58000016FD3D /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		4FAFE02485518620ABDA99AB /* [CP] Copy Pods Resources */ = {
+		14074CCF5B782ADDA06308A0 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -516,7 +536,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MyMapProject/Pods-MyMapProject-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		505E87FA7B411FFAA70B64CB /* [CP] Embed Pods Frameworks */ = {
+		172FC522720BD60F69BB02AA /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -533,7 +553,26 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-MyMapProject/Pods-MyMapProject-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		6FFF7DCA21F303E108945AFB /* [CP] Check Pods Manifest.lock */ = {
+		C28172A12637D09E0014E5A0 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
+				"$(SRCROOT)/$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if which swiftlint >/dev/null; then\n  swiftlint\nelse\n  echo \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi\n\"${PODS_ROOT}/FirebaseCrashlytics/run\"\n\n";
+		};
+		E51A7F3E08890645442DA654 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -555,25 +594,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C28172A12637D09E0014E5A0 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Contents/Resources/DWARF/${TARGET_NAME}",
-				"$(SRCROOT)/$(BUILT_PRODUCTS_DIR)/$(INFOPLIST_PATH)",
-			);
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/FirebaseCrashlytics/run\"\n";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -581,17 +601,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BCBD14B829570CA600AF1E0B /* OverlaysController.swift in Sources */,
 				C25598E825BC49D30000080D /* MapViewController.swift in Sources */,
 				C25598C225BC47190000080D /* Group.swift in Sources */,
 				C255990125BC49DE0000080D /* SwipeTableViewController.swift in Sources */,
 				C25598C325BC47190000080D /* Place.swift in Sources */,
 				C298DFE526157DBA006669FE /* AlertsHelper.swift in Sources */,
+				C26390FF25E7E4C600B6D6F9 /* MembershipViewController.swift in Sources */,
 				C264751D2619FB2B0021E88C /* MapStylesHelper.swift in Sources */,
 				C25598FA25BC49DE0000080D /* GroupListViewController.swift in Sources */,
 				BC97357628F43CAE007F1EBC /* SettingsViewController.swift in Sources */,
 				BCCB20C0291CEF5D0068F196 /* FieldPolygon.swift in Sources */,
 				C25598FF25BC49DE0000080D /* FieldListViewController.swift in Sources */,
+				C27B90A325E1244300063CE3 /* TeamViewController.swift in Sources */,
 				C25598CA25BC47470000080D /* LinesController.swift in Sources */,
 				C288A788261DCB4100969BFE /* ImportGeoFileHelper.swift in Sources */,
 				C2B4467824EFFEC600379EB1 /* SceneDelegate.swift in Sources */,
@@ -613,7 +634,6 @@
 				BC8A2A4428F53037001D2130 /* SettingViewModel.swift in Sources */,
 				BCAC6AE229544F4700B9F6AF /* ImportExportAlerts.swift in Sources */,
 				C2838C7525EE56C900F6E3CE /* PermissionsViewController.swift in Sources */,
-				C248C8C025D3DCDF005EC743 /* ItemsController.swift in Sources */,
 				C2E1B80E2607A73E005900F0 /* AdMobHelper.swift in Sources */,
 				BCCB20C9291D19930068F196 /* UIImageExtensions.swift in Sources */,
 				BC7922CC29163CA700FD834C /* APIConstants.swift in Sources */,
@@ -795,7 +815,7 @@
 		};
 		C2B4468724EFFEC700379EB1 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9C32C092A966103C64F17F76 /* Pods-MyMapProject.debug.xcconfig */;
+			baseConfigurationReference = 07AF6D64E456EA285C07C53E /* Pods-MyMapProject.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MyMapProject/MyMapProject.entitlements;
@@ -819,7 +839,7 @@
 		};
 		C2B4468824EFFEC700379EB1 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3D26FBD39712C2576173CC04 /* Pods-MyMapProject.release.xcconfig */;
+			baseConfigurationReference = DE5193CCB2A0CFE82BE55B64 /* Pods-MyMapProject.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = MyMapProject/MyMapProject.entitlements;

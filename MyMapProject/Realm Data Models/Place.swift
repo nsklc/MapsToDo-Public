@@ -1,18 +1,17 @@
 //
-//  Line.swift
+//  Place.swift
 //  MyMapProject
 //
-//  Created by Enes Kılıç on 7.10.2020.
+//  Created by Enes Kılıç on 6.10.2020.
 //  Copyright © 2020 Enes Kılıç. All rights reserved.
 //
 
 import Foundation
 import RealmSwift
 
-class Line: Overlay {
+class Place: Overlay {
     let photos = List<String>()
-    @objc dynamic var length: Double = 0.0
+    @objc dynamic var iconSize: Float = 0.003
     @objc dynamic var lastUpdateTime: Date = Date()
-    var polylineMarkersPositions = List<Position>()
+    @objc dynamic var markerPosition: Position? = Position()
 }
-

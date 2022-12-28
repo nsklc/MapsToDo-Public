@@ -13,5 +13,3 @@ class Group: Overlay {
     @objc dynamic var lastUpdateTime: Date = Date()
     let fields = List<Field>()
 }
-
-

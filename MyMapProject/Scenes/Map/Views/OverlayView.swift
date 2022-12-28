@@ -12,7 +12,7 @@ import RealmSwift
 
 class OverlayView: UIViewController {
     
-    let realm = try! Realm()
+    let realm: Realm! = try? Realm()
     
     private var userDefaults: Results<UserDefaults>?
     
@@ -64,15 +64,14 @@ class OverlayView: UIViewController {
         
         styleButtonsStackView.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor).isActive = true
         
-        
         let panGesture = UIPanGestureRecognizer(target: self, action: #selector(panGestureRecognizerAction))
         view.addGestureRecognizer(panGesture)
         
         slideIdicator.roundCorners(.allCorners, radius: 10)
-        //subscribeButton.roundCorners(.allCorners, radius: 10)
+        // subscribeButton.roundCorners(.allCorners, radius: 10)
         
         if let userDefaults = userDefaults?.first {
-            if userDefaults.mapType != K.mapTypes.custom {
+            if userDefaults.mapType != K.MapTypes.custom {
                 currentMapStyle = MapStylesHelper.standard
                 setMapStyle(to: makeJson(theme: currentMapStyle, features: makeFeaturesJson()))
             }
@@ -85,7 +84,7 @@ class OverlayView: UIViewController {
             pointOrigin = self.view.frame.origin
         }
     }
-    //MARK: - panGestureRecognizerAction
+    // MARK: - panGestureRecognizerAction
     @objc func panGestureRecognizerAction(sender: UIPanGestureRecognizer) {
         let translation = sender.translation(in: view)
         
@@ -107,7 +106,7 @@ class OverlayView: UIViewController {
             }
         }
     }
-    //MARK: - setMapStyle
+    // MARK: - setMapStyle
     func setMapStyle(to json: String) {
         print(json)
         if let mapView = mapView {
@@ -132,41 +131,41 @@ class OverlayView: UIViewController {
         
     }
     
-    //MARK: - darkButtonTapped
+    // MARK: - darkButtonTapped
     @IBAction func darkButtonTapped(_ sender: UIButton) {
         currentMapStyle = MapStylesHelper.dark
         setMapStyle(to: makeJson(theme: currentMapStyle, features: makeFeaturesJson()))
         
     }
     
-    //MARK: - retroButtonTapped
+    // MARK: - retroButtonTapped
     @IBAction func retroButtonTapped(_ sender: UIButton) {
         currentMapStyle = MapStylesHelper.retro
         setMapStyle(to: makeJson(theme: currentMapStyle, features: makeFeaturesJson()))
         
     }
     
-    //MARK: - nightButtonTapped
+    // MARK: - nightButtonTapped
     @IBAction func nightButtonTapped(_ sender: UIButton) {
         currentMapStyle = MapStylesHelper.night
         setMapStyle(to: makeJson(theme: currentMapStyle, features: makeFeaturesJson()))
         
     }
     
-    //MARK: - silverButtonTapped
+    // MARK: - silverButtonTapped
     @IBAction func silverButtonTapped(_ sender: UIButton) {
         currentMapStyle = MapStylesHelper.silver
         setMapStyle(to: makeJson(theme: currentMapStyle, features: makeFeaturesJson()))
         
     }
     
-    //MARK: - aubergineButtonTapped
+    // MARK: - aubergineButtonTapped
     @IBAction func aubergineButtonTapped(_ sender: UIButton) {
         currentMapStyle = MapStylesHelper.aubergine
         setMapStyle(to: makeJson(theme: currentMapStyle, features: makeFeaturesJson()))
         
     }
-    //MARK: - makeJson
+    // MARK: - makeJson
     func makeJson(theme: String, features: String) -> String {
     
         print(theme)
@@ -178,8 +177,8 @@ class OverlayView: UIViewController {
             retro.remove(at: index)
         }
         
-        //var road = features
-        //road.remove(at: road.firstIndex(of: "[")!)
+        // var road = features
+        // road.remove(at: road.firstIndex(of: "[")!)
         if theme != MapStylesHelper.standard {
             retro.append(",")
         }
@@ -187,12 +186,12 @@ class OverlayView: UIViewController {
         retro.append(makeFeaturesJson())
         retro.append("\n]")
        
-        //print("---")
+        // print("---")
         print(retro)
         
         return retro
     }
-    //MARK: - makeFeaturesJson
+    // MARK: - makeFeaturesJson
     func makeFeaturesJson() -> String {
         
         var features = ""
@@ -252,7 +251,7 @@ class OverlayView: UIViewController {
         return features
     }
     
-    //MARK: - roadsSliderValueChanged
+    // MARK: - roadsSliderValueChanged
     @IBAction func sliderValueChanged(_ sender: UISlider) {
         switch sender.value {
         case 0:
@@ -274,7 +273,7 @@ class OverlayView: UIViewController {
         }
     }
     
-    //MARK: - viewWillAppear
+    // MARK: - viewWillAppear
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         if let userDefaults = userDefaults?.first {
@@ -285,14 +284,14 @@ class OverlayView: UIViewController {
         }
     }
     
-    //MARK: - viewWillDisappear
+    // MARK: - viewWillDisappear
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
         
         if let userDefaults = userDefaults?.first {
             do {
                 try realm.write({
-                    userDefaults.mapType = K.mapTypes.custom
+                    userDefaults.mapType = K.MapTypes.custom
                     if let finalMapStyle = finalMapStyle {
                         userDefaults.customMapStyle = finalMapStyle
                     }
@@ -308,6 +307,5 @@ class OverlayView: UIViewController {
         }
         
     }
-    
     
 }

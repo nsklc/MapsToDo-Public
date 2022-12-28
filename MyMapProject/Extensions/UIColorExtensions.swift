@@ -7,7 +7,7 @@
 //
 
 import UIKit
-
+// swiftlint:disable identifier_name
 extension UIColor {
     enum HexFormat {
         case RGB
@@ -27,7 +27,7 @@ extension UIColor {
         let maxi = [.RGB, .ARGB, .RGBA].contains(format) ? 16 : 256
 
         func toI(_ f: CGFloat) -> Int {
-            return min(maxi - 1, Int(CGFloat(maxi) * f))
+            min(maxi - 1, Int(CGFloat(maxi) * f))
         }
 
         var r: CGFloat = 0

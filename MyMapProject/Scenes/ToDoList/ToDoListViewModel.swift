@@ -31,22 +31,22 @@ class ToDoListViewModel: ToDoListViewModelProtocol {
     
     weak var viewController: ToDoListViewControllerProtocol?
     
-    let realm = try! Realm()
-    private var userDefaults: Results<UserDefaults>?
+    let realm: Realm! = try? Realm()
+    private var userDefaults: UserDefaults!
     var todoItems: Results<Item>?
     var groupTodoItems: Results<Item>?
-
+    
     private let db = Firestore.firestore()
     private let user = Auth.auth().currentUser
     private var handle: AuthStateDidChangeListenerHandle?
     
     init() {
-        userDefaults = realm.objects(UserDefaults.self)
+        userDefaults = realm.objects(UserDefaults.self).first
     }
     
     func checkIsToDoItemsCountAtLimit() -> Bool {
-        if userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
-            if let itemCount = todoItems?.count, itemCount >= K.freeAccountLimitations.todoItemLimit {
+        if userDefaults.accountType == K.invites.accountTypes.freeAccount {
+            if let itemCount = todoItems?.count, itemCount >= K.FreeAccountLimitations.todoItemLimit {
                 return true
             }
         }
@@ -101,22 +101,22 @@ class ToDoListViewModel: ToDoListViewModelProtocol {
         return nil
     }
     
-    //MARK: - loadItemsWithGroup
+    // MARK: - loadItemsWithGroup
     func loadItemsWithGroup(selectedGroup: Group) {
-        groupTodoItems = selectedGroup.items.sorted(byKeyPath: "startDate",ascending: true)
+        groupTodoItems = selectedGroup.items.sorted(byKeyPath: "startDate", ascending: true)
         viewController?.reloadTableViewData()
     }
-    //MARK: - loadItemsWithField
+    // MARK: - loadItemsWithField
     func loadItemsWithField(selectedField: Field) {
-        todoItems = selectedField.items.sorted(byKeyPath: "startDate",ascending: true)
+        todoItems = selectedField.items.sorted(byKeyPath: "startDate", ascending: true)
         viewController?.reloadTableViewData()
     }
-    //MARK: - loadItemsWithLine
+    // MARK: - loadItemsWithLine
     func loadItemsWithLine(selectedLine: Line) {
-        todoItems = selectedLine.items.sorted(byKeyPath: "startDate",ascending: true)
+        todoItems = selectedLine.items.sorted(byKeyPath: "startDate", ascending: true)
         viewController?.reloadTableViewData()
     }
-    //MARK: - deleteItem
+    // MARK: - deleteItem
     func deleteItem(at indexPath: IndexPath, itemType: TodoItemType) {
         if itemType == TodoItemType.fieldsItem || itemType == TodoItemType.groupsItem {
             if indexPath.row < groupTodoItems!.count {
@@ -158,9 +158,9 @@ class ToDoListViewModel: ToDoListViewModelProtocol {
             }
         }
     }
-    //MARK: - loadItemsWithPlace
+    // MARK: - loadItemsWithPlace
     func loadItemsWithPlace(selectedPlace: Place) {
-        todoItems = selectedPlace.items.sorted(byKeyPath: "startDate",ascending: true)
+        todoItems = selectedPlace.items.sorted(byKeyPath: "startDate", ascending: true)
         viewController?.reloadTableViewData()
     }
     
@@ -169,96 +169,104 @@ class ToDoListViewModel: ToDoListViewModelProtocol {
         viewController?.reloadTableViewData()
     }
     
-    //MARK: - saveItemToCloud
+    // MARK: - saveItemToCloud
     func saveItemToCloud(item: Item) {
         if user != nil {
-            db.collection(userDefaults!.first!.bossID).document("Items").collection("Items").document(item.id).setData(item.dictionaryWithValues(forKeys: ["title", "startDate", "endDate", "note", "status", "parentID"])) { err in
+            db.collection(userDefaults.bossID).document("Items").collection("Items").document(item.id).setData(item.dictionaryWithValues(forKeys: ["title", "startDate", "endDate", "note", "status", "parentID"])) { err in
                 if let err = err {
                     print("Error writing document: \(err)")
                 } else {
                     print("Document successfully written!")
-                    //db.collection(user.uid).document("Items").setData([item.id : self.updateTime], merge: true)
+                    // db.collection(user.uid).document("Items").setData([item.id : self.updateTime], merge: true)
                 }
             }
         }
     }
-    //MARK: - deleteItemFromCloud
+    // MARK: - deleteItemFromCloud
     func deleteItemFromCloud(item: Item) {
-        if let user = user {
-            self.db.collection(userDefaults!.first!.bossID).document("Items").collection("Items").document(item.id).delete()
+        if user != nil {
+            self.db.collection(userDefaults.bossID).document("Items").collection("Items").document(item.id).delete()
         }
     }
-    //MARK: - listenItemDocuments
+    // MARK: - listenItemDocuments
     func listenItemDocuments(parentID: String, overlay: Overlay) {
         if user != nil {
-            self.db.collection(userDefaults!.first!.bossID).document("Items").collection("Items").whereField("parentID", isEqualTo: parentID).addSnapshotListener { [self] querySnapshot, error in
+            self.db.collection(userDefaults.bossID).document("Items").collection("Items").whereField("parentID", isEqualTo: parentID).addSnapshotListener { [self] querySnapshot, error in
                 guard let snapshot = querySnapshot else {
                     print("Error fetching snapshots: \(error!)")
                     return
                 }
                 snapshot.documentChanges.forEach { diff in
-                    if (diff.type == .added) {
+                    if diff.type == .added {
                         print("New item: \(diff.document.data())")
-                        //print(diff.document.documentID)
+                        // print(diff.document.documentID)
                         if realm.object(ofType: Item.self, forPrimaryKey: diff.document.documentID) != nil {
                         } else {
-                            //if diff.document.data()["updatedBy"] as? String != user.uid {
-                                let item = Item()
-                                item.id = diff.document.documentID
-                                let itemData = diff.document.data()
-                                if let title = itemData["title"] as? String, let status = itemData["status"] as? Int, let startDate = itemData["startDate"] as? Timestamp, let endDate = itemData["endDate"] as? Timestamp, let note = itemData["note"] as? String {
-                                    item.title = title
-                                    item.status = status
-                                    item.startDate = startDate.dateValue()
-                                    item.endDate = endDate.dateValue()
-                                    item.note = note
-                                }
+                            // if diff.document.data()["updatedBy"] as? String != user.uid {
+                            let item = Item()
+                            item.id = diff.document.documentID
+                            let itemData = diff.document.data()
+                            if let title = itemData["title"] as? String,
+                               let status = itemData["status"] as? Int,
+                               let startDate = itemData["startDate"] as? Timestamp,
+                               let endDate = itemData["endDate"] as? Timestamp,
+                               let note = itemData["note"] as? String {
+                                item.title = title
+                                item.status = status
+                                item.startDate = startDate.dateValue()
+                                item.endDate = endDate.dateValue()
+                                item.note = note
+                            }
+                            do {
+                                try realm.write({
+                                    realm.add(item)
+                                    overlay.items.append(item)
+                                })
+                            } catch {
+                                print("Error saving context, \(error)")
+                            }
+                        }
+                        viewController?.reloadTableViewData()
+                    }
+                    if diff.type == .modified {
+                        print("Modified item: \(diff.document.data())")
+                        if let specificItem = realm.object(ofType: Item.self, forPrimaryKey: diff.document.documentID) {
+                            // if diff.document.data()["updatedBy"] as? String != user.uid {
+                            let itemData = diff.document.data()
+                            
+                            if let title = itemData["title"] as? String,
+                               let status = itemData["status"] as? Int,
+                               let startDate = itemData["startDate"] as? Timestamp,
+                               let endDate = itemData["endDate"] as? Timestamp,
+                                let note = itemData["note"] as? String {
                                 do {
                                     try realm.write({
-                                        realm.add(item)
-                                        overlay.items.append(item)
+                                        if specificItem.title != title {
+                                            specificItem.title = title
+                                        }
+                                        if specificItem.status != status {
+                                            specificItem.status = status
+                                        }
+                                        if specificItem.startDate != startDate.dateValue() {
+                                            specificItem.startDate = startDate.dateValue()
+                                        }
+                                        if specificItem.endDate != endDate.dateValue() {
+                                            specificItem.endDate = endDate.dateValue()
+                                        }
+                                        if specificItem.note != note {
+                                            specificItem.note = note
+                                        }
                                     })
                                 } catch {
                                     print("Error saving context, \(error)")
                                 }
-                        }
-                        viewController?.reloadTableViewData()
-                    }
-                    if (diff.type == .modified) {
-                        print("Modified item: \(diff.document.data())")
-                        if let specificItem = realm.object(ofType: Item.self, forPrimaryKey: diff.document.documentID) {
-                            //if diff.document.data()["updatedBy"] as? String != user.uid {
-                                let itemData = diff.document.data()
-                                
-                                if let title = itemData["title"] as? String, let status = itemData["status"] as? Int, let startDate = itemData["startDate"] as? Timestamp, let endDate = itemData["endDate"] as? Timestamp, let note = itemData["note"] as? String {
-                                    do {
-                                        try realm.write({
-                                            if specificItem.title != title {
-                                                specificItem.title = title
-                                            }
-                                            if specificItem.status != status {
-                                                specificItem.status = status
-                                            }
-                                            if specificItem.startDate != startDate.dateValue() {
-                                                specificItem.startDate = startDate.dateValue()
-                                            }
-                                            if specificItem.endDate != endDate.dateValue() {
-                                                specificItem.endDate = endDate.dateValue()
-                                            }
-                                            if specificItem.note != note {
-                                                specificItem.note = note
-                                            }
-                                        })
-                                    } catch {
-                                        print("Error saving context, \(error)")
-                                    }
-                                }
+                            }
                             viewController?.reloadTableViewData()
                         } else {
                             
                         }
                     }
-                    if (diff.type == .removed) {
+                    if diff.type == .removed {
                         print("Removed item: \(diff.document.data())")
                         if let specificItem = realm.object(ofType: Item.self, forPrimaryKey: diff.document.documentID) {
                             do {

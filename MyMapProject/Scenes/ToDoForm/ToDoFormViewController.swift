@@ -28,7 +28,7 @@ class ToDoFormViewController: UIViewController {
     @IBOutlet weak var camButton: UIButton!
     
     private var statusPickerData = [String]()
-    private let realm = try! Realm()
+    private let realm: Realm! = try? Realm()
     private var userDefaults: Results<UserDefaults>?
     private let db = Firestore.firestore()
     private let user = Auth.auth().currentUser
@@ -48,15 +48,15 @@ class ToDoFormViewController: UIViewController {
         super.viewDidLoad()
         userDefaults = realm.objects(UserDefaults.self)
         
-        timer = Timer.scheduledTimer(timeInterval: K.freeAccountLimitations.toDoPageTimer, target: self, selector: #selector(fireTimer), userInfo: nil, repeats: false)
+        timer = Timer.scheduledTimer(timeInterval: K.FreeAccountLimitations.toDoPageTimer, target: self, selector: #selector(fireTimer), userInfo: nil, repeats: false)
         
         noteTextView.delegate = self
         
-        view.backgroundColor = UIColor(hexString: K.colors.thirdColor)
-        titleTextField.backgroundColor = UIColor(hexString: K.colors.primaryColor)
-        noteTextView.backgroundColor = UIColor(hexString: K.colors.primaryColor)
-        startDatePicker.backgroundColor = UIColor(hexString: K.colors.primaryColor)
-        endDatePicker.backgroundColor = UIColor(hexString: K.colors.primaryColor)
+        view.backgroundColor = UIColor(hexString: K.Colors.thirdColor)
+        titleTextField.backgroundColor = UIColor(hexString: K.Colors.primaryColor)
+        noteTextView.backgroundColor = UIColor(hexString: K.Colors.primaryColor)
+        startDatePicker.backgroundColor = UIColor(hexString: K.Colors.primaryColor)
+        endDatePicker.backgroundColor = UIColor(hexString: K.Colors.primaryColor)
         
         startDatePicker.datePickerMode = .dateAndTime
         endDatePicker.datePickerMode = .dateAndTime
@@ -64,7 +64,7 @@ class ToDoFormViewController: UIViewController {
         statusPickerData = [NSLocalizedString("Waiting To Run", comment: ""), NSLocalizedString("In Progress", comment: ""), NSLocalizedString("Completed", comment: ""), NSLocalizedString("Canceled", comment: "")]
         statusPickerView.delegate = self
         statusPickerView.dataSource = self
-        //statusPickerView.tintColor = UIColor.flatWhite()
+        // statusPickerView.tintColor = UIColor.flatWhite()
         statusPickerView.contentMode = .scaleToFill
         
         if let itemTitle = selectedItem?.title {
@@ -103,7 +103,7 @@ class ToDoFormViewController: UIViewController {
         )
     }
     
-    //MARK: - viewDidAppear
+    // MARK: - viewDidAppear
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
     }
@@ -118,7 +118,7 @@ class ToDoFormViewController: UIViewController {
         timer?.invalidate()
     }
     
-    //MARK: - keyboardWillShow
+    // MARK: - keyboardWillShow
     @objc func keyboardWillShow(notification: NSNotification) {
        guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
         
@@ -126,7 +126,7 @@ class ToDoFormViewController: UIViewController {
         let keyboardViewEndFrame = view.convert(keyboardScreenEndFrame, from: view.window)
         
         self.noteTextView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardViewEndFrame.height - view.safeAreaInsets.top, right: 0)
-        self.noteTextView.scrollIndicatorInsets = self.noteTextView.contentInset;
+        self.noteTextView.scrollIndicatorInsets = self.noteTextView.contentInset
         
         guard let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {
               // if keyboard size is not available for some reason, dont do anything
@@ -134,25 +134,25 @@ class ToDoFormViewController: UIViewController {
            }
          
          // move the root view up by the distance of keyboard height
-        //self.view.frame.origin.y = 0 - abs(keyboardSize.height - noteTextView.frame.maxY)
+        // self.view.frame.origin.y = 0 - abs(keyboardSize.height - noteTextView.frame.maxY)
     
-        self.noteTextView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: abs(noteTextView.frame.maxY - keyboardSize.minY) , right: 0)
-        self.noteTextView.scrollIndicatorInsets = self.noteTextView.contentInset;
+        self.noteTextView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: abs(noteTextView.frame.maxY - keyboardSize.minY), right: 0)
+        self.noteTextView.scrollIndicatorInsets = self.noteTextView.contentInset
     }
-    //MARK: - keyboardWillHide
-    @objc func keyboardWillHide(notification:NSNotification) {
-        //self.view.frame.origin.y = 0
+    // MARK: - keyboardWillHide
+    @objc func keyboardWillHide(notification: NSNotification) {
+        // self.view.frame.origin.y = 0
         print("keyboardWillHide")
-        self.noteTextView.contentInset = UIEdgeInsets.zero;
-        self.noteTextView.scrollIndicatorInsets = UIEdgeInsets.zero;
+        self.noteTextView.contentInset = UIEdgeInsets.zero
+        self.noteTextView.scrollIndicatorInsets = UIEdgeInsets.zero
     }
-    //MARK: - viewWillDisappear
+    // MARK: - viewWillDisappear
     override func viewWillDisappear(_ animated: Bool) {
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
      
-    //MARK: - updateStatus
+    // MARK: - updateStatus
     func updateStatus() {
         let date = Date()
         if selectedItem?.status != 3 && selectedItem?.status != 2 {
@@ -168,7 +168,7 @@ class ToDoFormViewController: UIViewController {
                 try realm.write({
                     selectedItem?.status = status
                 })
-            } catch  {
+            } catch {
                 print("Error saving item, \(error)")
             }
         } else {
@@ -187,15 +187,15 @@ class ToDoFormViewController: UIViewController {
             statusPickerView.backgroundColor = UIColor.flatGray()
         }
     }
-    //MARK: - startDateValueChanged
+    // MARK: - startDateValueChanged
     @IBAction func startDateValueChanged(_ sender: UIDatePicker) {
         updateStatus()
     }
-    //MARK: - endDateValueChanged
+    // MARK: - endDateValueChanged
     @IBAction func endDateValueChanged(_ sender: UIDatePicker) {
         updateStatus()
     }
-    //MARK: - saveButtonTapped
+    // MARK: - saveButtonTapped
     @IBAction func saveButtonTapped(_ sender: UIButton) {
         
         if let item = selectedItem {
@@ -206,7 +206,7 @@ class ToDoFormViewController: UIViewController {
                     item.endDate = endDatePicker.date
                     item.note = noteTextView.text
                 })
-            } catch  {
+            } catch {
                 print("Error saving item, \(error)")
             }
             saveItemToCloud(item: item)
@@ -216,13 +216,12 @@ class ToDoFormViewController: UIViewController {
             viewController.viewDidLoad()
         }
         
-        
         if showAd && userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
             if interstitial != nil {
                 interstitial?.present(fromRootViewController: self)
                 
                 let nc = NotificationCenter.default
-                nc.post(name:  Notification.Name("addShowed"), object: nil)
+                nc.post(name: Notification.Name("addShowed"), object: nil)
                 
             } else {
                 print("Ad wasn't ready")
@@ -231,20 +230,20 @@ class ToDoFormViewController: UIViewController {
 
         navigationController?.popViewController(animated: true)
     }
-    //MARK: - saveItemToCloud
+    // MARK: - saveItemToCloud
     func saveItemToCloud(item: Item) {
         if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
             db.collection(userDefaults!.first!.bossID).document("Items").collection("Items").document(item.id).setData(item.dictionaryWithValues(forKeys: ["title", "startDate", "endDate", "note", "status"]), merge: true) { err in
                 if let err = err {
                     print("Error writing document: \(err)")
                 } else {
-                    //print("Document successfully written!")
-                    //db.collection(user.uid).document("Items").setData([item.id : self.updateTime], merge: true)
+                    // print("Document successfully written!")
+                    // db.collection(user.uid).document("Items").setData([item.id : self.updateTime], merge: true)
                 }
             }
         }
     }
-    //MARK: - setSubViewsConstraints
+    // MARK: - setSubViewsConstraints
     func setSubViewsConstraints() {
         titleTextField.translatesAutoresizingMaskIntoConstraints = false
         titleTextField.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -5).isActive = true
@@ -259,8 +258,8 @@ class ToDoFormViewController: UIViewController {
         notesLabel.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 5).isActive = true
         notesLabel.bottomAnchor.constraint(equalTo: noteTextView.safeAreaLayoutGuide.topAnchor, constant: -5).isActive = true
         notesLabel.topAnchor.constraint(equalTo: titleTextField.safeAreaLayoutGuide.bottomAnchor, constant: 10).isActive = true
-        //notesLabel.layer.borderWidth = 1
-        //notesLabel.layer.borderColor = UIColor(hexString: K.colors.fourthColor)?.cgColor
+        // notesLabel.layer.borderWidth = 1
+        // notesLabel.layer.borderColor = UIColor(hexString: K.colors.fourthColor)?.cgColor
         notesLabel.adjustsFontForContentSizeCategory = true
         notesLabel.textAlignment = .center
         notesLabel.text = NSLocalizedString("Notes", comment: "")
@@ -271,8 +270,8 @@ class ToDoFormViewController: UIViewController {
         noteTextView.bottomAnchor.constraint(equalTo: startStackView.safeAreaLayoutGuide.topAnchor, constant: -10).isActive = true
         noteTextView.topAnchor.constraint(equalTo: notesLabel.safeAreaLayoutGuide.bottomAnchor, constant: 5).isActive = true
         noteTextView.isScrollEnabled = true
-        //noteTextView.layer.borderWidth = 1
-        //noteTextView.layer.borderColor = UIColor(hexString: K.colors.fourthColor)?.cgColor
+        // noteTextView.layer.borderWidth = 1
+        // noteTextView.layer.borderColor = UIColor(hexString: K.colors.fourthColor)?.cgColor
         
         noteTextView.layer.borderWidth = 0.75
         noteTextView.layer.borderColor = UIColor.systemBlue.cgColor
@@ -309,28 +308,27 @@ class ToDoFormViewController: UIViewController {
         camButton.isHidden = true
     }
     
-    //MARK: - camButtonTapped
+    // MARK: - camButtonTapped
     @IBAction func camButtonTapped(_ sender: UIButton) {
         addPhotoToTextView()
     }
     
-    //MARK: - addPhotoToTextView
+    // MARK: - addPhotoToTextView
     func addPhotoToTextView() {
         // create an NSMutableAttributedString that we'll append everything to
-        //let fullString = NSMutableAttributedString(string: "Start of text\n")
+        // let fullString = NSMutableAttributedString(string: "Start of text\n")
         let fullString = NSMutableAttributedString(string: noteTextView.text)
 
         // create our NSTextAttachment
         let image1Attachment = NSTextAttachment()
-        image1Attachment.image = UIImage(named: K.imagesFromXCAssets.satalite)?.imageScaled(to: CGSize(width: noteTextView.frame.width - 10, height: noteTextView.frame.width - 10))
+        image1Attachment.image = UIImage(named: K.ImagesFromXCAssets.satalite)?.imageScaled(to: CGSize(width: noteTextView.frame.width - 10, height: noteTextView.frame.width - 10))
 
         // wrap the attachment in its own attributed string so we can append it
         let image1String = NSAttributedString(attachment: image1Attachment)
 
         // add the NSTextAttachment wrapper to our full string, then add some more text.
         fullString.append(image1String)
-        //fullString.append(NSAttributedString(string: "\nEnd of text"))
-        
+        // fullString.append(NSAttributedString(string: "\nEnd of text"))
         
         // draw the result in a label
         noteTextView.attributedText = fullString
@@ -338,20 +336,20 @@ class ToDoFormViewController: UIViewController {
     
 }
 
-extension ToDoFormViewController: UIPickerViewDelegate, UIPickerViewDataSource{
-    //MARK: - numberOfComponents
+extension ToDoFormViewController: UIPickerViewDelegate, UIPickerViewDataSource {
+    // MARK: - numberOfComponents
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
-        return 1
+        1
     }
-    //MARK: - numberOfRowsInComponent
+    // MARK: - numberOfRowsInComponent
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return statusPickerData.count
+        statusPickerData.count
     }
-    //MARK: - titleForRow
+    // MARK: - titleForRow
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return statusPickerData[row]
+        statusPickerData[row]
     }
-    //MARK: - didSelectRow
+    // MARK: - didSelectRow
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
         switch row {
         case 0:
@@ -372,7 +370,7 @@ extension ToDoFormViewController: UIPickerViewDelegate, UIPickerViewDataSource{
                 try realm.write({
                     item.status = row
                 })
-            } catch  {
+            } catch {
                 print("Error saving item, \(error)")
             }
         }
@@ -413,7 +411,7 @@ extension ToDoFormViewController: GADFullScreenContentDelegate {
 }
 
 extension ToDoFormViewController: UITextViewDelegate {
-    //MARK: - textView shouldChangeTextIn
+    // MARK: - textView shouldChangeTextIn
     func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         // get the current text, or use an empty string if that failed
         let currentText = textView.text ?? ""
@@ -429,9 +427,8 @@ extension ToDoFormViewController: UITextViewDelegate {
     }
 }
 
-
 extension ToDoFormViewController: UITextFieldDelegate {
-    //MARK: - textFieldShouldReturn
+    // MARK: - textFieldShouldReturn
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         if textField == titleTextField {
             titleTextField.resignFirstResponder()
@@ -439,7 +436,7 @@ extension ToDoFormViewController: UITextFieldDelegate {
         return true
     }
     
-    //MARK: - textField shouldChangeCharactersIn
+    // MARK: - textField shouldChangeCharactersIn
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         // get the current text, or use an empty string if that failed
         let currentText = textField.text ?? ""
