@@ -34,7 +34,7 @@ class SubscriptionsHelper {
             
             if let purchaserInfo = purchaserInfo {
                 if purchaserInfo.entitlements.active.isEmpty {
-                    if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
+                    if userDefaults?.first?.accountType == K.Invites.AccountTypes.proAccount {
                         // print("user need to be deActive member or active member.")
                         
                         let nc = NotificationCenter.default
@@ -50,7 +50,7 @@ class SubscriptionsHelper {
                         
                         do {
                             try realm.write({
-                                userDefaults?.first?.accountType = K.invites.accountTypes.freeAccount
+                                userDefaults?.first?.accountType = K.Invites.AccountTypes.freeAccount
                             })
                         } catch {
                             print(error.localizedDescription)
@@ -58,13 +58,13 @@ class SubscriptionsHelper {
                     }
                 } else {
                     
-                    if userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
+                    if userDefaults?.first?.accountType == K.Invites.AccountTypes.freeAccount {
                         
                         if purchaserInfo.entitlements[K.Entitlements.professional]?.isActive == true {
                             // print("user need to be professional member")
                             do {
                                 try realm.write({
-                                    userDefaults?.first?.accountType = K.invites.accountTypes.proAccount
+                                    userDefaults?.first?.accountType = K.Invites.AccountTypes.proAccount
                                 })
                             } catch {
                                 print(error.localizedDescription)

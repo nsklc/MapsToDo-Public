@@ -154,7 +154,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         }
     }
     
-    fileprivate func setupObservers() {
+    private func setupObservers() {
         if UIDevice.current.userInterfaceIdiom == .pad {
             NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow), name: UIResponder.keyboardWillShowNotification, object: nil)
             NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide), name: UIResponder.keyboardWillHideNotification, object: nil)
@@ -262,7 +262,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         teamNavBarButton.isEnabled = false
         teamNavBarButton.image = UIImage()
         
-        if viewModel.userDefaults.accountType != K.invites.accountTypes.proAccount {
+        if viewModel.userDefaults.accountType != K.Invites.AccountTypes.proAccount {
             
             authenticationNavBarButton.image = UIImage(systemName: "star.circle")
             
@@ -276,7 +276,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             title = "\(K.appName) Pro"
         }
         bannerView.isHidden = true
-        if viewModel.userDefaults.accountType == K.invites.accountTypes.proAccount {
+        if viewModel.userDefaults.accountType == K.Invites.AccountTypes.proAccount {
             bannerView.isHidden = false
         }
         
@@ -290,7 +290,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
                     
                 }
             } else {
-                if viewModel.userDefaults.accountType == K.invites.accountTypes.proAccount {
+                if viewModel.userDefaults.accountType == K.Invites.AccountTypes.proAccount {
                     
                     AuthAlertsHelper.authInfoAlert(on: self) {
                         self.performSegue(withIdentifier: K.SegueIdentifiers.goToLoginViewController, sender: self)
@@ -502,14 +502,14 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             rect.replaceCoordinate(at: UInt(markers.firstIndex(of: selectedMarker) ?? 0), with: CLLocationCoordinate2D(latitude: selectedMarker.position.latitude, longitude: selectedMarker.position.longitude))
             if editingOverlayType == .field {
                 if viewModel.userDefaults.showDistancesBetweenTwoCorners {
-                    fieldsController.arrangeSelectedFieldLengthMarker(i: fieldsController.selectedFieldMarkers.firstIndex(of: selectedMarker)!, inside: true, add: false, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+                    fieldsController.arrangeSelectedFieldLengthMarker(index: fieldsController.selectedFieldMarkers.firstIndex(of: selectedMarker)!, inside: true, add: false, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                 }
             } else if editingOverlayType == .line {
                 if viewModel.userDefaults.showDistancesBetweenTwoCorners {
                     if (linesController.selectedLineMarkers.firstIndex(of: selectedMarker)! != 0) && (linesController.selectedLineMarkers.firstIndex(of: selectedMarker)! != linesController.selectedLineMarkers.count - 1) {
-                        linesController.arrangeSelectedLineLengthMarker(i: linesController.selectedLineMarkers.firstIndex(of: selectedMarker)!, inside: true, add: false, mapView: mapView, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+                        linesController.arrangeSelectedLineLengthMarker(index: linesController.selectedLineMarkers.firstIndex(of: selectedMarker)!, inside: true, add: false, mapView: mapView, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                     } else {
-                        linesController.arrangeSelectedLineLengthMarker(i: linesController.selectedLineMarkers.firstIndex(of: selectedMarker)!, inside: false, add: false, mapView: mapView, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
+                        linesController.arrangeSelectedLineLengthMarker(index: linesController.selectedLineMarkers.firstIndex(of: selectedMarker)!, inside: false, add: false, mapView: mapView, isMetric: viewModel.userDefaults.isMeasureSystemMetric, distanceUnit: viewModel.userDefaults.distanceUnit)
                     }
                 }
             }
@@ -564,10 +564,10 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     func mapView(_ mapView: GMSMapView, didTap overlay: GMSOverlay) {
         nc.addObserver(self, selector: #selector(endEditing), name: Notification.Name("EndEditing"), object: nil)
         
-        if overlay.isKind(of: GMSPolygon.self) {
-            editField(polygon: overlay as! GMSPolygon)
-        } else if overlay.isKind(of: GMSPolyline.self) {
-            editLine(polyline: overlay as! GMSPolyline)
+        if overlay.isKind(of: GMSPolygon.self), let polygon = overlay as? GMSPolygon {
+            editField(polygon: polygon)
+        } else if overlay.isKind(of: GMSPolyline.self), let polyline = overlay as? GMSPolyline {
+            editLine(polyline: polyline)
         }
     }
     // MARK: - editField
@@ -779,7 +779,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         switch segue.identifier {
         case K.SegueIdentifiers.goToItemsFromMapView:
             
-            let destinationVC = segue.destination as! ToDoListViewController
+            guard let destinationVC = segue.destination as? ToDoListViewController else { return }
             
             switch editingOverlayType {
             case .field:
@@ -792,21 +792,21 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             }
             
         case K.SegueIdentifiers.infoView:
-            let destinationVC = segue.destination as! FieldListViewController
+            guard let destinationVC = segue.destination as? FieldListViewController else { return }
             destinationVC.selectedGroup = fieldsController.selectedField.parentGroup.first
             destinationVC.fieldsController = fieldsController
             destinationVC.isMetric = viewModel.userDefaults.isMeasureSystemMetric
             
         case K.SegueIdentifiers.goToGroups:
-            let destinationVC = segue.destination as! GroupListViewController
+            guard let destinationVC = segue.destination as? GroupListViewController else { return }
             destinationVC.fieldsController = fieldsController
             
         case K.SegueIdentifiers.goToLines:
-            let destinationVC = segue.destination as! LineListViewController
+            guard let destinationVC = segue.destination as? LineListViewController else { return }
             destinationVC.linesController = linesController
             
         case K.SegueIdentifiers.goToPlaces:
-            let destinationVC = segue.destination as! PlaceListViewController
+            guard let destinationVC = segue.destination as? PlaceListViewController else { return }
             destinationVC.placesController = placesController
             
         case K.segueIdentifiers.goToAuthViewController:
@@ -816,7 +816,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             destinationVC.placesController = placesController
             
         case K.SegueIdentifiers.mapViewToInfoView:
-            let destinationVC = segue.destination as! InfoViewController
+            guard let destinationVC = segue.destination as? InfoViewController else { return }
             
             switch editingOverlayType {
             case .field:
@@ -886,7 +886,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     // MARK: - addFieldButtonTapped
     @IBAction func addFieldButtonTapped(_ sender: UIButton) {
         
-        if viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
+        if viewModel.userDefaults.accountType == K.Invites.AccountTypes.freeAccount {
             if let fieldCount = fieldsController.fields?.count {
                 
                 if fieldCount >= K.FreeAccountLimitations.overlayLimit {
@@ -904,7 +904,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     // MARK: - addLineButtonTapped
     @IBAction func addLineButtonTapped(_ sender: UIButton) {
         
-        if viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
+        if viewModel.userDefaults.accountType == K.Invites.AccountTypes.freeAccount {
             if let lineCount = linesController.lines?.count {
                 
                 if lineCount >= K.FreeAccountLimitations.overlayLimit {
@@ -923,7 +923,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     // MARK: - addPlaceButtonTapped
     @IBAction func addPlaceButtonTapped(_ sender: UIButton) {
         
-        if viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
+        if viewModel.userDefaults.accountType == K.Invites.AccountTypes.freeAccount {
             if let placeCount = placesController.places?.count {
                 
                 if placeCount >= K.FreeAccountLimitations.overlayLimit {
@@ -1017,7 +1017,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     @IBAction func authenticationButtonTapped(_ sender: UIBarButtonItem) {
        
         _ = Auth.auth().addStateDidChangeListener { [self] (_, user) in
-            if viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
+            if viewModel.userDefaults.accountType == K.Invites.AccountTypes.freeAccount {
                 performSegue(withIdentifier: K.SegueIdentifiers.mapViewToPremiumView, sender: self)
             } else {
                 if user != nil {
@@ -1034,8 +1034,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     @IBAction func didTapMenu(_ sender: UIBarButtonItem) {
 
         guard let menuViewController = storyboard?.instantiateViewController(withIdentifier: "MenuViewController") as? MenuViewController else { return }
-        menuViewController.didTapMenuType = { MenuType in
-            switch MenuType {
+        menuViewController.didTapMenuType = { menuType in
+            switch menuType {
             case .fields:
                 self.selectSegue(segueIdentifier: K.SegueIdentifiers.infoView)
             case .groups:
@@ -1149,12 +1149,12 @@ extension MapViewController {
             AlertsHelper.deleteAlert(on: self,
                                      with: .field,
                                      overlayTitle: fieldsController.selectedField.title) { [unowned self] in
-                if viewModel.userDefaults.accountType == K.invites.accountTypes.proAccount {
+                if viewModel.userDefaults.accountType == K.Invites.AccountTypes.proAccount {
                     fieldsController.deleteFieldFromCloud(field: fieldsController.selectedField)
                 }
                 fieldsController.deleteFieldFromDB(field: fieldsController.selectedField)
                 endEditing()
-                if viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
+                if viewModel.userDefaults.accountType == K.Invites.AccountTypes.freeAccount {
                     hideView(view: bannerView, hidden: false)
                 }
             }
@@ -1166,7 +1166,7 @@ extension MapViewController {
                 linesController.deleteLineFromCloud(line: linesController.selectedLine)
                 linesController.deleteSelectedLineFromDB(line: linesController.selectedLine)
                 endEditing()
-                if viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
+                if viewModel.userDefaults.accountType == K.Invites.AccountTypes.freeAccount {
                     hideView(view: bannerView, hidden: false)
                 }
             }
@@ -1179,7 +1179,7 @@ extension MapViewController {
                 placesController.deletePlaceFromCloud(place: placesController.selectedPlace)
                 placesController.deletePlaceFromDB(place: placesController.selectedPlace)
                 endEditing()
-                if viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
+                if viewModel.userDefaults.accountType == K.Invites.AccountTypes.freeAccount {
                     hideView(view: bannerView, hidden: false)
                 }
             }
@@ -1238,7 +1238,7 @@ extension MapViewController {
                     if closestMarkers.0 == 0 {
                         fieldsController.selectedFieldMarkers.insert(newMarker, at: closestMarkers.0)
                         if viewModel.userDefaults.showDistancesBetweenTwoCorners {
-                            fieldsController.arrangeSelectedFieldLengthMarker(i: closestMarkers.0,
+                            fieldsController.arrangeSelectedFieldLengthMarker(index: closestMarkers.0,
                                                                               inside: true,
                                                                               add: true, isMetric: viewModel.userDefaults.isMeasureSystemMetric,
                                                                               distanceUnit: viewModel.userDefaults.distanceUnit)
@@ -1254,7 +1254,7 @@ extension MapViewController {
                 } else if closestMarkers.0 < closestMarkers.1 {
                     fieldsController.selectedFieldMarkers.insert(newMarker, at: closestMarkers.1)
                     if viewModel.userDefaults.showDistancesBetweenTwoCorners {
-                        fieldsController.arrangeSelectedFieldLengthMarker(i: closestMarkers.1,
+                        fieldsController.arrangeSelectedFieldLengthMarker(index: closestMarkers.1,
                                                                           inside: true,
                                                                           add: true,
                                                                           isMetric: viewModel.userDefaults.isMeasureSystemMetric,
@@ -1263,7 +1263,7 @@ extension MapViewController {
                 } else {
                     fieldsController.selectedFieldMarkers.insert(newMarker, at: closestMarkers.0)
                     if viewModel.userDefaults.showDistancesBetweenTwoCorners {
-                        fieldsController.arrangeSelectedFieldLengthMarker(i: closestMarkers.0,
+                        fieldsController.arrangeSelectedFieldLengthMarker(index: closestMarkers.0,
                                                                           inside: true, add: true,
                                                                           isMetric: viewModel.userDefaults.isMeasureSystemMetric,
                                                                           distanceUnit: viewModel.userDefaults.distanceUnit)
@@ -1286,7 +1286,7 @@ extension MapViewController {
                         linesController.selectedLineMarkers.append(marker)
                     }
                     if viewModel.userDefaults.showDistancesBetweenTwoCorners {
-                        linesController.arrangeSelectedLineLengthMarker(i: closestMarkers.0,
+                        linesController.arrangeSelectedLineLengthMarker(index: closestMarkers.0,
                                                                         inside: false,
                                                                         add: true,
                                                                         mapView: mapView,
@@ -1296,7 +1296,7 @@ extension MapViewController {
                 } else if closestMarkers.0 == (linesController.selectedLineMarkers.count-1) {
                     linesController.selectedLineMarkers.append(newMarker)
                     if viewModel.userDefaults.showDistancesBetweenTwoCorners {
-                        linesController.arrangeSelectedLineLengthMarker(i: linesController.selectedLineMarkers.count-2,
+                        linesController.arrangeSelectedLineLengthMarker(index: linesController.selectedLineMarkers.count-2,
                                                                         inside: false,
                                                                         add: true,
                                                                         mapView: mapView,
@@ -1306,7 +1306,7 @@ extension MapViewController {
                 } else if closestMarkers.0 < closestMarkers.1 {
                     linesController.selectedLineMarkers.insert(newMarker, at: closestMarkers.1)
                     if viewModel.userDefaults.showDistancesBetweenTwoCorners {
-                        linesController.arrangeSelectedLineLengthMarker(i: closestMarkers.1,
+                        linesController.arrangeSelectedLineLengthMarker(index: closestMarkers.1,
                                                                         inside: true,
                                                                         add: true,
                                                                         mapView: mapView,
@@ -1316,7 +1316,7 @@ extension MapViewController {
                 } else {
                     linesController.selectedLineMarkers.insert(newMarker, at: closestMarkers.0)
                     if viewModel.userDefaults.showDistancesBetweenTwoCorners {
-                        linesController.arrangeSelectedLineLengthMarker(i: closestMarkers.0,
+                        linesController.arrangeSelectedLineLengthMarker(index: closestMarkers.0,
                                                                         inside: true,
                                                                         add: true,
                                                                         mapView: mapView,
@@ -1477,7 +1477,7 @@ extension MapViewController {
     }
     // MARK: - saveButtonTapped
     @IBAction func saveButtonTapped(_ sender: UIBarButtonItem) {
-        if viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
+        if viewModel.userDefaults.accountType == K.Invites.AccountTypes.freeAccount {
             hideView(view: bannerView, hidden: false)
         }
         switch editingOverlayType {
@@ -1494,7 +1494,7 @@ extension MapViewController {
         }
         endEditing()
         
-        if interstitial != nil && showAd && viewModel.userDefaults.accountType == K.invites.accountTypes.freeAccount {
+        if interstitial != nil && showAd && viewModel.userDefaults.accountType == K.Invites.AccountTypes.freeAccount {
             
             interstitial?.present(fromRootViewController: self)
             
@@ -1841,7 +1841,7 @@ extension MapViewController {
         }
     }
     // MARK: - setupBannerView
-    fileprivate func setupBannerView() {
+    private func setupBannerView() {
         // Handle Banner
         // Production adUnitID
         bannerView.adUnitID = APIConstants.ProductionAdUnitID

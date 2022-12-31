@@ -244,12 +244,11 @@ class LinesController {
     
     // MARK: - deleteLineFromCloud
     func deleteLineFromCloud(line: Line) {
-        if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
+        if userDefaults?.first?.accountType == K.Invites.AccountTypes.proAccount {
             self.db.collection(userDefaults!.first!.bossID).document("Lines").collection("Lines").document(line.id).delete()
             self.db.collection(userDefaults!.first!.bossID).document("Lines").updateData([line.id: FieldValue.delete()])
         }
     }
-    
     // MARK: - listenLineDocuments
     func listenLineDocuments(mapView: GMSMapView) {
         if let user = user {
@@ -261,89 +260,11 @@ class LinesController {
                 snapshot.documentChanges.forEach { diff in
                     // MARK: - added
                     if diff.type == .added {
-                        // print("New line: \(diff.document.data())")
-                        // print(diff.document.documentID)
-                        if realm.object(ofType: Line.self, forPrimaryKey: diff.document.documentID) != nil {
-                            
-                        } else {
-                            // if diff.document.data()["updatedBy"] as? String != user.uid {
-                            let line = Line()
-                            line.id = diff.document.documentID
-                            // print(diff.document.data())
-                            if let lineData = diff.document.data()[diff.document.documentID] as? [String: Any] {
-                                if let title = lineData["title"] as? String, let color = lineData["color"] as? String, let positions = diff.document.data()["positions"] as? [[String: Any]] {
-                                    line.title = title
-                                    line.color = color
-                                    
-                                    var initialMarkers = [GMSMarker]()
-                                    
-                                    for position in positions {
-                                        if let lat = position["latitude"] as? Double, let lon = position["longitude"] as? Double {
-                                            let marker = GMSMarker(position: CLLocationCoordinate2D(latitude: lat, longitude: lon))
-                                            initialMarkers.append(marker)
-                                        }
-                                    }
-                                    
-                                    addLine(title: title, color: color, initialMarkers: initialMarkers, mapView: mapView, isGeodesic: userDefaults!.first!.isGeodesicActive, id: diff.document.documentID)
-                                }
-                            }
-                        }
+                        addLinesFromFireStore(diff, mapView: mapView)
                     }
                     // MARK: - modified
                     if diff.type == .modified {
-                        // print("Modified line: \(diff.document.data())")
-                        if let specificLine = realm.object(ofType: Line.self, forPrimaryKey: diff.document.documentID) {
-                            if selectedLine == specificLine && !selectedLineMarkers.isEmpty {
-                                let nc = NotificationCenter.default
-                                nc.post(name: Notification.Name("EndEditing"), object: nil)
-                            }
-                            
-                            if diff.document.data()["updatedBy"] as? String != user.uid {
-                                if let lineData = diff.document.data()[diff.document.documentID] as? [String: Any] {
-                                    if let title = lineData["title"] as? String, let color = lineData["color"] as? String, let length = lineData["length"] as? Double {
-                                        do {
-                                            try realm.write({
-                                                if specificLine.length != length {
-                                                    specificLine.length = length
-                                                }
-                                                if let polyline = polylines.first(where: {$0.title == specificLine.id}) {
-                                                    if specificLine.title != title {
-                                                        specificLine.title = title
-                                                    }
-                                                    if specificLine.color != color {
-                                                        specificLine.color = color
-                                                        polyline.strokeColor = UIColor(hexString: color) ?? UIColor.flatRed()
-                                                    }
-                                                }
-                                            })
-                                        } catch {
-                                            print("Error saving context, \(error)")
-                                        }
-                                    }
-                                }
-                                if let positions = diff.document.data()["positions"] as? [[String: Double]] {
-                                    do {
-                                        try realm.write({
-                                            specificLine.polylineMarkersPositions.removeAll()
-                                            for position in positions {
-                                                if let lat = position["latitude"], let lon = position["longitude"] {
-                                                    let linePosition = Position()
-                                                    linePosition.latitude = lat
-                                                    linePosition.longitude = lon
-                                                    specificLine.polylineMarkersPositions.append(linePosition)
-                                                }
-                                            }
-                                            if let polyline = polylines.first(where: {$0.title == specificLine.id}) {
-                                                updatePolyline(line: specificLine, polyline: polyline, mapView: mapView)
-                                            }
-                                            
-                                        })
-                                    } catch {
-                                        print("Error saving context, \(error)")
-                                    }
-                                }
-                            }
-                        }
+                        updateLinesFromFireStore(diff, mapView: mapView)
                     }
                     // MARK: - removed
                     if diff.type == .removed {
@@ -368,7 +289,92 @@ class LinesController {
             }
         }
     }
-    
+    // MARK: - addLinesFromFireStore
+    private func addLinesFromFireStore(_ diff: DocumentChange, mapView: GMSMapView) {
+        // print("New line: \(diff.document.data())")
+        // print(diff.document.documentID)
+        if realm.object(ofType: Line.self, forPrimaryKey: diff.document.documentID) != nil {
+            
+        } else {
+            // if diff.document.data()["updatedBy"] as? String != user.uid {
+            let line = Line()
+            line.id = diff.document.documentID
+            // print(diff.document.data())
+            if let lineData = diff.document.data()[diff.document.documentID] as? [String: Any] {
+                if let title = lineData["title"] as? String, let color = lineData["color"] as? String, let positions = diff.document.data()["positions"] as? [[String: Any]] {
+                    line.title = title
+                    line.color = color
+                    
+                    var initialMarkers = [GMSMarker]()
+                    
+                    for position in positions {
+                        if let lat = position["latitude"] as? Double, let lon = position["longitude"] as? Double {
+                            let marker = GMSMarker(position: CLLocationCoordinate2D(latitude: lat, longitude: lon))
+                            initialMarkers.append(marker)
+                        }
+                    }
+                    
+                    addLine(title: title, color: color, initialMarkers: initialMarkers, mapView: mapView, isGeodesic: userDefaults!.first!.isGeodesicActive, id: diff.document.documentID)
+                }
+            }
+        }
+    }
+    // MARK: - updateLinesFromFireStore
+    private func updateLinesFromFireStore(_ diff: DocumentChange, mapView: GMSMapView) {
+        // print("Modified line: \(diff.document.data())")
+        if let specificLine = realm.object(ofType: Line.self, forPrimaryKey: diff.document.documentID) {
+            if selectedLine == specificLine && !selectedLineMarkers.isEmpty {
+                let nc = NotificationCenter.default
+                nc.post(name: Notification.Name("EndEditing"), object: nil)
+            }
+            
+            if diff.document.data()["updatedBy"] as? String != user?.uid {
+                if let lineData = diff.document.data()[diff.document.documentID] as? [String: Any] {
+                    if let title = lineData["title"] as? String, let color = lineData["color"] as? String, let length = lineData["length"] as? Double {
+                        do {
+                            try realm.write({
+                                if specificLine.length != length {
+                                    specificLine.length = length
+                                }
+                                if let polyline = polylines.first(where: {$0.title == specificLine.id}) {
+                                    if specificLine.title != title {
+                                        specificLine.title = title
+                                    }
+                                    if specificLine.color != color {
+                                        specificLine.color = color
+                                        polyline.strokeColor = UIColor(hexString: color) ?? UIColor.flatRed()
+                                    }
+                                }
+                            })
+                        } catch {
+                            print("Error saving context, \(error)")
+                        }
+                    }
+                }
+                if let positions = diff.document.data()["positions"] as? [[String: Double]] {
+                    do {
+                        try realm.write({
+                            specificLine.polylineMarkersPositions.removeAll()
+                            for position in positions {
+                                if let lat = position["latitude"], let lon = position["longitude"] {
+                                    let linePosition = Position()
+                                    linePosition.latitude = lat
+                                    linePosition.longitude = lon
+                                    specificLine.polylineMarkersPositions.append(linePosition)
+                                }
+                            }
+                            if let polyline = polylines.first(where: {$0.title == specificLine.id}) {
+                                updatePolyline(line: specificLine, polyline: polyline, mapView: mapView)
+                            }
+                            
+                        })
+                    } catch {
+                        print("Error saving context, \(error)")
+                    }
+                }
+            }
+        }
+    }
     // MARK: - updatePolyline
     func updatePolyline(line: Line, polyline: GMSPolyline, mapView: GMSMapView) {
         let path = GMSMutablePath()
@@ -386,59 +392,59 @@ class LinesController {
     // MARK: - LENGTH MARKERS
     
     // MARK: - arrangeSelectedLineLengthMarker
-    func arrangeSelectedLineLengthMarker(i: Int, inside: Bool, add: Bool, mapView: GMSMapView, isMetric: Bool, distanceUnit: Int) {
+    func arrangeSelectedLineLengthMarker(index: Int, inside: Bool, add: Bool, mapView: GMSMapView, isMetric: Bool, distanceUnit: Int) {
         
         if inside {
-            let tempMarker = GMSMarker(position: GMSUnproject( GMSMapPointInterpolate(GMSProject((selectedLineMarkers[i-1].position)), GMSProject((selectedLineMarkers[i].position)), 0.5)))
-            let tempLength = GMSGeometryDistance(selectedLineMarkers[i-1].position, selectedLineMarkers[i].position)
+            let tempMarker = GMSMarker(position: GMSUnproject( GMSMapPointInterpolate(GMSProject((selectedLineMarkers[index-1].position)), GMSProject((selectedLineMarkers[index].position)), 0.5)))
+            let tempLength = GMSGeometryDistance(selectedLineMarkers[index-1].position, selectedLineMarkers[index].position)
             tempMarker.groundAnchor = .init(x: 0.5, y: 0.5)
             tempMarker.isTappable = false
             tempMarker.title = "lengthMarker"
             tempMarker.iconView = UIImage.makeIconView(iconSize: 50, length: tempLength, isMetric: isMetric, distanceUnit: distanceUnit, isTappable: tempMarker.isTappable)
             if add {
-                selectedLineLengthMarkers[i-1].map = nil
-                selectedLineLengthMarkers.remove(at: i-1)
+                selectedLineLengthMarkers[index-1].map = nil
+                selectedLineLengthMarkers.remove(at: index-1)
                 
-                selectedLineLengthMarkers.insert(tempMarker, at: i-1)
+                selectedLineLengthMarkers.insert(tempMarker, at: index-1)
                 tempMarker.map = mapView
             } else {
-                selectedLineLengthMarkers[i-1].position = tempMarker.position
-                selectedLineLengthMarkers[i-1].iconView = tempMarker.iconView
+                selectedLineLengthMarkers[index-1].position = tempMarker.position
+                selectedLineLengthMarkers[index-1].iconView = tempMarker.iconView
             }
-            let tempMarker1 = GMSMarker(position: GMSUnproject( GMSMapPointInterpolate(GMSProject((selectedLineMarkers[i].position)), GMSProject((selectedLineMarkers[i+1].position)), 0.5)))
-            let tempLength1 = GMSGeometryDistance(selectedLineMarkers[i].position, selectedLineMarkers[i+1].position)
+            let tempMarker1 = GMSMarker(position: GMSUnproject( GMSMapPointInterpolate(GMSProject((selectedLineMarkers[index].position)), GMSProject((selectedLineMarkers[index+1].position)), 0.5)))
+            let tempLength1 = GMSGeometryDistance(selectedLineMarkers[index].position, selectedLineMarkers[index+1].position)
             tempMarker1.groundAnchor = .init(x: 0.5, y: 0.5)
             tempMarker1.isTappable = false
             tempMarker1.title = "lengthMarker"
             tempMarker1.iconView = UIImage.makeIconView(iconSize: 50, length: tempLength1, isMetric: isMetric, distanceUnit: distanceUnit, isTappable: tempMarker1.isTappable)
             if add {
-                selectedLineLengthMarkers.insert(tempMarker1, at: i)
+                selectedLineLengthMarkers.insert(tempMarker1, at: index)
                 tempMarker1.map = mapView
             } else {
-                selectedLineLengthMarkers[i].position = tempMarker1.position
-                selectedLineLengthMarkers[i].iconView = tempMarker1.iconView
+                selectedLineLengthMarkers[index].position = tempMarker1.position
+                selectedLineLengthMarkers[index].iconView = tempMarker1.iconView
             }
         } else {
-            if add || (!add && i == 0) {
-                let tempMarker = GMSMarker(position: GMSUnproject( GMSMapPointInterpolate(GMSProject((selectedLineMarkers[i].position)), GMSProject((selectedLineMarkers[i+1].position)), 0.5)))
-                let tempLength = GMSGeometryDistance(selectedLineMarkers[i].position, selectedLineMarkers[i+1].position)
+            if add || (!add && index == 0) {
+                let tempMarker = GMSMarker(position: GMSUnproject( GMSMapPointInterpolate(GMSProject((selectedLineMarkers[index].position)), GMSProject((selectedLineMarkers[index+1].position)), 0.5)))
+                let tempLength = GMSGeometryDistance(selectedLineMarkers[index].position, selectedLineMarkers[index+1].position)
                 tempMarker.groundAnchor = .init(x: 0.5, y: 0.5)
                 tempMarker.isTappable = false
                 tempMarker.title = "lengthMarker"
                 tempMarker.iconView = UIImage.makeIconView(iconSize: 50, length: tempLength, isMetric: isMetric, distanceUnit: distanceUnit, isTappable: tempMarker.isTappable)
-                if add && (i != 0) {
+                if add && (index != 0) {
                     selectedLineLengthMarkers.append(tempMarker)
                     tempMarker.map = mapView
-                } else if add && (i == 0) {
+                } else if add && (index == 0) {
                     selectedLineLengthMarkers.insert(tempMarker, at: 0)
                     tempMarker.map = mapView
                 } else {
-                    selectedLineLengthMarkers[i].position = tempMarker.position
-                    selectedLineLengthMarkers[i].iconView = tempMarker.iconView
+                    selectedLineLengthMarkers[index].position = tempMarker.position
+                    selectedLineLengthMarkers[index].iconView = tempMarker.iconView
                 }
             } else {
-                let tempMarker = GMSMarker(position: GMSUnproject( GMSMapPointInterpolate(GMSProject((selectedLineMarkers[i-1].position)), GMSProject((selectedLineMarkers[i].position)), 0.5)))
-                let tempLength = GMSGeometryDistance(selectedLineMarkers[i-1].position, selectedLineMarkers[i].position)
+                let tempMarker = GMSMarker(position: GMSUnproject( GMSMapPointInterpolate(GMSProject((selectedLineMarkers[index-1].position)), GMSProject((selectedLineMarkers[index].position)), 0.5)))
+                let tempLength = GMSGeometryDistance(selectedLineMarkers[index-1].position, selectedLineMarkers[index].position)
                 tempMarker.groundAnchor = .init(x: 0.5, y: 0.5)
                 tempMarker.isTappable = false
                 tempMarker.title = "lengthMarker"
@@ -447,8 +453,8 @@ class LinesController {
                     selectedLineLengthMarkers.append(tempMarker)
                     tempMarker.map = mapView
                 } else {
-                    selectedLineLengthMarkers[i-1].position = tempMarker.position
-                    selectedLineLengthMarkers[i-1].iconView = tempMarker.iconView
+                    selectedLineLengthMarkers[index-1].position = tempMarker.position
+                    selectedLineLengthMarkers[index-1].iconView = tempMarker.iconView
                 }
             }
         }
@@ -456,9 +462,9 @@ class LinesController {
     
     // MARK: - setSelectedLineLengthMarkers
     func setSelectedLineLengthMarkers(isMetric: Bool, distanceUnit: Int) {
-        for i in 0...selectedLineMarkers.count-2 {
-            let tempMarker = GMSMarker(position: GMSUnproject( GMSMapPointInterpolate(GMSProject((selectedLineMarkers[i].position)), GMSProject((selectedLineMarkers[i+1].position)), 0.5)))
-            let tempLength = GMSGeometryDistance(selectedLineMarkers[i].position, selectedLineMarkers[i+1].position)
+        for index in 0...selectedLineMarkers.count-2 {
+            let tempMarker = GMSMarker(position: GMSUnproject( GMSMapPointInterpolate(GMSProject((selectedLineMarkers[index].position)), GMSProject((selectedLineMarkers[index+1].position)), 0.5)))
+            let tempLength = GMSGeometryDistance(selectedLineMarkers[index].position, selectedLineMarkers[index+1].position)
             tempMarker.groundAnchor = .init(x: 0.5, y: 0.5)
             tempMarker.isTappable = false
             tempMarker.title = "lengthMarker"
@@ -538,14 +544,14 @@ class LinesController {
     func setEdgeLength(lengthMarkerIndex: Int, edgeLength: Double) -> GMSMarker? {
         if lengthMarkerIndex == index && index != selectedLineMarkers.count-1 {
             let oldLength = GMSGeometryDistance(selectedLineMarkers[index].position, selectedLineMarkers[index + 1].position)
-            let a = edgeLength / oldLength
-            let newPosition = GMSGeometryInterpolate(selectedLineMarkers[index].position, selectedLineMarkers[index + 1].position, a)
+            let ratio = edgeLength / oldLength
+            let newPosition = GMSGeometryInterpolate(selectedLineMarkers[index].position, selectedLineMarkers[index + 1].position, ratio)
             selectedLineMarkers[index + 1].position = newPosition
             return selectedLineMarkers[index + 1]
         } else {
             let oldLength = GMSGeometryDistance(selectedLineMarkers[index].position, selectedLineMarkers[index - 1].position)
-            let a = edgeLength / oldLength
-            let newPosition = GMSGeometryInterpolate(selectedLineMarkers[index].position, selectedLineMarkers[index - 1].position, a)
+            let ratio = edgeLength / oldLength
+            let newPosition = GMSGeometryInterpolate(selectedLineMarkers[index].position, selectedLineMarkers[index - 1].position, ratio)
             selectedLineMarkers[index - 1].position = newPosition
             return selectedLineMarkers[index - 1]
         }

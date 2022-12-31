@@ -35,12 +35,12 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
     
     @IBOutlet weak var shareBarButton: UIBarButtonItem!
     
-    enum pageType {
+    enum PageType {
         case fieldInfoPage
         case lineInfoPage
         case placeInfoPage
     }
-    var infoPageType = pageType.fieldInfoPage
+    var infoPageType = PageType.fieldInfoPage
     
     var images = [UIImage]()
     
@@ -142,7 +142,7 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
             images.removeAll()
         }
         
-        if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
+        if userDefaults?.first?.accountType == K.Invites.AccountTypes.proAccount {
             imageReferencesToDownload = getImageReferences()
         }
         
@@ -152,7 +152,7 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
                 image.accessibilityIdentifier = photoID
             } else {
                 // download image and add images array
-                if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
+                if userDefaults?.first?.accountType == K.Invites.AccountTypes.proAccount {
                     guard let directory = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false) as NSURL else {
                         return
                     }
@@ -167,7 +167,7 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
     // MARK: - cameraButtonTapped
     @IBAction func cameraButtonTapped(_ sender: UIBarButtonItem) {
         
-        if userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
+        if userDefaults?.first?.accountType == K.Invites.AccountTypes.freeAccount {
             // if let imageCount = images.count {
                 
                 if images.count >= K.FreeAccountLimitations.photoLimit {
@@ -300,7 +300,7 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
             return nil
         }
         
-        if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
+        if userDefaults?.first?.accountType == K.Invites.AccountTypes.proAccount {
             uploadImageToFirebase(data: data, imageID: imageID)
         }
         
@@ -322,7 +322,7 @@ class InfoViewController: UIViewController, UIImagePickerControllerDelegate, UIN
             let fileManager = FileManager.default
             try fileManager.removeItem(at: directory.appendingPathComponent("\(id).png")!)
             let imageURL = directory.appendingPathComponent("\(id).png")!
-            if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
+            if userDefaults?.first?.accountType == K.Invites.AccountTypes.proAccount {
                 deleteImageFromFirebase(imageURL: imageURL, imageID: id)
             }
             return true

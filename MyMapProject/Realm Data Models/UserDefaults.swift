@@ -27,7 +27,7 @@ class UserDefaults: Object {
     @objc dynamic var isBatterySaveModeActive = false
     @objc dynamic var isLowDataModeActive = false
     
-    @objc dynamic var accountType = K.invites.accountTypes.freeAccount
+    @objc dynamic var accountType = K.Invites.AccountTypes.freeAccount
     @objc dynamic var bossID = UUID().uuidString
     @objc dynamic var bossEmail = ""
     @objc dynamic var userRole = "admin"

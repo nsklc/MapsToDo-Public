@@ -104,17 +104,17 @@ class PlaceListViewController: SwipeTableViewController, UINavigationControllerD
     // MARK: - prepare
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == K.SegueIdentifiers.goToItems {
-            let destinationVC = segue.destination as! ToDoListViewController
+            let destinationVC = segue.destination as? ToDoListViewController
             
             if let indexPath = tableView.indexPathForSelectedRow {
-                destinationVC.selectedPlace = placesController?.places?[indexPath.row]
+                destinationVC?.selectedPlace = placesController?.places?[indexPath.row]
             }
         } else if segue.identifier == K.SegueIdentifiers.placeListToMapView {
             
-            let destinationVC = segue.destination as! MapViewController
+            let destinationVC = segue.destination as? MapViewController
             
             if let cameraPositionPath = cameraPositionPath {
-                destinationVC.cameraPositionPath = cameraPositionPath
+                destinationVC?.cameraPositionPath = cameraPositionPath
             }
             
         }

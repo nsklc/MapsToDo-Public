@@ -56,7 +56,7 @@ class MapViewModel: NSObject, MapViewModelProtocol {
             }
         }
         
-        if allUserDefaults.count == 0 {
+        if allUserDefaults.isEmpty {
             createUserDefaults()
         } else {
             userDefaults = allUserDefaults.first
@@ -125,22 +125,22 @@ class MapViewModel: NSObject, MapViewModelProtocol {
         var secondClosestMarkerIndex = 0
         var closestDistance = Double.greatestFiniteMagnitude
         var secondClosestDistance = Double.greatestFiniteMagnitude
-        for i in 0..<markers.count {
-            let distance = GMSGeometryDistance(newMarker.position, markers[i].position)
+        for index in 0..<markers.count {
+            let distance = GMSGeometryDistance(newMarker.position, markers[index].position)
             if distance < closestDistance {
                 secondClosestDistance = closestDistance
                 secondClosestMarkerIndex = closestMarkerIndex
                 closestDistance = distance
-                closestMarkerIndex = i
+                closestMarkerIndex = index
             } else if distance < secondClosestDistance {
                 secondClosestDistance = distance
-                secondClosestMarkerIndex = i
+                secondClosestMarkerIndex = index
             }
         }
         return (closestMarkerIndex, secondClosestMarkerIndex)
     }
     
-    fileprivate func createUserDefaults() {
+    private func createUserDefaults() {
         let userDefaults = UserDefaults()
         userDefaults.title = ""
         userDefaults.mapType = K.MapTypes.satellite

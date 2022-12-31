@@ -216,7 +216,7 @@ class ToDoFormViewController: UIViewController {
             viewController.viewDidLoad()
         }
         
-        if showAd && userDefaults?.first?.accountType == K.invites.accountTypes.freeAccount {
+        if showAd && userDefaults?.first?.accountType == K.Invites.AccountTypes.freeAccount {
             if interstitial != nil {
                 interstitial?.present(fromRootViewController: self)
                 
@@ -232,7 +232,7 @@ class ToDoFormViewController: UIViewController {
     }
     // MARK: - saveItemToCloud
     func saveItemToCloud(item: Item) {
-        if userDefaults?.first?.accountType == K.invites.accountTypes.proAccount {
+        if userDefaults?.first?.accountType == K.Invites.AccountTypes.proAccount {
             db.collection(userDefaults!.first!.bossID).document("Items").collection("Items").document(item.id).setData(item.dictionaryWithValues(forKeys: ["title", "startDate", "endDate", "note", "status"]), merge: true) { err in
                 if let err = err {
                     print("Error writing document: \(err)")

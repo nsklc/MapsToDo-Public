@@ -19,20 +19,17 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate, UITe
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var changePasswordButton: UIButton!
     @IBOutlet weak var signOutButton: UIButton!
-    
     @IBOutlet weak var bossEmailLabel: UILabel!
     @IBOutlet weak var bossEmailTextField: UITextField!
     @IBOutlet weak var leaveTeamButton: UIButton!
     
     let realm: Realm! = try? Realm()
-    
     private var userDefaults: Results<UserDefaults>?
     var fieldsController: FieldsController?
     var linesController: LinesController?
     var placesController: PlacesController?
     
     private let db = Firestore.firestore()
-    
     private var handle: AuthStateDidChangeListenerHandle?
     private let user = Auth.auth().currentUser
     
@@ -559,26 +556,4 @@ class AuthViewController: UIViewController, UINavigationControllerDelegate, UITe
         signOutButton.titleLabel?.font = .boldSystemFont(ofSize: 20)
     }
     
-}
-extension UIImageView {
-    func downloaded(from url: URL, contentMode mode: UIView.ContentMode = .scaleAspectFit) {
-        // for swift 4.2 syntax just use ===> mode: UIView.ContentMode
-        contentMode = mode
-        URLSession.shared.dataTask(with: url) { data, response, error in
-            guard
-                let httpURLResponse = response as? HTTPURLResponse, httpURLResponse.statusCode == 200,
-                let mimeType = response?.mimeType, mimeType.hasPrefix("image"),
-                let data = data, error == nil,
-                let image = UIImage(data: data)
-                else { return }
-            DispatchQueue.main.async {
-                self.image = image
-            }
-        }.resume()
-    }
-    func downloaded(from link: String, contentMode mode: UIView.ContentMode = .scaleAspectFit) {
-        // for swift 4.2 syntax just use ===> mode: UIView.ContentMode
-        guard let url = URL(string: link) else { return }
-        downloaded(from: url, contentMode: mode)
-    }
 }

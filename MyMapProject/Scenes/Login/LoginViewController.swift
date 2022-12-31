@@ -19,7 +19,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, GID
     @IBOutlet weak var loginWithEmailButton: UIButton!
     
     // Unhashed nonce.
-    fileprivate var currentNonce: String?
+    private var currentNonce: String?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -108,7 +108,7 @@ class LoginViewController: UIViewController, UINavigationControllerDelegate, GID
         performSegue(withIdentifier: "showEmailLoginViewController", sender: self)
     }
     // MARK: - SignInWithGoogleButtonTapped
-    @IBAction func SignInWithGoogleButtonTapped(_ sender: UIButton) {
+    @IBAction func signInWithGoogleButtonTapped(_ sender: UIButton) {
         GIDSignIn.sharedInstance()?.presentingViewController = self
         GIDSignIn.sharedInstance().signIn()
         

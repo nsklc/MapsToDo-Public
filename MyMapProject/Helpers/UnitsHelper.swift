@@ -13,6 +13,115 @@ class UnitsHelper {
         UnitsHelper()
     }()
 
+    private func addAllUnits(_ isMeasureSystemMetric: Bool, _ content: inout String, _ formatter: MeasurementFormatter, _ area: Measurement<UnitArea>, _ distanceUnit: Int, _ circumference: Measurement<UnitLength>) {
+        if isMeasureSystemMetric {
+            
+            content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareCentimeters))) "
+            
+            content += NSLocalizedString("\n Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareMeters))) "
+            
+            content += NSLocalizedString("\n Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareKilometers))) "
+            
+            content += NSLocalizedString("\n Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.ares))) "
+            
+            content += NSLocalizedString("\n Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.hectares))) "
+            
+            switch distanceUnit {
+            case 0:
+                content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.centimeters))) "
+            case 1:
+                content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.meters))) "
+            case 2:
+                content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.kilometers))) "
+            default:
+                break
+            }
+            
+        } else {
+            
+            content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareInches))) "
+            content += NSLocalizedString("\n Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareFeet))) "
+            content += NSLocalizedString("\n Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareYards))) "
+            content += NSLocalizedString("\n Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareMiles))) "
+            content += NSLocalizedString("\n Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.acres))) "
+            
+            switch distanceUnit {
+            case 0:
+                content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.inches))) "
+            case 1:
+                content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.feet))) "
+            case 2:
+                content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.yards))) "
+            case 3:
+                content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.miles))) "
+            default:
+                break
+            }
+        }
+    }
+    
+    private func addMetricUnit(_ areaUnit: Int, _ content: inout String, _ formatter: MeasurementFormatter, _ area: Measurement<UnitArea>, _ distanceUnit: Int, _ circumference: Measurement<UnitLength>) {
+        switch areaUnit {
+        case 0:
+            content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareCentimeters))) "
+        case 1:
+            content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareMeters))) "
+        case 2:
+            content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareKilometers))) "
+        case 3:
+            content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.ares))) "
+        case 4:
+            content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.hectares))) "
+        default:
+            break
+        }
+        
+        switch distanceUnit {
+        case 0:
+            content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.centimeters))) "
+        case 1:
+            content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.meters))) "
+        case 2:
+            content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.kilometers))) "
+        default:
+            break
+        }
+    }
+    
+    private func addUnit(_ isMeasureSystemMetric: Bool, _ areaUnit: Int, _ content: inout String, _ formatter: MeasurementFormatter, _ area: Measurement<UnitArea>, _ distanceUnit: Int, _ circumference: Measurement<UnitLength>) {
+        if isMeasureSystemMetric {
+            addMetricUnit(areaUnit, &content, formatter, area, distanceUnit, circumference)
+        } else {
+            switch areaUnit {
+            case 0:
+                content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareInches))) "
+            case 1:
+                content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareFeet))) "
+            case 2:
+                content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareYards))) "
+            case 3:
+                content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareMiles))) "
+            case 4:
+                content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.acres))) "
+            default:
+                break
+            }
+            
+            switch distanceUnit {
+            case 0:
+                content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.inches))) "
+            case 1:
+                content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.feet))) "
+            case 2:
+                content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.yards))) "
+            case 3:
+                content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.miles))) "
+            default:
+                break
+            }
+        }
+    }
+    
     func getUnitForField(isShowAllUnitsSelected: Bool, isMeasureSystemMetric: Bool, area: Measurement<UnitArea>, circumference: Measurement<UnitLength>, distanceUnit: Int, areaUnit: Int) -> String {
         
         let formatter = MeasurementFormatter()
@@ -22,109 +131,9 @@ class UnitsHelper {
         var content = ""
         
         if isShowAllUnitsSelected {
-            
-            if isMeasureSystemMetric {
-                
-                content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareCentimeters))) "
-            
-                content += NSLocalizedString("\n Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareMeters))) "
-            
-                content += NSLocalizedString("\n Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareKilometers))) "
-            
-                content += NSLocalizedString("\n Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.ares))) "
-            
-                content += NSLocalizedString("\n Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.hectares))) "
-                
-                switch distanceUnit {
-                case 0:
-                    content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.centimeters))) "
-                case 1:
-                    content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.meters))) "
-                case 2:
-                    content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.kilometers))) "
-                default:
-                    break
-                }
-                
-            } else {
-                
-                content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareInches))) "
-                content += NSLocalizedString("\n Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareFeet))) "
-                content += NSLocalizedString("\n Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareYards))) "
-                content += NSLocalizedString("\n Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareMiles))) "
-                content += NSLocalizedString("\n Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.acres))) "
-                
-                switch distanceUnit {
-                case 0:
-                    content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.inches))) "
-                case 1:
-                    content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.feet))) "
-                case 2:
-                    content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.yards))) "
-                case 3:
-                    content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.miles))) "
-                default:
-                    break
-                }
-            }
-            
+            addAllUnits(isMeasureSystemMetric, &content, formatter, area, distanceUnit, circumference)
         } else {
-            
-            if isMeasureSystemMetric {
-                switch areaUnit {
-                case 0:
-                    content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareCentimeters))) "
-                case 1:
-                    content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareMeters))) "
-                case 2:
-                    content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareKilometers))) "
-                case 3:
-                    content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.ares))) "
-                case 4:
-                    content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.hectares))) "
-                default:
-                    break
-                }
-                
-                switch distanceUnit {
-                case 0:
-                    content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.centimeters))) "
-                case 1:
-                    content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.meters))) "
-                case 2:
-                    content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.kilometers))) "
-                default:
-                    break
-                }
-            } else {
-                switch areaUnit {
-                case 0:
-                    content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareInches))) "
-                case 1:
-                    content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareFeet))) "
-                case 2:
-                    content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareYards))) "
-                case 3:
-                    content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.squareMiles))) "
-                case 4:
-                    content += NSLocalizedString(" Area = ", comment: "") + "\( formatter.string(from: area.converted(to: UnitArea.acres))) "
-                default:
-                    break
-                }
-                
-                switch distanceUnit {
-                case 0:
-                    content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.inches))) "
-                case 1:
-                    content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.feet))) "
-                case 2:
-                    content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.yards))) "
-                case 3:
-                    content += NSLocalizedString("\n Circumference = ", comment: "") + "\( formatter.string(from: circumference.converted(to: UnitLength.miles))) "
-                default:
-                    break
-                }
-            }
+            addUnit(isMeasureSystemMetric, areaUnit, &content, formatter, area, distanceUnit, circumference)
         }
         
         return content

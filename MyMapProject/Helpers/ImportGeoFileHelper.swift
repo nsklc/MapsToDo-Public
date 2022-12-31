@@ -22,11 +22,11 @@ class GeoJSON {
     var gmPoints = [GMUPoint]()
     
     func renderGeoJSON(url: URL, fieldsController: FieldsController, linesController: LinesController, placesController: PlacesController, mapView: GMSMapView, completion: @escaping () -> Void ) {
-//        guard let path = Bundle.main.path(forResource: "GeoJSON_sample", ofType: "json") else {
-//          return
-//        }
-//
-//        let url = URL(fileURLWithPath: path)
+        //        guard let path = Bundle.main.path(forResource: "GeoJSON_sample", ofType: "json") else {
+        //          return
+        //        }
+        //
+        //        let url = URL(fileURLWithPath: path)
         
         let geoJsonParser = GMUGeoJSONParser(url: url)
         
@@ -78,54 +78,64 @@ class GeoJSON {
                     }
                     
                     if let polyline = feature.geometry as? GMULineString {
-                        
-                        var markers = [GMSMarker]()
-                        for i in 0...polyline.path.count()-1 {
-                            let marker = GMSMarker(position: polyline.path.coordinate(at: i))
-                            markers.append(marker)
-                        }
-                        markers.removeDuplicates()
-                        if linesController.lines!.count < K.FreeAccountLimitations.overlayLimit {
-                            if markers.count > 1 {
-                                
-                                linesController.addLine(title: title, color: color, initialMarkers: markers, mapView: mapView, isGeodesic: true, id: nil)
-                                
-                            }
-                        }
+                        addLines(linesController: linesController, polyline, title, color)
                     } else if let polygon = feature.geometry as? GMUPolygon {
-                        // First path is represents the exterior ring. Any subsequent elements representinterior rings (or holes).
-                        
-                        if let path = polygon.paths.first {
-                            
-                            var markers = [GMSMarker]()
-                            for i in 0...path.count()-1 {
-                                let marker = GMSMarker(position: path.coordinate(at: i))
-                                markers.append(marker)
-                            }
-                            markers.removeDuplicates()
-                            
-                            if fieldsController.fields!.count < K.FreeAccountLimitations.overlayLimit {
-                                if markers.count > 2 {
-                                    
-                                    fieldsController.addField(title: title, groupTitle: group, color: color, initialMarkers: markers, id: nil, isGeodesic: true)
-                                    
-                                }
-                            }
-                            
-                        }
-                        
+                        addFields(fieldsController: fieldsController, polygon, title, group, color)
                     } else if let place = feature.geometry as? GMUPoint {
-                        
-                        let marker = GMSMarker(position: place.coordinate)
-                        
-                        if placesController.places!.count < K.FreeAccountLimitations.overlayLimit {
-                            placesController.addPlace(title: title, color: color, mapView: mapView, initialMarker: marker, id: nil, iconSize: nil)
-                        }
-                        
+                        addPlaces(placesController: placesController, place, title, color)
                     }
                 }
             }
         }
         completion()
+    }
+    
+    private func addFields(fieldsController: FieldsController, _ polygon: GMUPolygon, _ title: String, _ group: String, _ color: String) {
+        // First path is represents the exterior ring. Any subsequent elements representinterior rings (or holes).
+        
+        if let path = polygon.paths.first {
+            
+            var markers = [GMSMarker]()
+            for index in 0...path.count()-1 {
+                let marker = GMSMarker(position: path.coordinate(at: index))
+                markers.append(marker)
+            }
+            markers.removeDuplicates()
+            
+            if let fields = fieldsController.fields,
+               fields.count < K.FreeAccountLimitations.overlayLimit {
+                if markers.count > 2 {
+                    
+                    fieldsController.addField(title: title, groupTitle: group, color: color, initialMarkers: markers, id: nil, isGeodesic: true)
+                    
+                }
+            }
+        }
+    }
+    
+    private func addLines(linesController: LinesController, _ polyline: GMULineString, _ title: String, _ color: String) {
+        var markers = [GMSMarker]()
+        for index in 0...polyline.path.count()-1 {
+            let marker = GMSMarker(position: polyline.path.coordinate(at: index))
+            markers.append(marker)
+        }
+        markers.removeDuplicates()
+        if let lines = linesController.lines,
+           lines.count < K.FreeAccountLimitations.overlayLimit {
+            if markers.count > 1 {
+                
+                linesController.addLine(title: title, color: color, initialMarkers: markers, mapView: mapView, isGeodesic: true, id: nil)
+                
+            }
+        }
+    }
+    
+    private func addPlaces(placesController: PlacesController, _ place: GMUPoint, _ title: String, _ color: String) {
+        let marker = GMSMarker(position: place.coordinate)
+        
+        if let places = placesController.places,
+           places.count < K.FreeAccountLimitations.overlayLimit {
+            placesController.addPlace(title: title, color: color, mapView: mapView, initialMarker: marker, id: nil, iconSize: nil)
+        }
     }
 }

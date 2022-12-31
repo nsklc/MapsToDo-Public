@@ -19,11 +19,14 @@ enabled_rules:
   - unused_closure_parameter
 trailing_whitespace:
   max_lines: 2
-line_length:
-  warning: 120
+#line_length:
+#  warning: 120
 trailing_whitespace:
   max_lines: 2
 disabled_rules:
+  - file_length
+  - type_body_length
+  - line_length
   - trailing_whitespace
 excluded:
   - Carthage

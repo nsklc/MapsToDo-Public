@@ -106,7 +106,7 @@ class PlacesController {
     func checkTitleAvailable(title: String) -> String {
         var isValidName = true
         var errorMessage = "Place needs a title."
-        if title.count == 0 {
+        if title.isEmpty {
             isValidName = false
             errorMessage = "Place needs a title."
         }
@@ -283,24 +283,7 @@ class PlacesController {
                 snapshot.documentChanges.forEach { diff in
                     // MARK: - added
                     if diff.type == .added {
-                        // print("New place: \(diff.document.data())")
-                        // print(diff.document.documentID)
-                        if realm.object(ofType: Place.self, forPrimaryKey: diff.document.documentID) != nil {
-                        } else {
-                            // if diff.document.data()["updatedBy"] as? String != user.uid {
-                                
-                                // print(diff.document.data())
-                                if let placeData = diff.document.data()[diff.document.documentID] as? [String: Any], let position = diff.document.data()["position"] as? [String: Any] {
-                                    
-                                    if let title = placeData["title"] as? String, let color = placeData["color"] as? String, let iconSize = placeData["iconSize"] as? Float {
-                                        if let lat = position["latitude"] as? Double, let lon = position["longitude"] as? Double {
-                                            let initialMarker = GMSMarker(position: CLLocationCoordinate2D(latitude: lat, longitude: lon))
-                                            addPlace(title: title, color: color, mapView: mapView, initialMarker: initialMarker, id: diff.document.documentID, iconSize: iconSize)
-                                        }
-                                    }
-                                }
-                            // }
-                        }
+                        addPlacesFromFireStore(diff, mapView: mapView)
                     }
                     // MARK: - modified
                     if diff.type == .modified {
@@ -362,6 +345,27 @@ class PlacesController {
                     }
                 }
             }
+        }
+    }
+    // MARK: - addPlacesFromFireStore
+    private func addPlacesFromFireStore(_ diff: DocumentChange, mapView: GMSMapView) {
+        // print("New place: \(diff.document.data())")
+        // print(diff.document.documentID)
+        if realm.object(ofType: Place.self, forPrimaryKey: diff.document.documentID) != nil {
+        } else {
+            // if diff.document.data()["updatedBy"] as? String != user.uid {
+            
+            // print(diff.document.data())
+            if let placeData = diff.document.data()[diff.document.documentID] as? [String: Any], let position = diff.document.data()["position"] as? [String: Any] {
+                
+                if let title = placeData["title"] as? String, let color = placeData["color"] as? String, let iconSize = placeData["iconSize"] as? Float {
+                    if let lat = position["latitude"] as? Double, let lon = position["longitude"] as? Double {
+                        let initialMarker = GMSMarker(position: CLLocationCoordinate2D(latitude: lat, longitude: lon))
+                        addPlace(title: title, color: color, mapView: mapView, initialMarker: initialMarker, id: diff.document.documentID, iconSize: iconSize)
+                    }
+                }
+            }
+            // }
         }
     }
 }

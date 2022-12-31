@@ -6,7 +6,7 @@
 //  Copyright © 2021 Enes Kılıç. All rights reserved.
 //
 
-// swiftlint:disable: type_body_length
+// swiftlint:disable: all
 struct MapStylesHelper {
     
     static let standard: String = """

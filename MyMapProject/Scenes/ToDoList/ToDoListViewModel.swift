@@ -45,7 +45,7 @@ class ToDoListViewModel: ToDoListViewModelProtocol {
     }
     
     func checkIsToDoItemsCountAtLimit() -> Bool {
-        if userDefaults.accountType == K.invites.accountTypes.freeAccount {
+        if userDefaults.accountType == K.Invites.AccountTypes.freeAccount {
             if let itemCount = todoItems?.count, itemCount >= K.FreeAccountLimitations.todoItemLimit {
                 return true
             }

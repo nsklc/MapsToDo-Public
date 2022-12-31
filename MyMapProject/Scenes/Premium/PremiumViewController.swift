@@ -30,7 +30,7 @@ class PremiumViewController: UIViewController {
     @IBOutlet weak var buyButton: UIButton!
     
     let color = ["6EB5A5", "F9F4DB", "E7D6AC", "A13842"]
-    let textColors⁣⁣⁣⁣⁣⁣⁣⁣ = ["F9F4DB", "A13842", "A13842", "F9F4DB"]
+    let textColors = ["F9F4DB", "A13842", "A13842", "F9F4DB"]
     // Sandbox tester password: nt_x6dDmtQfUSbz
     
     private var packages = [Purchases.Package]()
@@ -101,7 +101,7 @@ class PremiumViewController: UIViewController {
         bottomView.backgroundColor = UIColor(hexString: color[3])
         
         headerLabel.text = K.appName + " Professional"
-        headerLabel.textColor = UIColor(hexString: textColors⁣⁣⁣⁣⁣⁣⁣⁣[3])
+        headerLabel.textColor = UIColor(hexString: textColors[3])
         // headerLabel1.font = UIFont(name: "System", size: 30)
         headerLabel.font = UIFont.boldSystemFont(ofSize: 30)
         
@@ -123,7 +123,7 @@ class PremiumViewController: UIViewController {
         buyButton.clipsToBounds = true
         buyButton.layer.cornerRadius = buyButton.bounds.height*0.3
         
-        contentLabel.textColor = UIColor(hexString: textColors⁣⁣⁣⁣⁣⁣⁣⁣[3])
+        contentLabel.textColor = UIColor(hexString: textColors[3])
         contentLabel.font = UIFont(name: "System", size: 25)
         contentLabel.numberOfLines = 0
         contentLabel.adjustsFontSizeToFitWidth = true
