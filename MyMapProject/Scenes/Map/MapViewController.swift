@@ -107,7 +107,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
         
         navBar.title = K.appName
         
-        viewModel = MapViewModel()
+        viewModel = MapViewModel(viewController: self)
         viewModel.notifyViewDidLoad()
         
         // Create a GMSCameraPosition that tells the map to display the coordinate.
@@ -280,6 +280,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
             bannerView.isHidden = false
         }
         
+        viewModel.notifyViewWillAppear()
     }
     // MARK: - viewDidAppear
     override func viewDidAppear(_ animated: Bool) {
@@ -2039,7 +2040,7 @@ extension MapViewController: MapViewControllerProtocol {
            let longitude = longitude,
            let zoom = zoom {
             let camera = GMSCameraPosition.camera(withLatitude: latitude, longitude: longitude, zoom: zoom)
-            mapView = GMSMapView.map(withFrame: CGRect.zero, camera: camera)
+            mapView.camera = camera
         }
         
         switch mapType {

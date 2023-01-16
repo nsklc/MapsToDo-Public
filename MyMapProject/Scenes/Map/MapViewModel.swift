@@ -16,6 +16,7 @@ protocol MapViewModelProtocol: AnyObject {
     var userDefaults: UserDefaults! { get }
     var viewController: MapViewControllerProtocol? { get set }
     func notifyViewDidLoad()
+    func notifyViewWillAppear()
     func saveCameraPosition(latitude: Double, longitude: Double, zoom: Float)
     func saveMapType(with mapType: String)
     func getMyLocation() -> CLLocation?
@@ -35,8 +36,8 @@ class MapViewModel: NSObject, MapViewModelProtocol {
     private var handle: AuthStateDidChangeListenerHandle?
     private let user = Auth.auth().currentUser
     
-    override init() {
-        
+    init(viewController: MapViewControllerProtocol) {
+        self.viewController = viewController
     }
     
     func notifyViewDidLoad() {
@@ -62,13 +63,6 @@ class MapViewModel: NSObject, MapViewModelProtocol {
             userDefaults = allUserDefaults.first
         }
         
-        viewController?.setMapView(latitude: userDefaults.cameraPosition?.latitude,
-                                   longitude: userDefaults.cameraPosition?.longitude,
-                                   zoom: userDefaults.cameraPosition?.zoom,
-                                   mapType: userDefaults.mapType,
-                                   customMapStyle: userDefaults.customMapStyle,
-                                   isBatterySaveModeActive: userDefaults.isBatterySaveModeActive)
-        
         if let userID = user?.uid {
             do {
                 try realm.write({
@@ -81,6 +75,15 @@ class MapViewModel: NSObject, MapViewModelProtocol {
         }
     }
     
+    func notifyViewWillAppear() {
+        viewController?.setMapView(latitude: userDefaults.cameraPosition?.latitude,
+                                   longitude: userDefaults.cameraPosition?.longitude,
+                                   zoom: userDefaults.cameraPosition?.zoom,
+                                   mapType: userDefaults.mapType,
+                                   customMapStyle: userDefaults.customMapStyle,
+                                   isBatterySaveModeActive: userDefaults.isBatterySaveModeActive)
+    }
+    
     func getMyLocation() -> CLLocation? {
         locationManager.location
     }
@@ -91,7 +94,6 @@ class MapViewModel: NSObject, MapViewModelProtocol {
                 userDefaults.cameraPosition?.latitude = latitude
                 userDefaults.cameraPosition?.longitude = longitude
                 userDefaults.cameraPosition?.zoom = zoom
-                realm.add(userDefaults)
             })
         } catch {
             print(K.errorSavingContext + " \(error)")
@@ -102,7 +104,6 @@ class MapViewModel: NSObject, MapViewModelProtocol {
         do {
             try realm.write({
                 userDefaults.mapType = mapType
-                realm.add(userDefaults)
             })
         } catch {
             print(K.errorSavingContext + "\(error)")

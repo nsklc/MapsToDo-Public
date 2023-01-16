@@ -89,10 +89,11 @@ class OverlayView: UIViewController {
         let translation = sender.translation(in: view)
         
         // Not allowing the user to drag the view upward
-        guard translation.y >= 0 else { return }
+        guard let pointOrigin = pointOrigin,
+              translation.y >= 0 else { return }
         
         // setting x as 0 because we don't want users to move the frame side ways!! Only want straight up or down
-        view.frame.origin = CGPoint(x: 0, y: self.pointOrigin!.y + translation.y)
+        view.frame.origin = CGPoint(x: 0, y: pointOrigin.y + translation.y)
         
         if sender.state == .ended {
             let dragVelocity = sender.velocity(in: view)
