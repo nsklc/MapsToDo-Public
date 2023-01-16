@@ -220,8 +220,8 @@ class ToDoListViewController: SwipeTableViewController, ToDoListViewControllerPr
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = super.tableView(tableView, cellForRowAt: indexPath)
-        let df = DateFormatter()
-        df.dateFormat = "MM.dd.YYYY"
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "MM.dd.YYYY"
         var statusIndex = 0
         
         switch itemType {
@@ -229,15 +229,15 @@ class ToDoListViewController: SwipeTableViewController, ToDoListViewControllerPr
             if indexPath.row < viewModel.getToDoItemsCount(itemType: .groupsItem) {
                 if let item = viewModel.getItem(for: itemType, with: indexPath.row) {
                     cell.textLabel?.text = String(format: NSLocalizedString("%@ - Group Task", comment: ""), item.title)
-                    cell.detailTextLabel?.text = df.string(from: item.startDate) + " - " + df.string(from: item.endDate)
+                    cell.detailTextLabel?.text = dateFormatter.string(from: item.startDate) + " - " + dateFormatter.string(from: item.endDate)
                     statusIndex = item.status
                 } else {
                     cell.textLabel?.text = NSLocalizedString("No Items Added", comment: "")
                 }
             } else {
-                if let item = viewModel.getItem(for: .fieldsItem, with: indexPath.row - viewModel.getToDoItemsCount(itemType: .groupsItem)) {
+                if let item = viewModel.getItem(for: .fieldsItem, with: indexPath.row) {
                     cell.textLabel?.text = item.title
-                    cell.detailTextLabel?.text = df.string(from: item.startDate) + " - " + df.string(from: item.endDate)
+                    cell.detailTextLabel?.text = dateFormatter.string(from: item.startDate) + " - " + dateFormatter.string(from: item.endDate)
                     statusIndex = item.status
                     
                 } else {
@@ -248,7 +248,7 @@ class ToDoListViewController: SwipeTableViewController, ToDoListViewControllerPr
             if let item = viewModel.getItem(for: itemType, with: indexPath.row) {
                 cell.textLabel?.text = item.title
                 
-                cell.detailTextLabel?.text = df.string(from: item.startDate) + " - " + df.string(from: item.endDate)
+                cell.detailTextLabel?.text = dateFormatter.string(from: item.startDate) + " - " + dateFormatter.string(from: item.endDate)
                 statusIndex = item.status
             } else {
                 cell.textLabel?.text = NSLocalizedString("No Items Added", comment: "")

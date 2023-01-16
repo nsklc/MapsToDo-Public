@@ -119,7 +119,8 @@ class ToDoListViewModel: ToDoListViewModelProtocol {
     // MARK: - deleteItem
     func deleteItem(at indexPath: IndexPath, itemType: TodoItemType) {
         if itemType == TodoItemType.fieldsItem || itemType == TodoItemType.groupsItem {
-            if indexPath.row < groupTodoItems!.count {
+            if let groupTodoItems = groupTodoItems,
+               indexPath.row < groupTodoItems.count {
                 if let itemForDeletion = self.groupTodoItems?[indexPath.row] {
                     deleteItemFromCloud(item: itemForDeletion)
                     do {
