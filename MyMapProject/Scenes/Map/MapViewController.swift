@@ -1392,6 +1392,8 @@ extension MapViewController {
             hideView(view: addFormStackView, hidden: true)
             hideView(view: colorsCollectionView, hidden: true)
             hideView(view: colorsCollectionView1, hidden: true)
+            titleTextField.resignFirstResponder()
+            groupTitleTextField.resignFirstResponder()
             tappableSettings(to: true)
             if mapTypeStackView.isHidden == false {
                 hideView(view: mapTypeStackView, hidden: true)
