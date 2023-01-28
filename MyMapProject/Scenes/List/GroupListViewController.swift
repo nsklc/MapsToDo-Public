@@ -30,7 +30,7 @@ class GroupListViewController: SwipeTableViewController, UITextFieldDelegate {
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
         guard orientation == .right else { return nil }
         
-        guard fieldsController!.groups![indexPath.row].title == NSLocalizedString("Groupless Group", comment: ""),
+        guard fieldsController!.groups![indexPath.row].title != NSLocalizedString("Groupless Group", comment: ""),
               let fieldsController = self.fieldsController,
               let groups = fieldsController.groups else { return nil }
         

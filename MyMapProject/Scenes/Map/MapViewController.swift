@@ -836,6 +836,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, GMSMapView
     
     // MARK: - addButtonTapped
     @IBAction func addButtonTapped(_ sender: UIButton?) {
+        colorsCollectionView.isHidden = true
+        colorsCollectionView1.isHidden = true
         titleTextField.resignFirstResponder()
         groupTitleTextField.resignFirstResponder()
         var errorMessage = ""
@@ -1281,11 +1283,7 @@ extension MapViewController {
             case .line:
                 closestMarkers = viewModel.findClosestMarkers(newMarker: newMarker, markers: linesController.selectedLineMarkers)
                 if closestMarkers.0 == 0 {
-                    linesController.selectedLineMarkers.removeAll()
-                    linesController.selectedLineMarkers.append(newMarker)
-                    for marker in linesController.selectedLineMarkers {
-                        linesController.selectedLineMarkers.append(marker)
-                    }
+                    linesController.selectedLineMarkers.insert(newMarker, at: 0)
                     if viewModel.userDefaults.showDistancesBetweenTwoCorners {
                         linesController.arrangeSelectedLineLengthMarker(index: closestMarkers.0,
                                                                         inside: false,
@@ -1500,7 +1498,6 @@ extension MapViewController {
         if interstitial != nil && showAd && viewModel.userDefaults.accountType == K.Invites.AccountTypes.freeAccount {
             
             interstitial?.present(fromRootViewController: self)
-            
         } else {
             // print("Ad wasn't ready")
         }

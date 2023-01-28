@@ -142,7 +142,7 @@ class FieldsController {
             createGrouplessGroup()
         }
         
-        for group in groups where groupTitle == groupTitle {
+        for group in groups where groupTitle == group.title {
             if group.color != color {
                 do {
                     try realm.write({

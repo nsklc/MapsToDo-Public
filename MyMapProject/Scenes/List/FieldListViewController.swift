@@ -143,7 +143,7 @@ final class FieldListViewController: SwipeTableViewController, UITextFieldDelega
                             fieldsController.saveColor(field: field, color: newGroup.color)
                         }
                     } else {
-                        if groupTitle.isEmpty {
+                        if !groupTitle.isEmpty {
                             if let oldGroup = field.parentGroup.first,
                                 let polygon = self.fieldsController.polygons.first(where: {$0.title == field.id}) {
                                 let newGroup = Group()
